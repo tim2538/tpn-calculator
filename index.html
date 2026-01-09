@@ -7,1709 +7,1924 @@
       body {
         background-color: white; /* Ensure the iframe has a white background */
       }
-
-      [data-theme="dark"] {
-        --button-bg: #e8e6e3; /* สีขาวอมเทา */
-        --button-hover: #f5f5f5; /* สีขาวสว่างเมื่อ hover */
-        --button-text: #0f0f0f; /* ตัวอักษรดำ */
-      }
-
-      .results-header {
-        flex-wrap: nowrap; /* เปลี่ยนจาก wrap */
-      }
-
-      [data-theme="dark"] {
-        --bg-primary: #0f0f0f; /* เข้มมาก (เกือบดำ) */
-        --bg-secondary: #1f1f1f; /* เข้มขึ้น */
-        --bg-tertiary: #1a1a1a; /* เข้มขึ้น */
-      }
     </style>
   </head>
   <body>
     <!DOCTYPE html>
-    <html lang="th">
+    <html lang="en">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>TPN Calculator - เครื่องคำนวณโภชนบำบัดทางหลอดเลือด</title>
-        <!-- เพิ่ม Lucide Icons -->
-        <script src="https://unpkg.com/lucide@latest"></script>
         <style>
-          @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap");
-
-          :root {
-            --bg-primary: #f7f6f3;
-            --bg-secondary: white;
-            --bg-tertiary: #fafaf9;
-            --text-primary: #37352f;
-            --text-secondary: #787774;
-            --text-tertiary: #9b9a97;
-            --border-color: #e9e9e7;
-            --border-light: #f1f1ef;
-            --input-border: #e3e2e0;
-            --accent-color: #2383e2;
-            --accent-hover: #1a6dc7;
-            --button-bg: #37352f;
-            --button-hover: #2c2a26;
-            --button-text: white;
-            --reset-bg: #f0f0f0;
-            --reset-hover: #e3e2e0;
-            --formula-bg: #fafaf9;
-            --summary-bg: #f7f6f3;
-            --shadow: rgba(0, 0, 0, 0.06);
-            --shadow-lg: rgba(0, 0, 0, 0.1);
-          }
-
-          [data-theme="dark"] {
-            --bg-primary: #0f0f0f;
-            --bg-secondary: #1f1f1f;
-            --bg-tertiary: #1a1a1a;
-            --text-primary: #e8e6e3;
-            --text-secondary: #9b9a97;
-            --text-tertiary: #6e6d6a;
-            --border-color: #333333;
-            --border-light: #2a2a2a;
-            --input-border: #404040;
-            --accent-color: #3b9eff;
-            --accent-hover: #5db0ff;
-            --button-bg: #e8e6e3;
-            --button-hover: #f5f5f5;
-            --button-text: #0f0f0f;
-            --reset-bg: #2a2a2a;
-            --reset-hover: #333333;
-            --formula-bg: #262626;
-            --summary-bg: #1a1a1a;
-            --shadow: rgba(0, 0, 0, 0.4);
-            --shadow-lg: rgba(0, 0, 0, 0.6);
-          }
-
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-
           body {
-            font-family: "Sarabun", -apple-system, BlinkMacSystemFont,
-              "Segoe UI", sans-serif;
-            background: var(--bg-primary);
-            padding: 20px;
-            padding-bottom: 100px;
-            min-height: 100vh;
-            color: var(--text-primary);
-            font-size: 16px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-          }
-
-          .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px var(--shadow);
-            overflow: hidden;
-            transition: background-color 0.3s ease;
-          }
-
-          .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 30px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            transition: background-color 0.3s ease;
-          }
-
-          .header-content h1 {
-            font-size: 2.2em;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-          }
-
-          .header-content p {
-            color: var(--text-secondary);
-            font-size: 1.15em;
-            font-weight: 400;
-          }
-
-          .theme-toggle {
-            background: var(--reset-bg);
-            border: none;
-            border-radius: 6px;
-            padding: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-          }
-
-          .theme-toggle:hover {
-            background: var(--reset-hover);
-          }
-
-          .theme-toggle svg {
-            width: 24px;
-            height: 24px;
-            color: var(--text-primary);
-          }
-
-          .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 30px;
-          }
-
-          .section {
-            background: var(--bg-tertiary);
-            padding: 24px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            transition: background-color 0.3s ease;
-          }
-
-          .section h2 {
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-          }
-
-          .section h2 svg {
-            width: 24px;
-            height: 24px;
-          }
-
-          .form-group {
-            margin-bottom: 16px;
-          }
-
-          label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 1em;
-          }
-
-          input,
-          select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--input-border);
-            border-radius: 4px;
-            font-size: 1em;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: all 0.15s ease;
-            appearance: none;
-            font-family: "Sarabun", sans-serif;
-          }
-
-          select {
-            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2337352f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 36px;
-          }
-
-          [data-theme="dark"] select {
-            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23e8e6e3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-          }
-
-          input:focus,
-          select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
-            scroll-margin-bottom: 120px;
-          }
-
-          input:read-only {
-            background: var(--formula-bg);
-            color: var(--text-secondary);
-          }
-
-          .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-          }
-
-          /* ปุ่ม Fixed ด้านล่าง */
-          .fixed-bottom-btn {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-secondary);
-            padding: 16px 20px;
-            box-shadow: 0 -4px 20px var(--shadow-lg);
-            z-index: 1000;
-            border-top: 1px solid var(--border-color);
-            transition: background-color 0.3s ease;
-          }
-
-          .fixed-bottom-btn .container-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-          }
-
-          .btn {
-            background: var(--button-bg);
-            color: var(--button-text);
-            padding: 14px 32px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            font-weight: 600;
-            font-family: "Sarabun", sans-serif;
-            min-width: 160px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            line-height: 1;
-          }
-
-          .btn:hover {
-            background: var(--button-hover);
-            transform: translateY(-1px);
-          }
-
-          .btn:active {
-            transform: translateY(0);
-          }
-
-          .btn-reset {
-            background: var(--reset-bg);
-            color: var(--text-primary);
-            border: none;
-            padding: 10px 24px;
-            font-size: 1em;
-            min-width: 120px;
-          }
-
-          .btn-reset:hover {
-            background: var(--reset-hover);
-          }
-
-          .btn-icon {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2;
-            flex-shrink: 0;
-          }
-
-          .btn svg {
-            display: block;
-          }
-
-          .btn-reset .btn-text {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            line-height: 1;
-          }
-
-          .btn-reset .btn-icon-only {
-            display: none;
-          }
-
-          .results {
-            grid-column: 1 / -1;
-          }
-
-          .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-          }
-
-          .results-header h2 {
-            margin: 0;
-          }
-
-          .formula-toggle-main {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--reset-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 0.95em;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: all 0.15s ease;
-            font-weight: 500;
-          }
-
-          .formula-toggle-main:hover {
-            background: var(--reset-hover);
-          }
-
-          .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
-          }
-
-          .result-card {
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            position: relative;
-            transition: background-color 0.3s ease;
-          }
-
-          .result-card h3 {
-            color: var(--text-secondary);
-            font-size: 0.95em;
-            margin-bottom: 8px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-
-          .result-card .value {
-            font-size: 2.2em;
-            font-weight: 600;
-            color: var(--text-primary);
-          }
-
-          .result-card .unit {
-            color: var(--text-tertiary);
-            font-size: 1em;
-            margin-left: 4px;
-            font-weight: 400;
-          }
-
-          .formula-details {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-light);
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            display: none;
-          }
-
-          .formula-details.show {
-            display: block;
-          }
-
-          .formula-label {
-            color: var(--text-tertiary);
-            font-size: 0.9em;
-          }
-
-          .formula-calculation {
-            color: var(--text-primary);
-            font-family: "Courier New", monospace;
-            background: var(--formula-bg);
-            padding: 2px 6px;
-            border-radius: 3px;
-            display: inline-block;
-            margin-top: 2px;
-          }
-
-          .alert {
-            padding: 16px 20px;
-            border-radius: 6px;
-            margin-top: 16px;
-            font-weight: 500;
-            border-left: 3px solid;
-            font-size: 1.05em;
-            line-height: 1.6;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-          }
-
-          .alert svg {
-            flex-shrink: 0;
-            margin-top: 2px;
-          }
-
-          .alert-warning {
-            background: #fef3c7;
-            color: #92400e;
-            border-left-color: #f59e0b;
-          }
-
-          [data-theme="dark"] .alert-warning {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-          }
-
-          .alert-danger {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left-color: #ef4444;
-          }
-
-          [data-theme="dark"] .alert-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-          }
-
-          .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left-color: #10b981;
-          }
-
-          [data-theme="dark"] .alert-success {
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
-          }
-
-          .alert strong {
-            font-weight: 600;
-          }
-
-          .electrolyte-results {
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 6px;
-            margin-top: 16px;
-            border: 1px solid var(--border-color);
-            transition: background-color 0.3s ease;
-          }
-
-          .electrolyte-results h3 {
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            font-weight: 600;
-            font-size: 1.25em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-
-          .electrolyte-results h3 svg {
-            width: 20px;
-            height: 20px;
-          }
-
-          .electrolyte-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-light);
-          }
-
-          .electrolyte-item:last-child {
-            border-bottom: none;
-          }
-
-          .electrolyte-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-
-          .electrolyte-name {
-            font-weight: 500;
-            color: var(--text-primary);
-            font-size: 1.05em;
-          }
-
-          .electrolyte-value {
-            color: var(--accent-color);
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            font-size: 1.05em;
-          }
-
-          .electrolyte-formula {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid var(--formula-bg);
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            display: none;
-          }
-
-          .electrolyte-formula.show {
-            display: block;
-          }
-
-          .electrolyte-formula .formula-label {
-            color: var(--text-tertiary);
-            font-size: 0.9em;
-            margin-bottom: 4px;
-          }
-
-          .electrolyte-formula .formula-calculation {
-            color: var(--text-primary);
-            font-family: "Courier New", monospace;
-            background: var(--formula-bg);
-            padding: 2px 6px;
-            border-radius: 3px;
-            display: inline-block;
-          }
-
-          /* Summary box for totals */
-          .summary-box {
-            background: var(--summary-bg);
-            padding: 16px;
-            border-radius: 6px;
-            margin-top: 12px;
-            border-left: 3px solid var(--accent-color);
-          }
-
-          .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 1.05em;
-          }
-
-          .summary-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-          }
-
-          .summary-value {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-family: "Courier New", monospace;
-          }
-
-          @media (max-width: 768px) {
-            body {
-              padding: 10px;
-              padding-bottom: 90px;
-            }
-
-            .content {
-              grid-template-columns: 1fr;
-              padding: 20px;
-            }
-
-            .header {
-              padding: 20px;
-              gap: 16px;
-            }
-
-            .header-content h1 {
-              font-size: 1.8em;
-            }
-
-            .grid-2 {
-              grid-template-columns: 1fr;
-            }
-
-            .fixed-bottom-btn {
-              padding: 12px 16px;
-            }
-
-            .fixed-bottom-btn .container-inner {
-              flex-direction: row;
-              justify-content: space-between;
-            }
-
-            .btn {
-              flex: 1;
-              min-width: auto;
-            }
-
-            .btn-reset {
-              min-width: 48px;
-              width: 48px;
-              padding: 10px;
-              flex: 0 0 48px;
-            }
-
-            .btn-reset .btn-text {
-              display: none;
-            }
-
-            .btn-reset .btn-icon-only {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-
-            .btn-icon {
-              width: 24px;
-              height: 24px;
-            }
-
-            .results-header {
-              flex-wrap: nowrap;
-            }
-          }
-
-          .hidden {
-            display: none;
-          }
-
-          .method-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-          }
-
-          .method-btn {
-            flex: 1;
-            padding: 10px 16px;
-            border: 1px solid var(--input-border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            font-weight: 500;
-            font-size: 1em;
-            font-family: "Sarabun", sans-serif;
-          }
-
-          .method-btn:hover {
-            background: var(--formula-bg);
-          }
-
-          .method-btn.active {
-            background: var(--button-bg);
-            color: var(--button-text);
-            border-color: var(--button-bg);
-          }
-
-          ::placeholder {
-            color: var(--text-tertiary);
-            opacity: 0.7;
-          }
-
-          button:focus-visible,
-          input:focus-visible,
-          select:focus-visible {
-            outline: 2px solid var(--accent-color);
-            outline-offset: 2px;
+            background-color: white;
           }
         </style>
       </head>
       <body>
-        <div class="container">
-          <div class="header">
-            <div class="header-content">
-              <h1>
-                <i data-lucide="hospital"></i>
-                TPN Calculator
-              </h1>
-              <p>เครื่องคำนวณโภชนบำบัดทางหลอดเลือด (Parenteral Nutrition)</p>
-            </div>
-            <button
-              class="theme-toggle"
-              onclick="toggleTheme()"
-              aria-label="Toggle dark mode"
-            >
-              <i data-lucide="sun" id="theme-icon-sun"></i>
-              <i
-                data-lucide="moon"
-                id="theme-icon-moon"
-                style="display: none"
-              ></i>
-            </button>
-          </div>
+        <!DOCTYPE html>
+        <html lang="th">
+          <head>
+            <meta charset="UTF-8" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1.0"
+            />
+            <title>TPN Calculator - เครื่องคำนวณโภชนบำบัดทางหลอดเลือด</title>
+            <script src="https://unpkg.com/lucide@latest"></script>
+            <style>
+              @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap");
+              :root {
+                --bg-primary: #f7f6f3;
+                --bg-secondary: white;
+                --bg-tertiary: #fafaf9;
+                --text-primary: #37352f;
+                --text-secondary: #787774;
+                --text-tertiary: #9b9a97;
+                --border-color: #e9e9e7;
+                --border-light: #f1f1ef;
+                --input-border: #e3e2e0;
+                --accent-color: #2383e2;
+                --accent-hover: #1a6dc7;
+                --button-bg: #37352f;
+                --button-hover: #2c2a26;
+                --button-text: white;
+                --button-disabled: #c1c0bd;
+                --reset-bg: #f0f0f0;
+                --reset-hover: #e3e2e0;
+                --formula-bg: #fafaf9;
+                --summary-bg: #f7f6f3;
+                --shadow: rgba(0, 0, 0, 0.06);
+                --shadow-lg: rgba(0, 0, 0, 0.1);
+              }
+              [data-theme="dark"] {
+                --bg-primary: #0f0f0f;
+                --bg-secondary: #1f1f1f;
+                --bg-tertiary: #1a1a1a;
+                --text-primary: #e8e6e3;
+                --text-secondary: #9b9a97;
+                --text-tertiary: #6e6d6a;
+                --border-color: #333333;
+                --border-light: #2a2a2a;
+                --input-border: #404040;
+                --accent-color: #3b9eff;
+                --accent-hover: #5db0ff;
+                --button-bg: #e8e6e3;
+                --button-hover: #f5f5f5;
+                --button-text: #0f0f0f;
+                --button-disabled: #404040;
+                --reset-bg: #2a2a2a;
+                --reset-hover: #333333;
+                --formula-bg: #262626;
+                --summary-bg: #1a1a1a;
+                --shadow: rgba(0, 0, 0, 0.4);
+                --shadow-lg: rgba(0, 0, 0, 0.6);
+              }
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              body {
+                font-family: "Sarabun", -apple-system, BlinkMacSystemFont,
+                  "Segoe UI", sans-serif;
+                background: var(--bg-primary);
+                padding: 20px;
+                padding-bottom: 100px;
+                min-height: 100vh;
+                color: var(--text-primary);
+                font-size: 16px;
+                transition: background-color 0.3s ease, color 0.3s ease;
+              }
+              .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: var(--bg-secondary);
+                border-radius: 8px;
+                box-shadow: 0 1px 3px var(--shadow);
+                overflow: hidden;
+                transition: background-color 0.3s ease;
+              }
+              .header {
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
+                padding: 30px 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                transition: background-color 0.3s ease;
+              }
+              .header-content h1 {
+                font-size: 2.2em;
+                margin-bottom: 8px;
+                color: var(--text-primary);
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+              }
+              .header-content p {
+                color: var(--text-secondary);
+                font-size: 1.15em;
+                font-weight: 400;
+              }
+              .theme-toggle {
+                background: var(--reset-bg);
+                border: none;
+                border-radius: 6px;
+                padding: 10px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+              }
+              .theme-toggle:hover {
+                background: var(--reset-hover);
+              }
+              .theme-toggle svg {
+                width: 24px;
+                height: 24px;
+                color: var(--text-primary);
+              }
+              .content {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                padding: 30px;
+              }
+              .section {
+                background: var(--bg-tertiary);
+                padding: 24px;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                transition: background-color 0.3s ease;
+              }
+              .section h2 {
+                color: var(--text-primary);
+                margin-bottom: 20px;
+                font-size: 1.5em;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+              }
+              .section h2 svg {
+                width: 24px;
+                height: 24px;
+              }
+              .form-group {
+                margin-bottom: 16px;
+              }
+              label {
+                display: block;
+                margin-bottom: 6px;
+                color: var(--text-primary);
+                font-weight: 500;
+                font-size: 1em;
+              }
+              input,
+              select {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid var(--input-border);
+                border-radius: 4px;
+                font-size: 1em;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                transition: all 0.15s ease;
+                appearance: none;
+                font-family: "Sarabun", sans-serif;
+              }
+              select {
+                background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2337352f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                padding-right: 36px;
+              }
+              [data-theme="dark"] select {
+                background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23e8e6e3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+              }
+              input:focus,
+              select:focus {
+                outline: none;
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
+                scroll-margin-bottom: 120px;
+              }
+              input:read-only {
+                background: var(--formula-bg);
+                color: var(--text-secondary);
+              }
 
-          <div class="content">
-            <!-- Patient Information -->
-            <div class="section">
-              <h2>
-                <i data-lucide="clipboard-list"></i>
-                ข้อมูลผู้ป่วย
-              </h2>
-              <div class="form-group">
-                <label>ID Number</label>
-                <input
-                  type="text"
-                  id="patientId"
-                  placeholder="รหัสผู้ป่วย"
-                  enterkeyhint="next"
-                />
-              </div>
-              <div class="form-group">
-                <label>ชื่อ-สกุล</label>
-                <input
-                  type="text"
-                  id="patientName"
-                  placeholder="ชื่อผู้ป่วย"
-                  enterkeyhint="next"
-                />
-              </div>
-              <div class="grid-2">
-                <div class="form-group">
-                  <label>น้ำหนัก (kg)</label>
-                  <input
-                    type="number"
-                    id="weight"
-                    placeholder="60"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
+              @keyframes shake {
+                0%,
+                100% {
+                  transform: translateX(0);
+                }
+                25% {
+                  transform: translateX(-5px);
+                }
+                75% {
+                  transform: translateX(5px);
+                }
+              }
+
+              .input-error {
+                border-color: #ef4444 !important;
+                animation: shake 0.3s ease;
+              }
+
+              .grid-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+              }
+              .fixed-bottom-btn {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--bg-secondary);
+                padding: 16px 20px;
+                box-shadow: 0 -4px 20px var(--shadow-lg);
+                z-index: 1000;
+                border-top: 1px solid var(--border-color);
+                transition: background-color 0.3s ease;
+              }
+              .fixed-bottom-btn .container-inner {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                gap: 12px;
+                justify-content: flex-end;
+              }
+              .btn {
+                background: var(--button-bg);
+                color: var(--button-text);
+                padding: 14px 32px;
+                border: none;
+                border-radius: 6px;
+                font-size: 1.1em;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                font-weight: 600;
+                font-family: "Sarabun", sans-serif;
+                min-width: 160px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                line-height: 1;
+              }
+              .btn:hover {
+                background: var(--button-hover);
+                transform: translateY(-1px);
+              }
+              .btn:active {
+                transform: translateY(0);
+              }
+              .btn-reset {
+                background: var(--reset-bg);
+                color: var(--text-primary);
+                border: none;
+                padding: 10px 24px;
+                font-size: 1em;
+                min-width: 120px;
+              }
+              .btn-reset:hover {
+                background: var(--reset-hover);
+              }
+              .btn-icon {
+                width: 20px;
+                height: 20px;
+                stroke-width: 2;
+                flex-shrink: 0;
+              }
+              .btn svg {
+                display: block;
+              }
+              .btn-reset .btn-text {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                line-height: 1;
+              }
+              .btn-reset .btn-icon-only {
+                display: none;
+              }
+              .results {
+                grid-column: 1 / -1;
+              }
+              .results-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                flex-wrap: nowrap;
+                gap: 12px;
+              }
+              .results-header h2 {
+                margin: 0;
+              }
+              .formula-toggle-main {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: var(--reset-bg);
+                border: none;
+                border-radius: 6px;
+                padding: 8px 16px;
+                font-size: 0.95em;
+                cursor: pointer;
+                color: var(--text-primary);
+                transition: all 0.15s ease;
+                font-weight: 500;
+              }
+              .formula-toggle-main:hover {
+                background: var(--reset-hover);
+              }
+              .result-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 16px;
+                margin-top: 20px;
+              }
+              .result-card {
+                background: var(--bg-secondary);
+                padding: 20px;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                position: relative;
+                transition: background-color 0.3s ease;
+              }
+              .result-card h3 {
+                color: var(--text-secondary);
+                font-size: 0.95em;
+                margin-bottom: 8px;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+              .result-card .value {
+                font-size: 2.2em;
+                font-weight: 600;
+                color: var(--text-primary);
+              }
+              .result-card .unit {
+                color: var(--text-tertiary);
+                font-size: 1em;
+                margin-left: 4px;
+                font-weight: 400;
+              }
+              .formula-details {
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid var(--border-light);
+                font-size: 0.85em;
+                color: var(--text-secondary);
+                line-height: 1.6;
+                display: none;
+              }
+              .formula-details.show {
+                display: block;
+              }
+              .formula-label {
+                color: var(--text-tertiary);
+                font-size: 0.9em;
+              }
+              .formula-calculation {
+                color: var(--text-primary);
+                font-family: "Courier New", monospace;
+                background: var(--formula-bg);
+                padding: 2px 6px;
+                border-radius: 3px;
+                display: inline-block;
+                margin-top: 2px;
+              }
+              .alert {
+                padding: 16px 20px;
+                border-radius: 6px;
+                margin-top: 16px;
+                font-weight: 500;
+                border-left: 3px solid;
+                font-size: 1.05em;
+                line-height: 1.6;
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+              }
+              .alert svg {
+                flex-shrink: 0;
+                margin-top: 2px;
+              }
+              .alert-warning {
+                background: #fef3c7;
+                color: #92400e;
+                border-left-color: #f59e0b;
+              }
+              [data-theme="dark"] .alert-warning {
+                background: rgba(245, 158, 11, 0.15);
+                color: #fbbf24;
+              }
+              .alert-danger {
+                background: #fee2e2;
+                color: #991b1b;
+                border-left-color: #ef4444;
+              }
+              [data-theme="dark"] .alert-danger {
+                background: rgba(239, 68, 68, 0.15);
+                color: #fca5a5;
+              }
+              .alert-success {
+                background: #d1fae5;
+                color: #065f46;
+                border-left-color: #10b981;
+              }
+              [data-theme="dark"] .alert-success {
+                background: rgba(16, 185, 129, 0.15);
+                color: #6ee7b7;
+              }
+              .alert strong {
+                font-weight: 600;
+              }
+              .electrolyte-results {
+                background: var(--bg-secondary);
+                padding: 20px;
+                border-radius: 6px;
+                margin-top: 16px;
+                border: 1px solid var(--border-color);
+                transition: background-color 0.3s ease;
+              }
+              .electrolyte-results h3 {
+                color: var(--text-primary);
+                margin-bottom: 16px;
+                font-weight: 600;
+                font-size: 1.25em;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              }
+              .electrolyte-results h3 svg {
+                width: 20px;
+                height: 20px;
+              }
+
+              .comparison-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-top: 16px;
+                align-items: start;
+              }
+              .comparison-section {
+                background: var(--bg-tertiary);
+                padding: 16px;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+              }
+              .comparison-section h4 {
+                color: var(--text-primary);
+                font-size: 1.1em;
+                font-weight: 600;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid var(--accent-color);
+              }
+              .comparison-section > div:first-of-type {
+                flex-grow: 1;
+              }
+              .electrolyte-item {
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border-light);
+              }
+              .electrolyte-item:last-child {
+                border-bottom: none;
+              }
+              .electrolyte-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+              .electrolyte-name {
+                font-weight: 500;
+                color: var(--text-primary);
+                font-size: 1.05em;
+              }
+              .electrolyte-value {
+                color: var(--accent-color);
+                font-weight: 600;
+                font-variant-numeric: tabular-nums;
+                font-size: 1.05em;
+              }
+              .electrolyte-formula {
+                padding-top: 8px;
+                font-size: 0.85em;
+                color: var(--text-secondary);
+                display: none;
+              }
+              .electrolyte-formula.show {
+                display: block;
+              }
+              .electrolyte-formula .formula-label {
+                color: var(--text-tertiary);
+                font-size: 0.9em;
+                margin-bottom: 4px;
+              }
+              .electrolyte-formula .formula-calculation {
+                color: var(--text-primary);
+                font-family: "Courier New", monospace;
+                background: var(--formula-bg);
+                padding: 2px 6px;
+                border-radius: 3px;
+                display: inline-block;
+              }
+              .summary-box {
+                background: var(--summary-bg);
+                padding: 16px;
+                border-radius: 6px;
+                margin-top: auto;
+                border-left: 3px solid var(--accent-color);
+              }
+              .summary-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                font-size: 1.05em;
+              }
+              .summary-label {
+                color: var(--text-secondary);
+                font-weight: 500;
+              }
+              .summary-value {
+                color: var(--text-primary);
+                font-weight: 600;
+                font-family: "Courier New", monospace;
+              }
+
+              .summary-main-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-top: 16px;
+              }
+
+              .summary-card {
+                background: var(--bg-tertiary);
+                padding: 20px;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                transition: background-color 0.3s ease;
+              }
+
+              .summary-card h4 {
+                color: var(--text-primary);
+                font-size: 1.15em;
+                font-weight: 600;
+                margin-bottom: 8px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid var(--accent-color);
+              }
+
+              .summary-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid var(--border-light);
+                font-size: 1.05em;
+              }
+
+              .summary-row:last-of-type {
+                border-bottom: none;
+              }
+
+              .summary-row-label {
+                color: var(--text-secondary);
+                font-weight: 500;
+              }
+
+              .summary-row-value {
+                color: var(--text-primary);
+                font-weight: 600;
+                font-family: "Courier New", monospace;
+              }
+
+              .summary-total-box {
+                background: var(--summary-bg);
+                padding: 14px 16px;
+                border-radius: 6px;
+                border-left: 3px solid var(--accent-color);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+
+              .summary-total-label {
+                color: var(--text-secondary);
+                font-weight: 600;
+                font-size: 1.05em;
+              }
+
+              .summary-total-value {
+                color: var(--accent-color);
+                font-weight: 700;
+                font-size: 1.15em;
+                font-family: "Courier New", monospace;
+              }
+
+              .summary-lipid-card {
+                grid-column: 1 / -1;
+              }
+
+              @media (max-width: 768px) {
+                body {
+                  padding: 10px;
+                  padding-bottom: 90px;
+                }
+                .content {
+                  grid-template-columns: 1fr;
+                  padding: 20px;
+                }
+                .header {
+                  padding: 20px 20px;
+                  gap: 16px;
+                }
+                .header-content h1 {
+                  font-size: 1.8em;
+                }
+                .grid-2 {
+                  grid-template-columns: 1fr;
+                  gap: 0;
+                }
+                .comparison-grid {
+                  grid-template-columns: 1fr;
+                }
+                .summary-main-grid {
+                  grid-template-columns: 1fr;
+                }
+                .fixed-bottom-btn {
+                  padding: 12px 16px;
+                }
+                .fixed-bottom-btn .container-inner {
+                  flex-direction: row;
+                  justify-content: space-between;
+                }
+                .btn {
+                  flex: 1;
+                  min-width: auto;
+                }
+                .btn-reset {
+                  min-width: 48px !important;
+                  width: 48px;
+                  padding: 10px;
+                  flex: 0 0 48px;
+                }
+                .btn-reset .btn-text {
+                  display: none;
+                }
+                .btn-reset .btn-icon-only {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .btn-icon {
+                  width: 24px;
+                  height: 24px;
+                }
+                .results-header {
+                  flex-wrap: nowrap;
+                }
+              }
+              .hidden {
+                display: none;
+              }
+              ::placeholder {
+                color: var(--text-tertiary);
+                opacity: 0.7;
+              }
+              button:focus-visible,
+              input:focus-visible,
+              select:focus-visible {
+                outline: 2px solid var(--accent-color);
+                outline-offset: 2px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <div class="header-content">
+                  <h1>
+                    <i data-lucide="hospital"></i>
+                    TPN Calculator
+                  </h1>
+                  <p>
+                    เครื่องคำนวณโภชนบำบัดทางหลอดเลือด (Parenteral Nutrition)
+                  </p>
                 </div>
-                <div class="form-group">
-                  <label>ส่วนสูง (cm)</label>
-                  <input
-                    type="number"
-                    id="height"
-                    placeholder="170"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>BMI (kg/m²)</label>
-                <input type="text" id="bmi" readonly />
-              </div>
-              <div class="form-group">
-                <label>สถานะทางคลินิก</label>
-                <select id="clinicalStatus" enterkeyhint="next">
-                  <option value="stable">Stable</option>
-                  <option value="critical">Critical</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Venous Access</label>
-                <select id="venousAccess" enterkeyhint="next">
-                  <option value="central">Central Line</option>
-                  <option value="peripheral">Peripheral Line</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Macronutrients -->
-            <div class="section">
-              <h2>
-                <i data-lucide="apple"></i>
-                Macronutrients
-              </h2>
-              <div class="form-group">
-                <label>Protein (g)</label>
-                <input
-                  type="number"
-                  id="protein"
-                  placeholder="50"
-                  step="0.1"
-                  inputmode="decimal"
-                  enterkeyhint="next"
-                />
-              </div>
-              <div class="form-group">
-                <label>Protein Product</label>
-                <select id="proteinProduct" enterkeyhint="next">
-                  <option value="amiparen">10% Amiparen</option>
-                  <option value="aminoplasmal">15% Aminoplasmal</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Dextrose (g)</label>
-                <input
-                  type="number"
-                  id="dextrose"
-                  placeholder="250"
-                  step="0.1"
-                  inputmode="decimal"
-                  enterkeyhint="next"
-                />
-              </div>
-              <div class="form-group">
-                <label>Lipid/IVLE (g)</label>
-                <input
-                  type="number"
-                  id="lipid"
-                  placeholder="50"
-                  step="0.1"
-                  inputmode="decimal"
-                  enterkeyhint="next"
-                />
-              </div>
-              <div class="form-group">
-                <label>Drip IVLE in (Hours)</label>
-                <input
-                  type="number"
-                  id="ivleHours"
-                  placeholder="12"
-                  step="0.1"
-                  inputmode="decimal"
-                  enterkeyhint="next"
-                />
-              </div>
-              <div class="form-group">
-                <label>Infusion Duration (Hours)</label>
-                <input
-                  type="number"
-                  id="infusionDuration"
-                  placeholder="24"
-                  step="0.1"
-                  inputmode="decimal"
-                  enterkeyhint="next"
-                />
-              </div>
-            </div>
-
-            <!-- Electrolytes -->
-            <div class="section">
-              <h2>
-                <i data-lucide="zap"></i>
-                Electrolytes
-              </h2>
-              <div class="method-selector">
                 <button
-                  class="method-btn active"
-                  onclick="selectMethod('k2hpo4')"
+                  class="theme-toggle"
+                  onclick="toggleTheme()"
+                  aria-label="Toggle dark mode"
                 >
-                  K₂HPO₄ First
-                </button>
-                <button class="method-btn" onclick="selectMethod('nacl')">
-                  NaCl First
-                </button>
-              </div>
-              <div class="grid-2">
-                <div class="form-group">
-                  <label>Na (mEq)</label>
-                  <input
-                    type="number"
-                    id="na"
-                    placeholder="100"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>K (mEq)</label>
-                  <input
-                    type="number"
-                    id="k"
-                    placeholder="60"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>Cl (mEq)</label>
-                  <input
-                    type="number"
-                    id="cl"
-                    placeholder="100"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>Ca (mEq)</label>
-                  <input
-                    type="number"
-                    id="ca"
-                    placeholder="5"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>Mg (mEq)</label>
-                  <input
-                    type="number"
-                    id="mg"
-                    placeholder="8"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="next"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>PO₄ (mmol)</label>
-                  <input
-                    type="number"
-                    id="po4"
-                    placeholder="10"
-                    step="0.1"
-                    inputmode="decimal"
-                    enterkeyhint="done"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- Results -->
-            <div class="section results hidden" id="resultsSection">
-              <div class="results-header">
-                <h2>
-                  <i data-lucide="bar-chart-3"></i>
-                  ผลการคำนวณ
-                </h2>
-                <button
-                  class="formula-toggle-main"
-                  onclick="toggleAllFormulas()"
-                >
+                  <i data-lucide="sun" id="theme-icon-sun"></i>
                   <i
-                    data-lucide="square-function"
-                    style="width: 18px; height: 18px"
+                    data-lucide="moon"
+                    id="theme-icon-moon"
+                    style="display: none"
                   ></i>
-                  <span id="toggleAllText">แสดงสูตร</span>
                 </button>
               </div>
-
-              <div class="result-grid">
-                <div class="result-card">
-                  <h3>Total Volume I</h3>
-                  <div class="value" id="totalVolume1">-</div>
-                  <span class="unit">mL (ไม่รวม IVLE)</span>
-                  <div class="formula-details" id="formula-volume1"></div>
-                </div>
-                <div class="result-card">
-                  <h3>Total Volume II</h3>
-                  <div class="value" id="totalVolume2">-</div>
-                  <span class="unit">mL (รวม IVLE)</span>
-                  <div class="formula-details" id="formula-volume2"></div>
-                </div>
-                <div class="result-card">
-                  <h3>Osmolarity</h3>
-                  <div class="value" id="osmolarity">-</div>
-                  <span class="unit">mOsm/L</span>
-                  <div class="formula-details" id="formula-osmolarity"></div>
-                </div>
-                <div class="result-card">
-                  <h3>GIR</h3>
-                  <div class="value" id="gir">-</div>
-                  <span class="unit">mg/kg/min</span>
-                  <div class="formula-details" id="formula-gir"></div>
-                </div>
-                <div class="result-card">
-                  <h3>Total Calories</h3>
-                  <div class="value" id="totalCalories">-</div>
-                  <span class="unit">kcal</span>
-                  <div class="formula-details" id="formula-calories"></div>
-                </div>
-                <div class="result-card">
-                  <h3>Flow Rate</h3>
-                  <div class="value" id="flowRate">-</div>
-                  <span class="unit">mL/hr</span>
-                  <div class="formula-details" id="formula-flowrate"></div>
-                </div>
-              </div>
-
-              <div id="alerts"></div>
-
-              <div class="electrolyte-results">
-                <h3>
-                  <i data-lucide="droplet"></i>
-                  Electrolyte Solutions (ml)
-                </h3>
-                <div id="electrolyteSolutions"></div>
-                <div class="summary-box">
-                  <div class="summary-item">
-                    <span class="summary-label"
-                      >รวม Electrolyte Solutions:</span
+              <div class="content">
+                <!-- Patient Information -->
+                <div class="section">
+                  <h2>
+                    <i data-lucide="clipboard-list"></i>
+                    ข้อมูลผู้ป่วย
+                  </h2>
+                  <div class="form-group">
+                    <label
+                      >ID Number
+                      <span style="color: var(--text-tertiary)"
+                        >(ไม่บังคับ)</span
+                      ></label
                     >
-                    <span class="summary-value" id="totalElectrolyte"
-                      >- mL</span
+                    <input
+                      type="text"
+                      id="patientId"
+                      placeholder="รหัสผู้ป่วย"
+                      enterkeyhint="next"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label
+                      >ชื่อ-สกุล
+                      <span style="color: var(--text-tertiary)"
+                        >(ไม่บังคับ)</span
+                      ></label
                     >
+                    <input
+                      type="text"
+                      id="patientName"
+                      placeholder="ชื่อผู้ป่วย"
+                      enterkeyhint="next"
+                    />
+                  </div>
+                  <div class="grid-2">
+                    <div class="form-group">
+                      <label>น้ำหนัก (kg)</label>
+                      <input
+                        type="number"
+                        id="weight"
+                        placeholder="60"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>ส่วนสูง (cm)</label>
+                      <input
+                        type="number"
+                        id="height"
+                        placeholder="170"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>BMI (kg/m²)</label>
+                    <input type="text" id="bmi" disabled />
+                  </div>
+                  <div class="form-group">
+                    <label>Clinical Status</label>
+                    <select
+                      id="clinicalStatus"
+                      enterkeyhint="next"
+                      class="required-field"
+                    >
+                      <option value="">-- เลือก --</option>
+                      <option value="stable">Stable</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Venous Access</label>
+                    <select
+                      id="venousAccess"
+                      enterkeyhint="next"
+                      class="required-field"
+                    >
+                      <option value="">-- เลือก --</option>
+                      <option value="central">Central Line</option>
+                      <option value="peripheral">Peripheral Line</option>
+                    </select>
                   </div>
                 </div>
-              </div>
+                <!-- Macronutrients -->
+                <div class="section">
+                  <h2>
+                    <i data-lucide="apple"></i>
+                    Macronutrients
+                  </h2>
+                  <div class="form-group">
+                    <label>Protein (g)</label>
+                    <input
+                      type="number"
+                      id="protein"
+                      placeholder="50"
+                      step="0.1"
+                      inputmode="decimal"
+                      enterkeyhint="next"
+                      class="required-field"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Protein Product</label>
+                    <select
+                      id="proteinProduct"
+                      enterkeyhint="next"
+                      class="required-field"
+                    >
+                      <option value="">-- เลือก --</option>
+                      <option value="amiparen">10% Amiparen</option>
+                      <option value="aminoplasmal">15% Aminoplasmal</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Dextrose (g)</label>
+                    <input
+                      type="number"
+                      id="dextrose"
+                      placeholder="250"
+                      step="0.1"
+                      inputmode="decimal"
+                      enterkeyhint="next"
+                      class="required-field"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Infusion Duration (hours)</label>
+                    <input
+                      type="number"
+                      id="infusionDuration"
+                      placeholder="24"
+                      step="0.1"
+                      inputmode="decimal"
+                      enterkeyhint="next"
+                      class="required-field"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Lipid/IVLE (g)</label>
+                    <input
+                      type="number"
+                      id="lipid"
+                      placeholder="50"
+                      step="0.1"
+                      inputmode="decimal"
+                      enterkeyhint="next"
+                      class="required-field"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Drip IVLE in (hours)</label>
+                    <input
+                      type="number"
+                      id="ivleHours"
+                      placeholder="12"
+                      step="0.1"
+                      inputmode="decimal"
+                      enterkeyhint="next"
+                      class="required-field"
+                    />
+                  </div>
+                </div>
+                <!-- Electrolytes -->
+                <div class="section">
+                  <h2>
+                    <i data-lucide="zap"></i>
+                    Electrolytes
+                  </h2>
+                  <div class="grid-2">
+                    <div class="form-group">
+                      <label>Na (mEq)</label>
+                      <input
+                        type="number"
+                        id="na"
+                        placeholder="100"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>K (mEq)</label>
+                      <input
+                        type="number"
+                        id="k"
+                        placeholder="60"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Cl (mEq)</label>
+                      <input
+                        type="number"
+                        id="cl"
+                        placeholder="100"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Ca (mEq)</label>
+                      <input
+                        type="number"
+                        id="ca"
+                        placeholder="5"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Mg (mEq)</label>
+                      <input
+                        type="number"
+                        id="mg"
+                        placeholder="8"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="next"
+                        class="required-field"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>PO₄ (mmol)</label>
+                      <input
+                        type="number"
+                        id="po4"
+                        placeholder="10"
+                        step="0.1"
+                        inputmode="decimal"
+                        enterkeyhint="done"
+                        class="required-field"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <!-- Results -->
+                <div class="section results hidden" id="resultsSection">
+                  <div class="results-header">
+                    <h2>
+                      <i data-lucide="bar-chart-3"></i>
+                      ผลการคำนวณ
+                    </h2>
+                    <button
+                      class="formula-toggle-main"
+                      onclick="toggleAllFormulas()"
+                    >
+                      <i
+                        data-lucide="square-function"
+                        style="width: 18px; height: 18px"
+                      ></i>
+                      <span id="toggleAllText">แสดงสูตร</span>
+                    </button>
+                  </div>
+                  <div class="result-grid">
+                    <div class="result-card">
+                      <h3>Total Volume I</h3>
+                      <div class="value" id="totalVolume1">-</div>
+                      <span class="unit">mL (ไม่รวม IVLE)</span>
+                      <div class="formula-details" id="formula-volume1"></div>
+                    </div>
+                    <div class="result-card">
+                      <h3>Total Volume II</h3>
+                      <div class="value" id="totalVolume2">-</div>
+                      <span class="unit">mL (ไม่รวม IVLE)</span>
+                      <div class="formula-details" id="formula-volume2"></div>
+                    </div>
+                    <div class="result-card">
+                      <h3>Osmolarity</h3>
+                      <div class="value" id="osmolarity">-</div>
+                      <span class="unit">mOsm/L</span>
+                      <div
+                        class="formula-details"
+                        id="formula-osmolarity"
+                      ></div>
+                    </div>
+                    <div class="result-card">
+                      <h3>GIR</h3>
+                      <div class="value" id="gir">-</div>
+                      <span class="unit">mg/kg/min</span>
+                      <div class="formula-details" id="formula-gir"></div>
+                    </div>
+                    <div class="result-card">
+                      <h3>Total Calories</h3>
+                      <div class="value" id="totalCalories">-</div>
+                      <span class="unit">kcal</span>
+                      <div class="formula-details" id="formula-calories"></div>
+                    </div>
+                    <div class="result-card">
+                      <h3>Flow Rate</h3>
+                      <div class="value" id="flowRate">-</div>
+                      <span class="unit">mL/hr</span>
+                      <div class="formula-details" id="formula-flowrate"></div>
+                    </div>
+                  </div>
+                  <div id="alerts"></div>
 
-              <div class="electrolyte-results">
-                <h3>
-                  <i data-lucide="flask-conical"></i>
-                  Macronutrient Solutions (ml)
-                </h3>
-                <div id="macronutrientSolutions"></div>
-                <div class="summary-box">
-                  <div class="summary-item">
-                    <span class="summary-label">รวม Protein Solution:</span>
-                    <span class="summary-value" id="totalProtein">- mL</span>
+                  <!-- เปรียบเทียบ 2 วิธี -->
+                  <div class="electrolyte-results">
+                    <h3>
+                      <i data-lucide="droplet"></i>
+                      Electrolyte Solutions - เปรียบเทียบ 2 วิธี
+                    </h3>
+                    <div class="comparison-grid">
+                      <div class="comparison-section">
+                        <h4>K₂HPO₄ First Method</h4>
+                        <div id="electrolyteSolutions1"></div>
+                        <div class="summary-box">
+                          <div class="summary-item">
+                            <span class="summary-label">รวม:</span>
+                            <span class="summary-value" id="totalElectrolyte1"
+                              >- mL</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                      <div class="comparison-section">
+                        <h4>NaCl First Method</h4>
+                        <div id="electrolyteSolutions2"></div>
+                        <div class="summary-box">
+                          <div class="summary-item">
+                            <span class="summary-label">รวม:</span>
+                            <span class="summary-value" id="totalElectrolyte2"
+                              >- mL</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="summary-item">
-                    <span class="summary-label">รวม Dextrose Solution:</span>
-                    <span class="summary-value" id="totalDextrose">- mL</span>
+
+                  <!-- Macronutrient Solutions -->
+                  <div class="electrolyte-results">
+                    <h3>
+                      <i data-lucide="flask-conical"></i>
+                      Macronutrient Solutions (ml)
+                    </h3>
+                    <div id="macronutrientSolutions"></div>
                   </div>
-                  <div class="summary-item">
-                    <span class="summary-label">รวม Lipid Solution:</span>
-                    <span class="summary-value" id="totalLipid">- mL</span>
-                  </div>
-                  <div
-                    class="summary-item"
-                    style="
-                      border-top: 2px solid var(--input-border);
-                      margin-top: 8px;
-                      padding-top: 12px;
-                      font-size: 1.1em;
-                    "
-                  >
-                    <span class="summary-label" style="font-weight: 600"
-                      >รวมทั้งหมด (Volume I):</span
-                    >
-                    <span
-                      class="summary-value"
-                      style="color: var(--accent-color); font-size: 1.1em"
-                      id="grandTotal"
-                      >- mL</span
-                    >
+
+                  <!-- Summary ใหม่ -->
+                  <div class="electrolyte-results">
+                    <h3>
+                      <i data-lucide="clipboard-check"></i>
+                      Summary
+                    </h3>
+                    <div class="summary-main-grid">
+                      <!-- กล่องบนซ้าย: Volume I -->
+                      <div class="summary-card">
+                        <h4>Volume I (ไม่รวม Lipid)</h4>
+                        <div>
+                          <div class="summary-row">
+                            <span class="summary-row-label"
+                              >รวม Protein Solution:</span
+                            >
+                            <span class="summary-row-value" id="summaryProtein"
+                              >- mL</span
+                            >
+                          </div>
+                          <div class="summary-row">
+                            <span class="summary-row-label"
+                              >รวม Dextrose Solution:</span
+                            >
+                            <span class="summary-row-value" id="summaryDextrose"
+                              >- mL</span
+                            >
+                          </div>
+                          <div class="summary-row">
+                            <span class="summary-row-label"
+                              >รวม K₂HPO₄ First Method:</span
+                            >
+                            <span class="summary-row-value" id="summaryK2"
+                              >- mL</span
+                            >
+                          </div>
+                        </div>
+                        <div class="summary-total-box">
+                          <span class="summary-total-label">รวม:</span>
+                          <span class="summary-total-value" id="summaryVolI"
+                            >- mL</span
+                          >
+                        </div>
+                      </div>
+
+                      <!-- กล่องบนขวา: Volume II -->
+                      <div class="summary-card">
+                        <h4>Volume II (ไม่รวม Lipid)</h4>
+                        <div>
+                          <div class="summary-row">
+                            <span class="summary-row-label"
+                              >รวม Protein Solution:</span
+                            >
+                            <span class="summary-row-value" id="summaryProtein2"
+                              >- mL</span
+                            >
+                          </div>
+                          <div class="summary-row">
+                            <span class="summary-row-label"
+                              >รวม Dextrose Solution:</span
+                            >
+                            <span
+                              class="summary-row-value"
+                              id="summaryDextrose2"
+                              >- mL</span
+                            >
+                          </div>
+                          <div class="summary-row">
+                            <span class="summary-row-label"
+                              >รวม NaCl First Method:</span
+                            >
+                            <span class="summary-row-value" id="summaryNaCl"
+                              >- mL</span
+                            >
+                          </div>
+                        </div>
+                        <div class="summary-total-box">
+                          <span class="summary-total-label">รวม:</span>
+                          <span class="summary-total-value" id="summaryVolII"
+                            >- mL</span
+                          >
+                        </div>
+                      </div>
+
+                      <!-- กล่องล่าง: Lipid Solution -->
+                      <div class="summary-card summary-lipid-card">
+                        <h4>Lipid Solution</h4>
+                        <div class="summary-row">
+                          <span class="summary-row-label"
+                            >รวม Lipid Solution:</span
+                          >
+                          <span class="summary-row-value" id="summaryLipid"
+                            >- mL</span
+                          >
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Fixed Bottom Button -->
-        <div class="fixed-bottom-btn">
-          <div class="container-inner">
-            <button class="btn btn-reset" onclick="resetForm()">
-              <i data-lucide="rotate-ccw" class="btn-icon btn-icon-only"></i>
-              <span class="btn-text">
-                <i data-lucide="rotate-ccw" class="btn-icon"></i>
-                รีเซ็ต
-              </span>
-            </button>
-            <button class="btn" onclick="calculate()">
-              <i data-lucide="calculator" class="btn-icon"></i>
-              คำนวณ TPN
-            </button>
-          </div>
-        </div>
+            <!-- Fixed Bottom Button -->
+            <div class="fixed-bottom-btn">
+              <div class="container-inner">
+                <button class="btn btn-reset" onclick="resetForm()">
+                  <i
+                    data-lucide="rotate-ccw"
+                    class="btn-icon btn-icon-only"
+                  ></i>
+                  <span class="btn-text">
+                    <i data-lucide="rotate-ccw" class="btn-icon"></i>
+                    รีเซ็ต
+                  </span>
+                </button>
+                <button
+                  class="btn"
+                  id="calculateBtn"
+                  onclick="handleCalculate()"
+                >
+                  <i data-lucide="calculator" class="btn-icon"></i>
+                  คำนวณ TPN
+                </button>
+              </div>
+            </div>
 
-        <script>
-          // Initialize Lucide icons
-          lucide.createIcons();
+            <script>
+              lucide.createIcons();
+              let allFormulasVisible = false;
 
-          let calculationMethod = "k2hpo4";
-          let allFormulasVisible = false;
-
-          // Dark mode toggle
-          function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-            html.setAttribute("data-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-
-            const sunIcon = document.getElementById("theme-icon-sun");
-            const moonIcon = document.getElementById("theme-icon-moon");
-
-            if (newTheme === "dark") {
-              sunIcon.style.display = "none";
-              moonIcon.style.display = "block";
-            } else {
-              sunIcon.style.display = "block";
-              moonIcon.style.display = "none";
-            }
-
-            lucide.createIcons();
-          }
-
-          // Load saved theme on page load
-          document.addEventListener("DOMContentLoaded", function () {
-            const savedTheme = localStorage.getItem("theme") || "light";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-
-            const sunIcon = document.getElementById("theme-icon-sun");
-            const moonIcon = document.getElementById("theme-icon-moon");
-
-            if (savedTheme === "dark") {
-              sunIcon.style.display = "none";
-              moonIcon.style.display = "block";
-            }
-
-            lucide.createIcons();
-          });
-
-          // Auto-calculate BMI
-          document
-            .getElementById("weight")
-            .addEventListener("input", calculateBMI);
-          document
-            .getElementById("height")
-            .addEventListener("input", calculateBMI);
-
-          function calculateBMI() {
-            const weight = parseFloat(document.getElementById("weight").value);
-            const height = parseFloat(document.getElementById("height").value);
-            if (weight && height) {
-              const bmi = weight / Math.pow(height / 100, 2);
-              document.getElementById("bmi").value = bmi.toFixed(2);
-            }
-          }
-
-          function selectMethod(method) {
-            calculationMethod = method;
-            document.querySelectorAll(".method-btn").forEach((btn) => {
-              btn.classList.remove("active");
-            });
-            event.target.classList.add("active");
-          }
-
-          function toggleAllFormulas() {
-            allFormulasVisible = !allFormulasVisible;
-            const text = document.getElementById("toggleAllText");
-
-            document.querySelectorAll(".formula-details").forEach((f) => {
-              if (allFormulasVisible) {
-                f.classList.add("show");
-              } else {
-                f.classList.remove("show");
+              function toggleTheme() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute("data-theme");
+                const newTheme = currentTheme === "dark" ? "light" : "dark";
+                html.setAttribute("data-theme", newTheme);
+                localStorage.setItem("theme", newTheme);
+                const sunIcon = document.getElementById("theme-icon-sun");
+                const moonIcon = document.getElementById("theme-icon-moon");
+                if (newTheme === "dark") {
+                  sunIcon.style.display = "none";
+                  moonIcon.style.display = "block";
+                } else {
+                  sunIcon.style.display = "block";
+                  moonIcon.style.display = "none";
+                }
+                lucide.createIcons();
               }
-            });
 
-            document.querySelectorAll(".electrolyte-formula").forEach((f) => {
-              if (allFormulasVisible) {
-                f.classList.add("show");
-              } else {
-                f.classList.remove("show");
-              }
-            });
+              document.addEventListener("DOMContentLoaded", function () {
+                const savedTheme = localStorage.getItem("theme") || "light";
+                document.documentElement.setAttribute("data-theme", savedTheme);
+                const sunIcon = document.getElementById("theme-icon-sun");
+                const moonIcon = document.getElementById("theme-icon-moon");
+                if (savedTheme === "dark") {
+                  sunIcon.style.display = "none";
+                  moonIcon.style.display = "block";
+                }
+                lucide.createIcons();
 
-            text.textContent = allFormulasVisible ? "ซ่อนสูตร" : "แสดงสูตร";
-          }
-
-          function resetForm() {
-            document.getElementById("patientId").value = "";
-            document.getElementById("patientName").value = "";
-            document.getElementById("weight").value = "";
-            document.getElementById("height").value = "";
-            document.getElementById("bmi").value = "";
-            document.getElementById("clinicalStatus").value = "stable";
-            document.getElementById("venousAccess").value = "central";
-            document.getElementById("protein").value = "";
-            document.getElementById("proteinProduct").value = "amiparen";
-            document.getElementById("dextrose").value = "";
-            document.getElementById("lipid").value = "";
-            document.getElementById("ivleHours").value = "";
-            document.getElementById("infusionDuration").value = "";
-            document.getElementById("na").value = "";
-            document.getElementById("k").value = "";
-            document.getElementById("cl").value = "";
-            document.getElementById("ca").value = "";
-            document.getElementById("mg").value = "";
-            document.getElementById("po4").value = "";
-
-            document.getElementById("resultsSection").classList.add("hidden");
-
-            allFormulasVisible = false;
-            document.getElementById("toggleAllText").textContent = "แสดงสูตร";
-
-            calculationMethod = "k2hpo4";
-            document.querySelectorAll(".method-btn").forEach((btn) => {
-              btn.classList.remove("active");
-            });
-            document.querySelector(".method-btn").classList.add("active");
-
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-
-          function getNextInput(currentInput) {
-            const inputs = Array.from(
-              document.querySelectorAll("input:not([readonly]), select")
-            );
-            const currentIndex = inputs.indexOf(currentInput);
-            return inputs[currentIndex + 1] || null;
-          }
-
-          document.addEventListener("DOMContentLoaded", function () {
-            const inputs = document.querySelectorAll(
-              "input:not([readonly]), select"
-            );
-
-            inputs.forEach((input) => {
-              input.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  const enterkeyhint = this.getAttribute("enterkeyhint");
-
-                  if (enterkeyhint === "done") {
-                    this.blur();
-                    calculate();
-                  } else {
-                    const nextInput = getNextInput(this);
-                    if (nextInput) {
-                      nextInput.focus();
+                // แก้ไข: เพิ่ม event listener เพื่อลบ error class เมื่อกรอกข้อมูล
+                const requiredFields =
+                  document.querySelectorAll(".required-field");
+                requiredFields.forEach((field) => {
+                  // สำหรับ input
+                  field.addEventListener("input", function () {
+                    if (field.tagName === "INPUT") {
                       if (
-                        nextInput.tagName === "INPUT" &&
-                        nextInput.type === "number"
+                        this.value &&
+                        this.value !== "" &&
+                        parseFloat(this.value) !== 0
                       ) {
-                        nextInput.select();
+                        this.classList.remove("input-error");
                       }
                     }
-                  }
-                }
+                  });
+
+                  // สำหรับ select
+                  field.addEventListener("change", function () {
+                    if (field.tagName === "SELECT") {
+                      if (this.value && this.value !== "") {
+                        this.classList.remove("input-error");
+                      }
+                    }
+                  });
+                });
               });
 
-              if (input.tagName === "SELECT") {
-                input.addEventListener("change", function () {
-                  setTimeout(() => {
-                    const nextInput = getNextInput(this);
-                    if (nextInput) {
-                      nextInput.focus();
-                    }
-                  }, 100);
-                });
+              document
+                .getElementById("weight")
+                .addEventListener("input", calculateBMI);
+              document
+                .getElementById("height")
+                .addEventListener("input", calculateBMI);
+
+              function calculateBMI() {
+                const weight = parseFloat(
+                  document.getElementById("weight").value
+                );
+                const height = parseFloat(
+                  document.getElementById("height").value
+                );
+                if (weight && height) {
+                  const bmi = weight / Math.pow(height / 100, 2);
+                  document.getElementById("bmi").value = bmi.toFixed(2);
+                }
               }
 
-              input.addEventListener("focus", function () {
-                setTimeout(() => {
-                  this.scrollIntoView({
+              // แก้ไข: ปรับ handleCalculate ให้ลบ error class เมื่อกรอกข้อมูลครบ
+              function handleCalculate() {
+                const requiredFields =
+                  document.querySelectorAll(".required-field");
+                let firstEmptyField = null;
+                let hasError = false;
+
+                for (let field of requiredFields) {
+                  let isEmpty = false;
+
+                  if (field.tagName === "SELECT") {
+                    if (!field.value || field.value === "") {
+                      isEmpty = true;
+                    }
+                  } else if (field.tagName === "INPUT") {
+                    if (
+                      !field.value ||
+                      field.value === "" ||
+                      parseFloat(field.value) === 0
+                    ) {
+                      isEmpty = true;
+                    }
+                  }
+
+                  if (isEmpty) {
+                    if (!firstEmptyField) {
+                      firstEmptyField = field;
+                    }
+                    field.classList.add("input-error");
+                    hasError = true;
+                  } else {
+                    // ลบ error ถ้ากรอกข้อมูลแล้ว
+                    field.classList.remove("input-error");
+                  }
+                }
+
+                if (hasError && firstEmptyField) {
+                  firstEmptyField.focus();
+                  firstEmptyField.scrollIntoView({
                     behavior: "smooth",
                     block: "center",
                   });
-                }, 300);
+                  return;
+                }
+
+                calculate();
+              }
+
+              document.addEventListener("DOMContentLoaded", function () {
+                const inputs = document.querySelectorAll(
+                  "input:not([readonly]), select"
+                );
+                inputs.forEach((input) => {
+                  input.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const enterkeyhint = this.getAttribute("enterkeyhint");
+                      if (enterkeyhint === "done") {
+                        this.blur();
+                        handleCalculate();
+                      } else {
+                        const nextInput = getNextInput(this);
+                        if (nextInput) {
+                          nextInput.focus();
+                          if (
+                            nextInput.tagName === "INPUT" &&
+                            nextInput.type === "number"
+                          ) {
+                            nextInput.select();
+                          }
+                        }
+                      }
+                    }
+                  });
+                  if (input.tagName === "SELECT") {
+                    input.addEventListener("change", function () {
+                      setTimeout(() => {
+                        const nextInput = getNextInput(this);
+                        if (nextInput) {
+                          nextInput.focus();
+                        }
+                      }, 100);
+                    });
+                  }
+                  input.addEventListener("focus", function () {
+                    setTimeout(() => {
+                      this.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
+                    }, 300);
+                  });
+                });
               });
-            });
-          });
 
-          function calculate() {
-            try {
-              const weight =
-                parseFloat(document.getElementById("weight").value) || 0;
-              const protein =
-                parseFloat(document.getElementById("protein").value) || 0;
-              const dextrose =
-                parseFloat(document.getElementById("dextrose").value) || 0;
-              const lipid =
-                parseFloat(document.getElementById("lipid").value) || 0;
-              const infusionDuration =
-                parseFloat(document.getElementById("infusionDuration").value) ||
-                24;
-
-              const na = parseFloat(document.getElementById("na").value) || 0;
-              const k = parseFloat(document.getElementById("k").value) || 0;
-              const cl = parseFloat(document.getElementById("cl").value) || 0;
-              const ca = parseFloat(document.getElementById("ca").value) || 0;
-              const mg = parseFloat(document.getElementById("mg").value) || 0;
-              const po4 = parseFloat(document.getElementById("po4").value) || 0;
-
-              const proteinProduct =
-                document.getElementById("proteinProduct").value;
-
-              let proteinSolution = 0;
-              let proteinConcentration = 0;
-              let proteinFormula = "";
-
-              if (proteinProduct === "amiparen") {
-                proteinSolution = (protein * 100) / 10;
-                proteinConcentration = 10;
-                proteinFormula = `${protein} × 100 ÷ 10 = ${proteinSolution.toFixed(
-                  2
-                )}`;
-              } else {
-                proteinSolution = (protein * 100) / 15;
-                proteinConcentration = 15;
-                proteinFormula = `${protein} × 100 ÷ 15 = ${proteinSolution.toFixed(
-                  2
-                )}`;
+              function toggleAllFormulas() {
+                allFormulasVisible = !allFormulasVisible;
+                const text = document.getElementById("toggleAllText");
+                document.querySelectorAll(".formula-details").forEach((f) => {
+                  if (allFormulasVisible) {
+                    f.classList.add("show");
+                  } else {
+                    f.classList.remove("show");
+                  }
+                });
+                document
+                  .querySelectorAll(".electrolyte-formula")
+                  .forEach((f) => {
+                    if (allFormulasVisible) {
+                      f.classList.add("show");
+                    } else {
+                      f.classList.remove("show");
+                    }
+                  });
+                text.textContent = allFormulasVisible ? "ซ่อนสูตร" : "แสดงสูตร";
               }
 
-              const dextroseSolution = (dextrose * 100) / 50;
-              const dextroseFormula = `${dextrose} × 100 ÷ 50 = ${dextroseSolution.toFixed(
-                2
-              )}`;
-
-              const lipidSolution = (lipid * 100) / 20;
-              const lipidFormula = `${lipid} × 100 ÷ 20 = ${lipidSolution.toFixed(
-                2
-              )}`;
-
-              let electrolytes = {};
-              let electrolyteFormulas = {};
-
-              if (calculationMethod === "k2hpo4") {
-                const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
-                electrolyteFormulas[
-                  "8.71% K₂HPO₄"
-                ] = `${po4} ÷ 0.5 = ${k2hpo4.toFixed(2)}`;
-
-                const kcl_temp = k - k2hpo4 * 1;
-                const kcl = kcl_temp > 0 && cl > 0 ? kcl_temp / 2 : 0;
-                electrolyteFormulas["15% KCl"] = `(${k} - ${k2hpo4.toFixed(
-                  2
-                )}) ÷ 2 = ${kcl.toFixed(2)}`;
-
-                const kac = (k - k2hpo4 * 1 - kcl * 2) / 3;
-                electrolyteFormulas["29.4% KAc"] = `(${k} - ${k2hpo4.toFixed(
-                  2
-                )} - ${(kcl * 2).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
-
-                const nacl = (cl - kcl * 2) / 0.5;
-                electrolyteFormulas["3% NaCl"] = `(${cl} - ${(kcl * 2).toFixed(
-                  2
-                )}) ÷ 0.5 = ${nacl.toFixed(2)}`;
-
-                const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 / 1 : 0;
-                electrolyteFormulas["Glycophos"] =
-                  glycophos > 0 ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}` : "0";
-
-                const naac = (na - nacl * 0.5 - glycophos * 2) / 3;
-                electrolyteFormulas["24.6% NaAc"] = `(${na} - ${(
-                  nacl * 0.5
-                ).toFixed(2)} - ${(glycophos * 2).toFixed(
-                  2
-                )}) ÷ 3 = ${naac.toFixed(2)}`;
-
-                const cagluconate = ca / 0.5;
-                electrolyteFormulas[
-                  "10% Ca Gluconate"
-                ] = `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
-
-                const mgso4 = mg / 4;
-                electrolyteFormulas["50% MgSO₄"] = `${mg} ÷ 4 = ${mgso4.toFixed(
-                  2
-                )}`;
-
-                electrolytes = {
-                  "8.71% K₂HPO₄": k2hpo4,
-                  "15% KCl": kcl,
-                  "29.4% KAc": kac,
-                  "3% NaCl": nacl,
-                  "24.6% NaAc": naac,
-                  Glycophos: glycophos,
-                  "10% Ca Gluconate": cagluconate,
-                  "50% MgSO₄": mgso4,
-                };
-              } else {
-                const nacl = Math.min(na, cl) / 0.5;
-                electrolyteFormulas[
-                  "3% NaCl"
-                ] = `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
-
-                const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
-                electrolyteFormulas[
-                  "8.71% K₂HPO₄"
-                ] = `${po4} ÷ 0.5 = ${k2hpo4.toFixed(2)}`;
-
-                const kcl = (cl - nacl * 0.5) / 2;
-                electrolyteFormulas["15% KCl"] = `(${cl} - ${(
-                  nacl * 0.5
-                ).toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
-
-                const kac = (k - k2hpo4 - (cl - nacl * 0.5)) / 3;
-                electrolyteFormulas["29.4% KAc"] = `(${k} - ${k2hpo4.toFixed(
-                  2
-                )} - ${(cl - nacl * 0.5).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
-
-                const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 / 1 : 0;
-                electrolyteFormulas["Glycophos"] =
-                  glycophos > 0 ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}` : "0";
-
-                const naac = (na - nacl * 0.5 - glycophos * 2) / 3;
-                electrolyteFormulas["24.6% NaAc"] = `(${na} - ${(
-                  nacl * 0.5
-                ).toFixed(2)} - ${(glycophos * 2).toFixed(
-                  2
-                )}) ÷ 3 = ${naac.toFixed(2)}`;
-
-                const cagluconate = ca / 0.5;
-                electrolyteFormulas[
-                  "10% Ca Gluconate"
-                ] = `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
-
-                const mgso4 = mg / 4;
-                electrolyteFormulas["50% MgSO₄"] = `${mg} ÷ 4 = ${mgso4.toFixed(
-                  2
-                )}`;
-
-                electrolytes = {
-                  "3% NaCl": nacl,
-                  "8.71% K₂HPO₄": k2hpo4,
-                  "15% KCl": kcl,
-                  "29.4% KAc": kac,
-                  "24.6% NaAc": naac,
-                  Glycophos: glycophos,
-                  "10% Ca Gluconate": cagluconate,
-                  "50% MgSO₄": mgso4,
-                };
+              function resetForm() {
+                document.getElementById("patientId").value = "";
+                document.getElementById("patientName").value = "";
+                document.getElementById("weight").value = "";
+                document.getElementById("height").value = "";
+                document.getElementById("bmi").value = "";
+                document.getElementById("clinicalStatus").value = "";
+                document.getElementById("venousAccess").value = "";
+                document.getElementById("protein").value = "";
+                document.getElementById("proteinProduct").value = "";
+                document.getElementById("dextrose").value = "";
+                document.getElementById("lipid").value = "";
+                document.getElementById("ivleHours").value = "";
+                document.getElementById("infusionDuration").value = "";
+                document.getElementById("na").value = "";
+                document.getElementById("k").value = "";
+                document.getElementById("cl").value = "";
+                document.getElementById("ca").value = "";
+                document.getElementById("mg").value = "";
+                document.getElementById("po4").value = "";
+                document
+                  .getElementById("resultsSection")
+                  .classList.add("hidden");
+                document.querySelectorAll(".input-error").forEach((el) => {
+                  el.classList.remove("input-error");
+                });
+                window.scrollTo({ top: 0, behavior: "smooth" });
               }
 
-              const totalElectrolyteVolume = Object.values(electrolytes).reduce(
-                (a, b) => a + b,
-                0
-              );
-              const totalVolume1 =
-                proteinSolution + dextroseSolution + totalElectrolyteVolume;
-              const totalVolume2 = totalVolume1 + lipidSolution;
-              const osmolarity =
-                protein * 10 +
-                dextrose * 5 +
-                na * 2 +
-                k * 2 +
-                mg * 1 +
-                ca * 1.4;
-              const gir = (dextrose * 1000) / (weight * infusionDuration * 60);
-              const proteinCalories = protein * 4;
-              const dextroseCalories = dextrose * 3.4;
-              const lipidCalories = lipid * 10;
-              const totalCalories =
-                proteinCalories + dextroseCalories + lipidCalories;
-              const flowRate = totalVolume1 / infusionDuration;
+              function getNextInput(currentInput) {
+                const inputs = Array.from(
+                  document.querySelectorAll("input:not([readonly]), select")
+                );
+                const currentIndex = inputs.indexOf(currentInput);
+                return inputs[currentIndex + 1] || null;
+              }
 
-              document.getElementById("totalVolume1").textContent =
-                totalVolume1.toFixed(1);
-              document.getElementById("totalVolume2").textContent =
-                totalVolume2.toFixed(1);
-              document.getElementById("osmolarity").textContent =
-                osmolarity.toFixed(0);
-              document.getElementById("gir").textContent = gir.toFixed(2);
-              document.getElementById("totalCalories").textContent =
-                totalCalories.toFixed(0);
-              document.getElementById("flowRate").textContent =
-                flowRate.toFixed(1);
+              function calculateElectrolytes(method, na, k, cl, ca, mg, po4) {
+                let electrolytes = {};
+                let formulas = {};
+                if (method === "k2hpo4") {
+                  const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
+                  formulas["8.71% K₂HPO₄"] = `${po4} ÷ 0.5 = ${k2hpo4.toFixed(
+                    2
+                  )}`;
+                  const kcl_temp = k - k2hpo4 * 1;
+                  const kcl = kcl_temp > 0 && cl > 0 ? kcl_temp / 2 : 0;
+                  formulas["15% KCl"] = `(${k} - ${k2hpo4.toFixed(
+                    2
+                  )}) ÷ 2 = ${kcl.toFixed(2)}`;
+                  const kac = (k - k2hpo4 * 1 - kcl * 2) / 3;
+                  formulas["29.4% KAc"] = `(${k} - ${k2hpo4.toFixed(2)} - ${(
+                    kcl * 2
+                  ).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
+                  const nacl = (cl - kcl * 2) / 0.5;
+                  formulas["3% NaCl"] = `(${cl} - ${(kcl * 2).toFixed(
+                    2
+                  )}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+                  const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 / 1 : 0;
+                  formulas["Glycophos"] =
+                    glycophos > 0
+                      ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}`
+                      : "0";
+                  const naac = (na - nacl * 0.5 - glycophos * 2) / 3;
+                  formulas["24.6% NaAc"] = `(${na} - ${(nacl * 0.5).toFixed(
+                    2
+                  )} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
+                  const cagluconate = ca / 0.5;
+                  formulas[
+                    "10% Ca Gluconate"
+                  ] = `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
+                  const mgso4 = mg / 4;
+                  formulas["50% MgSO₄"] = `${mg} ÷ 4 = ${mgso4.toFixed(2)}`;
+                  electrolytes = {
+                    "8.71% K₂HPO₄": k2hpo4,
+                    "15% KCl": kcl,
+                    "29.4% KAc": kac,
+                    "3% NaCl": nacl,
+                    "24.6% NaAc": naac,
+                    Glycophos: glycophos,
+                    "10% Ca Gluconate": cagluconate,
+                    "50% MgSO₄": mgso4,
+                  };
+                } else {
+                  const nacl = Math.min(na, cl) / 0.5;
+                  formulas[
+                    "3% NaCl"
+                  ] = `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+                  const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
+                  formulas["8.71% K₂HPO₄"] = `${po4} ÷ 0.5 = ${k2hpo4.toFixed(
+                    2
+                  )}`;
+                  const kcl = (cl - nacl * 0.5) / 2;
+                  formulas["15% KCl"] = `(${cl} - ${(nacl * 0.5).toFixed(
+                    2
+                  )}) ÷ 2 = ${kcl.toFixed(2)}`;
+                  const kac = (k - k2hpo4 - (cl - nacl * 0.5)) / 3;
+                  formulas["29.4% KAc"] = `(${k} - ${k2hpo4.toFixed(2)} - ${(
+                    cl -
+                    nacl * 0.5
+                  ).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
+                  const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 / 1 : 0;
+                  formulas["Glycophos"] =
+                    glycophos > 0
+                      ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}`
+                      : "0";
+                  const naac = (na - nacl * 0.5 - glycophos * 2) / 3;
+                  formulas["24.6% NaAc"] = `(${na} - ${(nacl * 0.5).toFixed(
+                    2
+                  )} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
+                  const cagluconate = ca / 0.5;
+                  formulas[
+                    "10% Ca Gluconate"
+                  ] = `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
+                  const mgso4 = mg / 4;
+                  formulas["50% MgSO₄"] = `${mg} ÷ 4 = ${mgso4.toFixed(2)}`;
+                  electrolytes = {
+                    "3% NaCl": nacl,
+                    "8.71% K₂HPO₄": k2hpo4,
+                    "15% KCl": kcl,
+                    "29.4% KAc": kac,
+                    "24.6% NaAc": naac,
+                    Glycophos: glycophos,
+                    "10% Ca Gluconate": cagluconate,
+                    "50% MgSO₄": mgso4,
+                  };
+                }
+                return { electrolytes, formulas };
+              }
 
-              document.getElementById("totalElectrolyte").textContent =
-                totalElectrolyteVolume.toFixed(2) + " mL";
-              document.getElementById("totalProtein").textContent =
-                proteinSolution.toFixed(2) + " mL";
-              document.getElementById("totalDextrose").textContent =
-                dextroseSolution.toFixed(2) + " mL";
-              document.getElementById("totalLipid").textContent =
-                lipidSolution.toFixed(2) + " mL";
-              document.getElementById("grandTotal").textContent =
-                totalVolume1.toFixed(2) + " mL";
+              function calculate() {
+                try {
+                  const weight =
+                    parseFloat(document.getElementById("weight").value) || 0;
+                  const protein =
+                    parseFloat(document.getElementById("protein").value) || 0;
+                  const dextrose =
+                    parseFloat(document.getElementById("dextrose").value) || 0;
+                  const lipid =
+                    parseFloat(document.getElementById("lipid").value) || 0;
+                  const infusionDuration =
+                    parseFloat(
+                      document.getElementById("infusionDuration").value
+                    ) || 24;
+                  const na =
+                    parseFloat(document.getElementById("na").value) || 0;
+                  const k = parseFloat(document.getElementById("k").value) || 0;
+                  const cl =
+                    parseFloat(document.getElementById("cl").value) || 0;
+                  const ca =
+                    parseFloat(document.getElementById("ca").value) || 0;
+                  const mg =
+                    parseFloat(document.getElementById("mg").value) || 0;
+                  const po4 =
+                    parseFloat(document.getElementById("po4").value) || 0;
+                  const proteinProduct =
+                    document.getElementById("proteinProduct").value;
 
-              document.getElementById("formula-volume1").innerHTML = `
-                    <div class="formula-label">สูตร:</div>
-                    <div class="formula-calculation">Protein Sol + Dextrose Sol + Electrolyte Sol</div>
-                    <div class="formula-calculation">${proteinSolution.toFixed(
+                  let proteinSolution = 0;
+                  let proteinConcentration = 0;
+                  let proteinFormula = "";
+                  if (proteinProduct === "amiparen") {
+                    proteinSolution = (protein * 100) / 10;
+                    proteinConcentration = 10;
+                    proteinFormula = `${protein} × 100 ÷ 10 = ${proteinSolution.toFixed(
                       2
-                    )} + ${dextroseSolution.toFixed(
-                2
-              )} + ${totalElectrolyteVolume.toFixed(
-                2
-              )} = ${totalVolume1.toFixed(1)} mL</div>
-                `;
+                    )}`;
+                  } else {
+                    proteinSolution = (protein * 100) / 15;
+                    proteinConcentration = 15;
+                    proteinFormula = `${protein} × 100 ÷ 15 = ${proteinSolution.toFixed(
+                      2
+                    )}`;
+                  }
+                  const dextroseSolution = (dextrose * 100) / 50;
+                  const dextroseFormula = `${dextrose} × 100 ÷ 50 = ${dextroseSolution.toFixed(
+                    2
+                  )}`;
+                  const lipidSolution = (lipid * 100) / 20;
+                  const lipidFormula = `${lipid} × 100 ÷ 20 = ${lipidSolution.toFixed(
+                    2
+                  )}`;
 
-              document.getElementById("formula-volume2").innerHTML = `
+                  const method1 = calculateElectrolytes(
+                    "k2hpo4",
+                    na,
+                    k,
+                    cl,
+                    ca,
+                    mg,
+                    po4
+                  );
+                  const method2 = calculateElectrolytes(
+                    "nacl",
+                    na,
+                    k,
+                    cl,
+                    ca,
+                    mg,
+                    po4
+                  );
+                  const totalElectrolyteVolume1 = Object.values(
+                    method1.electrolytes
+                  ).reduce((a, b) => a + b, 0);
+                  const totalElectrolyteVolume2 = Object.values(
+                    method2.electrolytes
+                  ).reduce((a, b) => a + b, 0);
+
+                  const totalVolume1 =
+                    proteinSolution +
+                    dextroseSolution +
+                    totalElectrolyteVolume1;
+                  const totalVolume2 =
+                    proteinSolution +
+                    dextroseSolution +
+                    totalElectrolyteVolume2;
+
+                  const osmolarity =
+                    protein * 10 +
+                    dextrose * 5 +
+                    na * 2 +
+                    k * 2 +
+                    mg * 1 +
+                    ca * 1.4;
+                  const gir =
+                    (dextrose * 1000) / (weight * infusionDuration * 60);
+                  const proteinCalories = protein * 4;
+                  const dextroseCalories = dextrose * 3.4;
+                  const lipidCalories = lipid * 10;
+                  const totalCalories =
+                    proteinCalories + dextroseCalories + lipidCalories;
+                  const flowRate = totalVolume1 / infusionDuration;
+
+                  document.getElementById("totalVolume1").textContent =
+                    totalVolume1.toFixed(1);
+                  document.getElementById("totalVolume2").textContent =
+                    totalVolume2.toFixed(1);
+                  document.getElementById("osmolarity").textContent =
+                    osmolarity.toFixed(0);
+                  document.getElementById("gir").textContent = gir.toFixed(2);
+                  document.getElementById("totalCalories").textContent =
+                    totalCalories.toFixed(0);
+                  document.getElementById("flowRate").textContent =
+                    flowRate.toFixed(1);
+                  document.getElementById("totalElectrolyte1").textContent =
+                    totalElectrolyteVolume1.toFixed(2) + " mL";
+                  document.getElementById("totalElectrolyte2").textContent =
+                    totalElectrolyteVolume2.toFixed(2) + " mL";
+
+                  document.getElementById("summaryProtein").textContent =
+                    proteinSolution.toFixed(2) + " mL";
+                  document.getElementById("summaryDextrose").textContent =
+                    dextroseSolution.toFixed(2) + " mL";
+                  document.getElementById("summaryK2").textContent =
+                    totalElectrolyteVolume1.toFixed(2) + " mL";
+                  document.getElementById("summaryVolI").textContent =
+                    totalVolume1.toFixed(2) + " mL";
+
+                  document.getElementById("summaryProtein2").textContent =
+                    proteinSolution.toFixed(2) + " mL";
+                  document.getElementById("summaryDextrose2").textContent =
+                    dextroseSolution.toFixed(2) + " mL";
+                  document.getElementById("summaryNaCl").textContent =
+                    totalElectrolyteVolume2.toFixed(2) + " mL";
+                  document.getElementById("summaryVolII").textContent =
+                    totalVolume2.toFixed(2) + " mL";
+
+                  document.getElementById("summaryLipid").textContent =
+                    lipidSolution.toFixed(2) + " mL";
+
+                  document.getElementById("formula-volume1").innerHTML = `
+                <div class="formula-label">สูตร:</div>
+                <div class="formula-calculation">Protein Sol + Dextrose Sol + K₂HPO₄ Electrolyte Sol</div>
+                <div class="formula-calculation">${proteinSolution.toFixed(
+                  2
+                )} + ${dextroseSolution.toFixed(
+                    2
+                  )} + ${totalElectrolyteVolume1.toFixed(
+                    2
+                  )} = ${totalVolume1.toFixed(1)} mL</div>
+              `;
+                  document.getElementById("formula-volume2").innerHTML = `
+                <div class="formula-label">สูตร:</div>
+                <div class="formula-calculation">Protein Sol + Dextrose Sol + NaCl Electrolyte Sol</div>
+                <div class="formula-calculation">${proteinSolution.toFixed(
+                  2
+                )} + ${dextroseSolution.toFixed(
+                    2
+                  )} + ${totalElectrolyteVolume2.toFixed(
+                    2
+                  )} = ${totalVolume2.toFixed(1)} mL</div>
+              `;
+                  document.getElementById("formula-osmolarity").innerHTML = `
+                <div class="formula-label">สูตร:</div>
+                <div class="formula-calculation">(Protein × 10) + (Dextrose × 5) + (Na × 2) + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
+                <div class="formula-calculation">(${protein} × 10) + (${dextrose} × 5) + (${na} × 2) + (${k} × 2) + (${mg} × 1) + (${ca} × 1.4) = ${osmolarity.toFixed(
+                    0
+                  )}</div>
+              `;
+                  document.getElementById("formula-gir").innerHTML = `
+                <div class="formula-label">สูตร:</div>
+                <div class="formula-calculation">(Dextrose × 1000) ÷ (Weight × Duration × 60)</div>
+                <div class="formula-calculation">(${dextrose} × 1000) ÷ (${weight} × ${infusionDuration} × 60) = ${gir.toFixed(
+                    2
+                  )}</div>
+              `;
+                  document.getElementById("formula-calories").innerHTML = `
+                <div class="formula-label">สูตร:</div>
+                <div class="formula-calculation">(Protein × 4) + (Dextrose × 3.4) + (Lipid × 10)</div>
+                <div class="formula-calculation">(${protein} × 4) + (${dextrose} × 3.4) + (${lipid} × 10) = ${totalCalories.toFixed(
+                    0
+                  )} kcal</div>
+              `;
+                  document.getElementById("formula-flowrate").innerHTML = `
+                <div class="formula-label">สูตร:</div>
+                <div class="formula-calculation">Total Volume I ÷ Duration</div>
+                <div class="formula-calculation">${totalVolume1.toFixed(
+                  1
+                )} ÷ ${infusionDuration} = ${flowRate.toFixed(1)} mL/hr</div>
+              `;
+
+                  let electrolyteHTML1 = "";
+                  for (const [name, value] of Object.entries(
+                    method1.electrolytes
+                  )) {
+                    if (value > 0) {
+                      electrolyteHTML1 += `
+                    <div class="electrolyte-item">
+                      <div class="electrolyte-header">
+                        <span class="electrolyte-name">${name}</span>
+                        <span class="electrolyte-value">${value.toFixed(
+                          2
+                        )} mL</span>
+                      </div>
+                      <div class="electrolyte-formula ${
+                        allFormulasVisible ? "show" : ""
+                      }">
+                        <div class="formula-label">สูตร:</div>
+                        <div class="formula-calculation">${
+                          method1.formulas[name]
+                        }</div>
+                      </div>
+                    </div>
+                  `;
+                    }
+                  }
+                  document.getElementById("electrolyteSolutions1").innerHTML =
+                    electrolyteHTML1;
+
+                  let electrolyteHTML2 = "";
+                  for (const [name, value] of Object.entries(
+                    method2.electrolytes
+                  )) {
+                    if (value > 0) {
+                      electrolyteHTML2 += `
+                    <div class="electrolyte-item">
+                      <div class="electrolyte-header">
+                        <span class="electrolyte-name">${name}</span>
+                        <span class="electrolyte-value">${value.toFixed(
+                          2
+                        )} mL</span>
+                      </div>
+                      <div class="electrolyte-formula ${
+                        allFormulasVisible ? "show" : ""
+                      }">
+                        <div class="formula-label">สูตร:</div>
+                        <div class="formula-calculation">${
+                          method2.formulas[name]
+                        }</div>
+                      </div>
+                    </div>
+                  `;
+                    }
+                  }
+                  document.getElementById("electrolyteSolutions2").innerHTML =
+                    electrolyteHTML2;
+
+                  const macroHTML = `
+                <div class="electrolyte-item">
+                  <div class="electrolyte-header">
+                    <span class="electrolyte-name">${proteinConcentration}% ${
+                    proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"
+                  }</span>
+                    <span class="electrolyte-value">${proteinSolution.toFixed(
+                      2
+                    )} mL</span>
+                  </div>
+                  <div class="electrolyte-formula ${
+                    allFormulasVisible ? "show" : ""
+                  }">
                     <div class="formula-label">สูตร:</div>
-                    <div class="formula-calculation">Total Volume I + Lipid</div>
-                    <div class="formula-calculation">${totalVolume1.toFixed(
-                      1
-                    )} + ${lipidSolution.toFixed(2)} = ${totalVolume2.toFixed(
-                1
-              )} mL</div>
-                `;
-
-              document.getElementById("formula-osmolarity").innerHTML = `
+                    <div class="formula-calculation">${proteinFormula}</div>
+                  </div>
+                </div>
+                <div class="electrolyte-item">
+                  <div class="electrolyte-header">
+                    <span class="electrolyte-name">50% Dextrose</span>
+                    <span class="electrolyte-value">${dextroseSolution.toFixed(
+                      2
+                    )} mL</span>
+                  </div>
+                  <div class="electrolyte-formula ${
+                    allFormulasVisible ? "show" : ""
+                  }">
                     <div class="formula-label">สูตร:</div>
-                    <div class="formula-calculation">(Protein × 10) + (Dextrose × 5) + (Na × 2) + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
-                    <div class="formula-calculation">(${protein} × 10) + (${dextrose} × 5) + (${na} × 2) + (${k} × 2) + (${mg} × 1) + (${ca} × 1.4) = ${osmolarity.toFixed(
-                0
-              )}</div>
-                `;
-
-              document.getElementById("formula-gir").innerHTML = `
+                    <div class="formula-calculation">${dextroseFormula}</div>
+                  </div>
+                </div>
+                <div class="electrolyte-item">
+                  <div class="electrolyte-header">
+                    <span class="electrolyte-name">20% Lipid Emulsion</span>
+                    <span class="electrolyte-value">${lipidSolution.toFixed(
+                      2
+                    )} mL</span>
+                  </div>
+                  <div class="electrolyte-formula ${
+                    allFormulasVisible ? "show" : ""
+                  }">
                     <div class="formula-label">สูตร:</div>
-                    <div class="formula-calculation">(Dextrose × 1000) ÷ (Weight × Duration × 60)</div>
-                    <div class="formula-calculation">(${dextrose} × 1000) ÷ (${weight} × ${infusionDuration} × 60) = ${gir.toFixed(
-                2
-              )}</div>
-                `;
+                    <div class="formula-calculation">${lipidFormula}</div>
+                  </div>
+                </div>
+              `;
+                  document.getElementById("macronutrientSolutions").innerHTML =
+                    macroHTML;
 
-              document.getElementById("formula-calories").innerHTML = `
-                    <div class="formula-label">สูตร:</div>
-                    <div class="formula-calculation">(Protein × 4) + (Dextrose × 3.4) + (Lipid × 10)</div>
-                    <div class="formula-calculation">(${protein} × 4) + (${dextrose} × 3.4) + (${lipid} × 10) = ${totalCalories.toFixed(
-                0
-              )} kcal</div>
+                  let alertsHTML = "";
+                  const venousAccess =
+                    document.getElementById("venousAccess").value;
+                  if (osmolarity > 900 && venousAccess === "peripheral") {
+                    alertsHTML += `
+                  <div class="alert alert-danger">
+                    <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+                    <div>
+                      <strong>อันตราย!</strong> Osmolarity > 900 mOsm/L (${osmolarity.toFixed(
+                        0
+                      )} mOsm/L) 
+                      ต้องใช้ Central Line เท่านั้น แต่ผู้ป่วยมี Peripheral Line
+                    </div>
+                  </div>
                 `;
-
-              document.getElementById("formula-flowrate").innerHTML = `
-                    <div class="formula-label">สูตร:</div>
-                    <div class="formula-calculation">Total Volume I ÷ Duration</div>
-                    <div class="formula-calculation">${totalVolume1.toFixed(
-                      1
-                    )} ÷ ${infusionDuration} = ${flowRate.toFixed(
-                1
-              )} mL/hr</div>
+                  } else if (osmolarity > 900) {
+                    alertsHTML += `
+                  <div class="alert alert-warning">
+                    <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+                    <div>
+                      <strong>คำเตือน:</strong> Osmolarity > 900 mOsm/L (${osmolarity.toFixed(
+                        0
+                      )} mOsm/L) 
+                      ต้องให้ทาง Central Line เท่านั้น
+                    </div>
+                  </div>
                 `;
-
-              let electrolyteHTML = "";
-              for (const [name, value] of Object.entries(electrolytes)) {
-                if (value > 0) {
-                  electrolyteHTML += `
-                            <div class="electrolyte-item">
-                                <div class="electrolyte-header">
-                                    <span class="electrolyte-name">${name}</span>
-                                    <span class="electrolyte-value">${value.toFixed(
-                                      2
-                                    )} mL</span>
-                                </div>
-                                <div class="electrolyte-formula ${
-                                  allFormulasVisible ? "show" : ""
-                                }">
-                                    <div class="formula-label">สูตร:</div>
-                                    <div class="formula-calculation">${
-                                      electrolyteFormulas[name]
-                                    }</div>
-                                </div>
-                            </div>
-                        `;
+                  }
+                  if (gir > 4) {
+                    alertsHTML += `
+                  <div class="alert alert-warning">
+                    <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+                    <div>
+                      <strong>คำเตือน:</strong> GIR > 4 mg/kg/min (${gir.toFixed(
+                        2
+                      )} mg/kg/min) 
+                      อาจเสี่ยงต่อ Hyperglycemia และ Steatosis
+                    </div>
+                  </div>
+                `;
+                  }
+                  if (osmolarity <= 900 && gir <= 4) {
+                    alertsHTML += `
+                  <div class="alert alert-success">
+                    <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
+                    <div>
+                      <strong>ปลอดภัย:</strong> ค่าทั้งหมดอยู่ในเกณฑ์ปกติ
+                    </div>
+                  </div>
+                `;
+                  }
+                  alertsHTML += `
+                <div class="alert alert-warning">
+                  <i data-lucide="clipboard-list" style="width: 20px; height: 20px;"></i>
+                  <div>
+                    <strong>ลำดับการผสม:</strong> Dextrose + AA → Phosphate → Electrolyte → Calcium
+                    <br>เพื่อป้องกัน Calcium Phosphate Precipitation
+                  </div>
+                </div>
+              `;
+                  document.getElementById("alerts").innerHTML = alertsHTML;
+                  document
+                    .getElementById("resultsSection")
+                    .classList.remove("hidden");
+                  document
+                    .getElementById("resultsSection")
+                    .scrollIntoView({ behavior: "smooth", block: "nearest" });
+                  lucide.createIcons();
+                } catch (error) {
+                  alert("เกิดข้อผิดพลาดในการคำนวณ: " + error.message);
+                  console.error(error);
                 }
               }
-              document.getElementById("electrolyteSolutions").innerHTML =
-                electrolyteHTML;
 
-              const macroHTML = `
-                    <div class="electrolyte-item">
-                        <div class="electrolyte-header">
-                            <span class="electrolyte-name">${proteinConcentration}% ${
-                proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"
-              }</span>
-                            <span class="electrolyte-value">${proteinSolution.toFixed(
-                              2
-                            )} mL</span>
-                        </div>
-                        <div class="electrolyte-formula ${
-                          allFormulasVisible ? "show" : ""
-                        }">
-                            <div class="formula-label">สูตร:</div>
-                            <div class="formula-calculation">${proteinFormula}</div>
-                        </div>
-                    </div>
-                    <div class="electrolyte-item">
-                        <div class="electrolyte-header">
-                            <span class="electrolyte-name">50% Dextrose</span>
-                            <span class="electrolyte-value">${dextroseSolution.toFixed(
-                              2
-                            )} mL</span>
-                        </div>
-                        <div class="electrolyte-formula ${
-                          allFormulasVisible ? "show" : ""
-                        }">
-                            <div class="formula-label">สูตร:</div>
-                            <div class="formula-calculation">${dextroseFormula}</div>
-                        </div>
-                    </div>
-                    <div class="electrolyte-item">
-                        <div class="electrolyte-header">
-                            <span class="electrolyte-name">20% Lipid Emulsion</span>
-                            <span class="electrolyte-value">${lipidSolution.toFixed(
-                              2
-                            )} mL</span>
-                        </div>
-                        <div class="electrolyte-formula ${
-                          allFormulasVisible ? "show" : ""
-                        }">
-                            <div class="formula-label">สูตร:</div>
-                            <div class="formula-calculation">${lipidFormula}</div>
-                        </div>
-                    </div>
-                `;
-              document.getElementById("macronutrientSolutions").innerHTML =
-                macroHTML;
-
-              let alertsHTML = "";
-              const venousAccess =
-                document.getElementById("venousAccess").value;
-
-              if (osmolarity > 900 && venousAccess === "peripheral") {
-                alertsHTML += `
-                        <div class="alert alert-danger">
-                            <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
-                            <div>
-                                <strong>อันตราย!</strong> Osmolarity > 900 mOsm/L (${osmolarity.toFixed(
-                                  0
-                                )} mOsm/L) 
-                                ต้องใช้ Central Line เท่านั้น แต่ผู้ป่วยมี Peripheral Line
-                            </div>
-                        </div>
-                    `;
-              } else if (osmolarity > 900) {
-                alertsHTML += `
-                        <div class="alert alert-warning">
-                            <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
-                            <div>
-                                <strong>คำเตือน:</strong> Osmolarity > 900 mOsm/L (${osmolarity.toFixed(
-                                  0
-                                )} mOsm/L) 
-                                ต้องให้ทาง Central Line เท่านั้น
-                            </div>
-                        </div>
-                    `;
-              }
-
-              if (gir > 4) {
-                alertsHTML += `
-                        <div class="alert alert-warning">
-                            <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
-                            <div>
-                                <strong>คำเตือน:</strong> GIR > 4 mg/kg/min (${gir.toFixed(
-                                  2
-                                )} mg/kg/min) 
-                                อาจเสี่ยงต่อ Hyperglycemia และ Steatosis
-                            </div>
-                        </div>
-                    `;
-              }
-
-              if (osmolarity <= 900 && gir <= 4) {
-                alertsHTML += `
-                        <div class="alert alert-success">
-                            <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
-                            <div>
-                                <strong>ปลอดภัย:</strong> ค่าทั้งหมดอยู่ในเกณฑ์ปกติ
-                            </div>
-                        </div>
-                    `;
-              }
-
-              alertsHTML += `
-                    <div class="alert alert-warning">
-                        <i data-lucide="clipboard-list" style="width: 20px; height: 20px;"></i>
-                        <div>
-                            <strong>ลำดับการผสม:</strong> Dextrose + AA → Phosphate → Electrolyte → Calcium
-                            <br>เพื่อป้องกัน Calcium Phosphate Precipitation
-                        </div>
-                    </div>
-                `;
-
-              document.getElementById("alerts").innerHTML = alertsHTML;
-              document
-                .getElementById("resultsSection")
-                .classList.remove("hidden");
-              document
-                .getElementById("resultsSection")
-                .scrollIntoView({ behavior: "smooth", block: "nearest" });
-
-              lucide.createIcons();
-            } catch (error) {
-              alert("เกิดข้อผิดพลาดในการคำนวณ: " + error.message);
-              console.error(error);
-            }
-          }
-
-          let resizeTimeout;
-          window.addEventListener("resize", function () {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(function () {
-              // Handle responsive adjustments
-            }, 250);
-          });
-        </script>
+              let resizeTimeout;
+              window.addEventListener("resize", function () {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function () {}, 250);
+              });
+            </script>
+          </body>
+        </html>
+        <script></script>
       </body>
     </html>
 
