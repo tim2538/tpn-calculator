@@ -416,7 +416,7 @@
           }
           .result-card {
             background: var(--bg-secondary);
-            padding: 20px;
+            padding: 16px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             position: relative;
@@ -445,7 +445,7 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 20px 28px;
+            padding: 8px 0;
             margin-top: 20px;
             display: flex;
             align-items: stretch;
@@ -462,6 +462,8 @@
             border-left: 1px solid var(--border-color);
           }
           .rate-hero .rate-label {
+            flex: 1;
+            text-align: center;
             font-size: 0.9em;
             font-weight: 600;
             color: var(--text-secondary);
@@ -809,6 +811,9 @@
             .btn-icon {
               width: 24px;
               height: 24px;
+            }
+            .rate-hero .rate-value {
+              font-size: 2.5em;
             }
             .results-header {
               flex-wrap: nowrap;
@@ -1506,7 +1511,12 @@
                 รีเซ็ต
               </span>
             </button>
-            <button class="btn btn-reset" id="printBtn" onclick="printReport()" disabled>
+            <button
+              class="btn btn-reset"
+              id="printBtn"
+              onclick="printReport()"
+              disabled
+            >
               <i data-lucide="printer" class="btn-icon btn-icon-only"></i>
               <span class="btn-text">
                 <i data-lucide="printer" class="btn-icon"></i>
@@ -1525,15 +1535,25 @@
             <div class="print-modal-header">
               <h3>ตัวอย่างก่อนพิมพ์</h3>
               <div class="print-method-toggle">
-                <button id="methodBtn1" class="active" onclick="selectPrintMethod('1')">วิธีที่ 1 (K₂HPO₄ First)</button>
-                <button id="methodBtn2" onclick="selectPrintMethod('2')">วิธีที่ 2 (NaCl First)</button>
+                <button
+                  id="methodBtn1"
+                  class="active"
+                  onclick="selectPrintMethod('1')"
+                >
+                  วิธีที่ 1 (K₂HPO₄ First)
+                </button>
+                <button id="methodBtn2" onclick="selectPrintMethod('2')">
+                  วิธีที่ 2 (NaCl First)
+                </button>
               </div>
             </div>
             <div class="print-canvas-wrapper">
               <canvas id="previewCanvas" width="900" height="1200"></canvas>
             </div>
             <div class="print-modal-actions">
-              <button class="btn btn-reset" onclick="closePrintModal()">ปิด</button>
+              <button class="btn btn-reset" onclick="closePrintModal()">
+                ปิด
+              </button>
               <button class="btn" onclick="downloadPNG()">
                 <i data-lucide="download" class="btn-icon"></i>
                 ดาวน์โหลด PNG
@@ -2408,11 +2428,15 @@
               // Store results for PNG export
               window.lastResult = {
                 patientId: document.getElementById("patientId").value.trim(),
-                patientName: document.getElementById("patientName").value.trim(),
+                patientName: document
+                  .getElementById("patientName")
+                  .value.trim(),
                 weight,
                 venousAccess,
                 proteinProduct,
-                sterileWater: needsDilution ? effectiveVolume - totalVolume1 : 0,
+                sterileWater: needsDilution
+                  ? effectiveVolume - totalVolume1
+                  : 0,
                 dextroseSolution,
                 proteinSolution,
                 protein,
@@ -2421,9 +2445,18 @@
                 electrolytes2: method2.electrolytes,
                 addamelVol: document.getElementById("addamel").checked ? 10 : 0,
                 soluvitVol: document.getElementById("soluvit").checked ? 10 : 0,
-                cernevitVol: document.getElementById("cernevit").checked ? 5 : 0,
-                bcomplexVol: document.getElementById("bComplex").checked ? 2 : 0,
-                na, k, cl, ca, mg, po4,
+                cernevitVol: document.getElementById("cernevit").checked
+                  ? 5
+                  : 0,
+                bcomplexVol: document.getElementById("bComplex").checked
+                  ? 2
+                  : 0,
+                na,
+                k,
+                cl,
+                ca,
+                mg,
+                po4,
                 flowRate1: flowRate,
                 flowRate2,
               };
@@ -2446,26 +2479,37 @@
             document.getElementById("methodBtn2").classList.remove("active");
             const canvas = document.getElementById("previewCanvas");
             drawExportCanvas(canvas, currentPrintMethod);
-            document.getElementById("printPreviewModal").classList.add("active");
+            document
+              .getElementById("printPreviewModal")
+              .classList.add("active");
             lucide.createIcons();
           }
 
           function selectPrintMethod(method) {
             currentPrintMethod = method;
-            document.getElementById("methodBtn1").classList.toggle("active", method === "1");
-            document.getElementById("methodBtn2").classList.toggle("active", method === "2");
+            document
+              .getElementById("methodBtn1")
+              .classList.toggle("active", method === "1");
+            document
+              .getElementById("methodBtn2")
+              .classList.toggle("active", method === "2");
             drawExportCanvas(document.getElementById("previewCanvas"), method);
           }
 
           function closePrintModal() {
-            document.getElementById("printPreviewModal").classList.remove("active");
+            document
+              .getElementById("printPreviewModal")
+              .classList.remove("active");
           }
 
           function downloadPNG() {
             const canvas = document.getElementById("previewCanvas");
             canvas.toBlob(function (blob) {
               const r = window.lastResult;
-              const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+              const dateStr = new Date()
+                .toISOString()
+                .slice(0, 10)
+                .replace(/-/g, "");
               const idStr = r.patientId || "report";
               const a = document.createElement("a");
               a.href = URL.createObjectURL(blob);
@@ -2480,7 +2524,8 @@
             if (!r) return;
             const elec = method === "1" ? r.electrolytes1 : r.electrolytes2;
             const ctx = canvas.getContext("2d");
-            const W = 900, H = 1200;
+            const W = 900,
+              H = 1200;
             canvas.width = W;
             canvas.height = H;
 
@@ -2499,8 +2544,11 @@
               ctx.textAlign = "right";
               ctx.font = "600 18px " + FONT;
               ctx.fillText(
-                (typeof value === "number" ? value.toFixed(2) : value) + "  " + unit,
-                valX, y
+                (typeof value === "number" ? value.toFixed(2) : value) +
+                  "  " +
+                  unit,
+                valX,
+                y,
               );
             }
 
@@ -2540,23 +2588,27 @@
             ctx.stroke();
 
             // ─── LEFT COLUMN ───
-            const LX = 50, LVAL = 420;
+            const LX = 50,
+              LVAL = 420;
 
             ctx.textAlign = "left";
             ctx.font = "700 20px " + FONT;
             ctx.fillStyle = BLACK;
             ctx.fillText("Ingredients:", LX, 196);
 
-            const proteinLabel = r.proteinProduct === "amiparen"
-              ? "Protein as Amiparen"
-              : "Protein as Aminoplasmal";
+            const proteinLabel =
+              r.proteinProduct === "amiparen"
+                ? "Protein as Amiparen"
+                : "Protein as Aminoplasmal";
 
             const leftRows = [
               ["Sterile water", r.sterileWater, "ml", 242],
               ["50% Glucose", r.dextroseSolution, "ml", 282],
               [proteinLabel, r.proteinSolution, "ml", 322],
             ];
-            leftRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+            leftRows.forEach(([lbl, val, unit, y]) =>
+              rowLine(lbl, val, unit, y, LX, LVAL),
+            );
 
             const elecRows = [
               ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", 390],
@@ -2568,7 +2620,9 @@
               ["Addamel", r.addamelVol, "ml", 630],
               ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 670],
             ];
-            elecRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+            elecRows.forEach(([lbl, val, unit, y]) =>
+              rowLine(lbl, val, unit, y, LX, LVAL),
+            );
 
             ctx.textAlign = "left";
             ctx.font = "700 20px " + FONT;
@@ -2580,10 +2634,13 @@
               ["Cernevit", r.cernevitVol, "ml", 818],
               ["B complex", r.bcomplexVol, "ml", 858],
             ];
-            addRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+            addRows.forEach(([lbl, val, unit, y]) =>
+              rowLine(lbl, val, unit, y, LX, LVAL),
+            );
 
             // ─── RIGHT COLUMN ───
-            const RX = 468, RVAL = 858;
+            const RX = 468,
+              RVAL = 858;
 
             ctx.textAlign = "left";
             ctx.font = "700 20px " + FONT;
@@ -2600,7 +2657,9 @@
               ["Mg", r.mg, "mEq", 482],
               ["PO₄", r.po4, "mmol", 522],
             ];
-            summaryRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, RX, RVAL));
+            summaryRows.forEach(([lbl, val, unit, y]) =>
+              rowLine(lbl, val, unit, y, RX, RVAL),
+            );
 
             // ── Rate (right column, below summary) ──
             const rate = method === "1" ? r.flowRate1 : r.flowRate2;
@@ -2620,7 +2679,9 @@
 
             // ── Footer ──
             const dateLabel = new Date().toLocaleDateString("th-TH", {
-              year: "numeric", month: "long", day: "numeric"
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             });
             ctx.textAlign = "center";
             ctx.font = "13px " + FONT;
