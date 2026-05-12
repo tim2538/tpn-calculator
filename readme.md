@@ -137,14 +137,25 @@ Triggered when `Osmolarity > 900 mOsm/L` AND venous access is `peripheral`.
 ```
 V₂ (mL)         = (Osmolarity × Total Volume I) ÷ 900
 Extra Water (mL) = V₂ − Total Volume I
-Flow Rate        = V₂ ÷ Infusion Duration
 ```
 
-If central line or osmolarity ≤ 900, flow rate uses Total Volume I directly:
+If central line or osmolarity ≤ 900, effective volumes equal the total volumes directly.
+
+---
+
+### 5a. Rate I and Rate II
+
+Both methods produce a rate. Each uses its own effective volume:
 
 ```
-Flow Rate (mL/hr) = Total Volume I ÷ Infusion Duration
+Effective Volume I  = needsDilution ? (Osmolarity × Total Volume I)  ÷ 900 : Total Volume I
+Effective Volume II = needsDilution ? (Osmolarity × Total Volume II) ÷ 900 : Total Volume II
+
+Rate I  (mL/hr) = Effective Volume I  ÷ Infusion Duration
+Rate II (mL/hr) = Effective Volume II ÷ Infusion Duration
 ```
+
+Both rates are displayed as large text in the right panel and the PNG export shows the rate matching the selected method.
 
 ---
 
@@ -234,7 +245,8 @@ Cl_max = Na + K − K₂HPO₄ − Glycophos×2
 | Osmolarity           | AA + Dextrose×5 + Na×2 + K×2 + Mg×1 + Ca×1.4     | mOsm/L    |
 | V₂ (diluted)         | Osmolarity × Vol I ÷ 900                         | mL        |
 | Extra Water          | V₂ − Vol I                                       | mL        |
-| Flow Rate            | Effective Volume ÷ Duration                      | mL/hr     |
+| Rate I               | Effective Volume I ÷ Duration  (K₂HPO₄ method)   | mL/hr     |
+| Rate II              | Effective Volume II ÷ Duration (NaCl method)      | mL/hr     |
 | GIR                  | Dextrose×1000 ÷ (Weight×Duration×60)             | mg/kg/min |
 | Total Calories       | Protein×4 + Dextrose×3.4 + Lipid×10              | kcal      |
 | IVLE Hourly          | Lipid ÷ Weight ÷ IVLE Duration                   | g/kg/hr   |

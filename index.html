@@ -441,6 +441,46 @@
             margin-left: 4px;
             font-weight: 400;
           }
+          .rate-hero {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px 28px;
+            margin-top: 20px;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+          }
+          .rate-hero-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+          }
+          .rate-hero-col + .rate-hero-col {
+            border-left: 1px solid var(--border-color);
+          }
+          .rate-hero .rate-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+          }
+          .rate-hero .rate-value {
+            font-size: 3.4em;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+          }
+          .rate-hero .rate-unit {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+          }
           .formula-details {
             margin-top: 12px;
             padding-top: 12px;
@@ -1216,6 +1256,18 @@
                   <span id="toggleAllText">แสดงสูตร</span>
                 </button>
               </div>
+              <div class="rate-hero">
+                <div class="rate-hero-col">
+                  <div class="rate-label">Rate I (K₂HPO₄ First)</div>
+                  <div class="rate-value" id="rateHero1">-</div>
+                  <div class="rate-unit">ml/hr</div>
+                </div>
+                <div class="rate-hero-col">
+                  <div class="rate-label">Rate II (NaCl First)</div>
+                  <div class="rate-value" id="rateHero2">-</div>
+                  <div class="rate-unit">ml/hr</div>
+                </div>
+              </div>
               <div class="result-grid">
                 <div class="result-card">
                   <h3>Total Volume I</h3>
@@ -1246,12 +1298,6 @@
                   <div class="value" id="totalCalories">-</div>
                   <span class="unit">kcal</span>
                   <div class="formula-details" id="formula-calories"></div>
-                </div>
-                <div class="result-card">
-                  <h3>Flow Rate</h3>
-                  <div class="value" id="flowRate">-</div>
-                  <span class="unit">mL/hr</span>
-                  <div class="formula-details" id="formula-flowrate"></div>
                 </div>
                 <div class="result-card hidden" id="dilutionCard">
                   <h3>Volume ที่ต้องการ (V₂)</h3>
@@ -1484,7 +1530,7 @@
               </div>
             </div>
             <div class="print-canvas-wrapper">
-              <canvas id="previewCanvas" width="1200" height="900"></canvas>
+              <canvas id="previewCanvas" width="900" height="1200"></canvas>
             </div>
             <div class="print-modal-actions">
               <button class="btn btn-reset" onclick="closePrintModal()">ปิด</button>
@@ -1703,6 +1749,8 @@
             window.scrollTo({ top: 0, behavior: "smooth" });
             document.getElementById("printBtn").disabled = true;
             window.lastResult = null;
+            document.getElementById("rateHero1").textContent = "-";
+            document.getElementById("rateHero2").textContent = "-";
           }
           function getNextInput(currentInput) {
             const inputs = Array.from(
@@ -2000,7 +2048,11 @@
               const effectiveVolume = needsDilution
                 ? (osmolarity * totalVolume1) / 900
                 : totalVolume1;
+              const effectiveVolume2 = needsDilution
+                ? (osmolarity * totalVolume2) / 900
+                : totalVolume2;
               const flowRate = effectiveVolume / infusionDuration;
+              const flowRate2 = effectiveVolume2 / infusionDuration;
               const volumeIWithLipid = totalVolume1 + lipidSolution;
               const volumeIIWithLipid = totalVolume2 + lipidSolution;
 
@@ -2013,8 +2065,10 @@
               document.getElementById("gir").textContent = gir.toFixed(2);
               document.getElementById("totalCalories").textContent =
                 totalCalories.toFixed(0);
-              document.getElementById("flowRate").textContent =
+              document.getElementById("rateHero1").textContent =
                 flowRate.toFixed(1);
+              document.getElementById("rateHero2").textContent =
+                flowRate2.toFixed(1);
               const ivleRateHr = ivleHours > 0 ? lipid / weight / ivleHours : 0;
               const ivleRateDay = lipid / weight;
               document.getElementById("ivleRateHr").textContent =
@@ -2126,11 +2180,6 @@
             <div class="formula-calculation">(${protein} × 4) + (${dextrose} × 3.4) + (${lipid} × 10) = ${totalCalories.toFixed(
               0,
             )} kcal</div>
-          `;
-              document.getElementById("formula-flowrate").innerHTML = `
-            <div class="formula-label">สูตร:</div>
-            <div class="formula-calculation">${needsDilution ? "V₂ (หลังเจือจาง)" : "Total Volume I"} ÷ Duration</div>
-            <div class="formula-calculation">${effectiveVolume.toFixed(1)} ÷ ${infusionDuration} = ${flowRate.toFixed(1)} mL/hr</div>
           `;
               document.getElementById("electrolyteSolutions1").innerHTML =
                 renderElectrolyteHTML(
@@ -2375,6 +2424,8 @@
                 cernevitVol: document.getElementById("cernevit").checked ? 5 : 0,
                 bcomplexVol: document.getElementById("bComplex").checked ? 2 : 0,
                 na, k, cl, ca, mg, po4,
+                flowRate1: flowRate,
+                flowRate2,
               };
               document.getElementById("printBtn").disabled = false;
               lucide.createIcons();
@@ -2429,7 +2480,7 @@
             if (!r) return;
             const elec = method === "1" ? r.electrolytes1 : r.electrolytes2;
             const ctx = canvas.getContext("2d");
-            const W = 1200, H = 900;
+            const W = 900, H = 1200;
             canvas.width = W;
             canvas.height = H;
 
@@ -2443,10 +2494,10 @@
             function rowLine(label, value, unit, y, leftX, valX) {
               ctx.textAlign = "left";
               ctx.fillStyle = BLACK;
-              ctx.font = "16px " + FONT;
+              ctx.font = "18px " + FONT;
               ctx.fillText(label, leftX, y);
               ctx.textAlign = "right";
-              ctx.font = "600 16px " + FONT;
+              ctx.font = "600 18px " + FONT;
               ctx.fillText(
                 (typeof value === "number" ? value.toFixed(2) : value) + "  " + unit,
                 valX, y
@@ -2455,12 +2506,12 @@
 
             // ── Header ──
             ctx.textAlign = "left";
-            ctx.font = "600 18px " + FONT;
+            ctx.font = "600 22px " + FONT;
             ctx.fillStyle = BLACK;
             const hn = r.patientId || "—";
             const name = r.patientName || "—";
-            ctx.fillText("HN  " + hn + "      ชื่อ-สกุล  " + name, 50, 55);
-            ctx.fillText("BW  " + r.weight + "  kg", 50, 88);
+            ctx.fillText("HN  " + hn + "      ชื่อ-สกุล  " + name, 50, 70);
+            ctx.fillText("BW  " + r.weight + "  kg", 50, 108);
 
             // ── Access type (selected only, large) ──
             const isCentral = r.venousAccess === "central";
@@ -2468,88 +2519,104 @@
               ? "****** Central Line Use Only ******"
               : "Peripheral Line Use";
             ctx.textAlign = "center";
-            ctx.font = "700 22px " + FONT;
+            ctx.font = "700 26px " + FONT;
             ctx.fillStyle = BLACK;
-            ctx.fillText(accessLabel, W / 2, 125);
+            ctx.fillText(accessLabel, W / 2, 152);
 
             // ── Horizontal rule ──
             ctx.strokeStyle = "#333333";
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.moveTo(50, 142);
-            ctx.lineTo(W - 50, 142);
+            ctx.moveTo(50, 172);
+            ctx.lineTo(W - 50, 172);
             ctx.stroke();
 
             // ── Vertical divider ──
             ctx.strokeStyle = "#cccccc";
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(618, 148);
-            ctx.lineTo(618, H - 45);
+            ctx.moveTo(448, 172);
+            ctx.lineTo(448, 1155);
             ctx.stroke();
 
             // ─── LEFT COLUMN ───
-            const LX = 50, LVAL = 590;
+            const LX = 50, LVAL = 420;
 
             ctx.textAlign = "left";
-            ctx.font = "700 17px " + FONT;
+            ctx.font = "700 20px " + FONT;
             ctx.fillStyle = BLACK;
-            ctx.fillText("Ingredients:", LX, 168);
+            ctx.fillText("Ingredients:", LX, 196);
 
             const proteinLabel = r.proteinProduct === "amiparen"
               ? "Protein as Amiparen"
               : "Protein as Aminoplasmal";
 
             const leftRows = [
-              ["Sterile water", r.sterileWater, "ml", 198],
-              ["50% Glucose", r.dextroseSolution, "ml", 223],
-              [proteinLabel, r.proteinSolution, "ml", 248],
+              ["Sterile water", r.sterileWater, "ml", 242],
+              ["50% Glucose", r.dextroseSolution, "ml", 282],
+              [proteinLabel, r.proteinSolution, "ml", 322],
             ];
             leftRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
 
             const elecRows = [
-              ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", 283],
-              ["Glycophos", elec["Glycophos"] ?? 0, "ml", 308],
-              ["15% KCl", elec["15% KCl"] ?? 0, "ml", 333],
-              ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", 358],
-              ["24.6% Na Ac", elec["24.6% NaAc"] ?? 0, "ml", 383],
-              ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", 408],
-              ["Addamel", r.addamelVol, "ml", 433],
-              ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 458],
+              ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", 390],
+              ["Glycophos", elec["Glycophos"] ?? 0, "ml", 430],
+              ["15% KCl", elec["15% KCl"] ?? 0, "ml", 470],
+              ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", 510],
+              ["24.6% Na Ac", elec["24.6% NaAc"] ?? 0, "ml", 550],
+              ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", 590],
+              ["Addamel", r.addamelVol, "ml", 630],
+              ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 670],
             ];
             elecRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
 
             ctx.textAlign = "left";
-            ctx.font = "700 17px " + FONT;
+            ctx.font = "700 20px " + FONT;
             ctx.fillStyle = BLACK;
-            ctx.fillText("Add before administration", LX, 493);
+            ctx.fillText("Add before administration", LX, 728);
 
             const addRows = [
-              ["Soluvit", r.soluvitVol, "ml", 518],
-              ["Cernevit", r.cernevitVol, "ml", 543],
-              ["B complex", r.bcomplexVol, "ml", 568],
+              ["Soluvit", r.soluvitVol, "ml", 778],
+              ["Cernevit", r.cernevitVol, "ml", 818],
+              ["B complex", r.bcomplexVol, "ml", 858],
             ];
             addRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
 
             // ─── RIGHT COLUMN ───
-            const RX = 648, RVAL = 1150;
+            const RX = 468, RVAL = 858;
 
             ctx.textAlign = "left";
-            ctx.font = "700 17px " + FONT;
+            ctx.font = "700 20px " + FONT;
             ctx.fillStyle = BLACK;
-            ctx.fillText("Summary:", RX, 168);
+            ctx.fillText("Summary:", RX, 196);
 
             const summaryRows = [
-              ["Protein", r.protein, "g", 203],
-              ["Glucose", r.dextrose, "g", 228],
-              ["Na", r.na, "mEq", 253],
-              ["K", r.k, "mEq", 278],
-              ["Cl", r.cl, "mEq", 303],
-              ["Ca", r.ca, "mEq", 328],
-              ["Mg", r.mg, "mEq", 353],
-              ["PO₄", r.po4, "mmol", 378],
+              ["Protein", r.protein, "g", 242],
+              ["Glucose", r.dextrose, "g", 282],
+              ["Na", r.na, "mEq", 322],
+              ["K", r.k, "mEq", 362],
+              ["Cl", r.cl, "mEq", 402],
+              ["Ca", r.ca, "mEq", 442],
+              ["Mg", r.mg, "mEq", 482],
+              ["PO₄", r.po4, "mmol", 522],
             ];
             summaryRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, RX, RVAL));
+
+            // ── Rate (right column, below summary) ──
+            const rate = method === "1" ? r.flowRate1 : r.flowRate2;
+            if (rate != null) {
+              ctx.textAlign = "left";
+              ctx.font = "600 20px " + FONT;
+              ctx.fillStyle = BLACK;
+              ctx.fillText("Rate", RX, 572);
+              ctx.textAlign = "right";
+              ctx.font = "700 36px " + FONT;
+              ctx.fillText(rate.toFixed(1), RVAL - 56, 620);
+              ctx.textAlign = "left";
+              ctx.font = "18px " + FONT;
+              ctx.fillStyle = GREY;
+              ctx.fillText("ml/hr", RVAL - 50, 620);
+            }
 
             // ── Footer ──
             const dateLabel = new Date().toLocaleDateString("th-TH", {
@@ -2558,7 +2625,7 @@
             ctx.textAlign = "center";
             ctx.font = "13px " + FONT;
             ctx.fillStyle = GREY;
-            ctx.fillText("TPN Calculator  |  " + dateLabel, W / 2, H - 22);
+            ctx.fillText("TPN Calculator  |  " + dateLabel, W / 2, 1175);
           }
         </script>
       </body>
