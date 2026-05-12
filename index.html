@@ -297,6 +297,86 @@
           .btn-reset .btn-icon-only {
             display: none;
           }
+          .btn-reset:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+          }
+          .btn-reset:disabled:hover {
+            background: var(--reset-bg);
+          }
+          /* Print Preview Modal */
+          .print-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+          }
+          .print-modal-overlay.active {
+            display: flex;
+          }
+          .print-modal {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px var(--shadow-lg);
+            padding: 24px;
+            width: 92vw;
+            max-width: 960px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+          }
+          .print-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .print-modal-header h3 {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+          }
+          .print-method-toggle {
+            display: flex;
+            gap: 8px;
+          }
+          .print-method-toggle button {
+            background: var(--reset-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.9em;
+            font-family: "Sarabun", sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+          }
+          .print-method-toggle button.active {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border-color: var(--button-bg);
+          }
+          .print-canvas-wrapper {
+            overflow: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            flex: 1;
+            min-height: 0;
+            background: #fff;
+          }
+          .print-canvas-wrapper canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+          }
+          .print-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+          }
           .results {
             grid-column: 1 / -1;
           }
@@ -692,6 +772,11 @@
             }
             .results-header {
               flex-wrap: nowrap;
+            }
+            .print-modal-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 10px;
             }
           }
           .hidden {
@@ -1375,10 +1460,39 @@
                 รีเซ็ต
               </span>
             </button>
+            <button class="btn btn-reset" id="printBtn" onclick="printReport()" disabled>
+              <i data-lucide="printer" class="btn-icon btn-icon-only"></i>
+              <span class="btn-text">
+                <i data-lucide="printer" class="btn-icon"></i>
+                พิมพ์
+              </span>
+            </button>
             <button class="btn" id="calculateBtn" onclick="handleCalculate()">
               <i data-lucide="calculator" class="btn-icon"></i>
               คำนวณ TPN
             </button>
+          </div>
+        </div>
+        <!-- Print Preview Modal -->
+        <div class="print-modal-overlay" id="printPreviewModal">
+          <div class="print-modal">
+            <div class="print-modal-header">
+              <h3>ตัวอย่างก่อนพิมพ์</h3>
+              <div class="print-method-toggle">
+                <button id="methodBtn1" class="active" onclick="selectPrintMethod('1')">วิธีที่ 1 (K₂HPO₄ First)</button>
+                <button id="methodBtn2" onclick="selectPrintMethod('2')">วิธีที่ 2 (NaCl First)</button>
+              </div>
+            </div>
+            <div class="print-canvas-wrapper">
+              <canvas id="previewCanvas" width="1200" height="900"></canvas>
+            </div>
+            <div class="print-modal-actions">
+              <button class="btn btn-reset" onclick="closePrintModal()">ปิด</button>
+              <button class="btn" onclick="downloadPNG()">
+                <i data-lucide="download" class="btn-icon"></i>
+                ดาวน์โหลด PNG
+              </button>
+            </div>
           </div>
         </div>
         <script>
@@ -1587,6 +1701,8 @@
             document.getElementById("bComplex").checked = false;
             document.getElementById("addamel").checked = false;
             window.scrollTo({ top: 0, behavior: "smooth" });
+            document.getElementById("printBtn").disabled = true;
+            window.lastResult = null;
           }
           function getNextInput(currentInput) {
             const inputs = Array.from(
@@ -2240,11 +2356,209 @@
               document
                 .getElementById("resultsSection")
                 .scrollIntoView({ behavior: "smooth", block: "nearest" });
+              // Store results for PNG export
+              window.lastResult = {
+                patientId: document.getElementById("patientId").value.trim(),
+                patientName: document.getElementById("patientName").value.trim(),
+                weight,
+                venousAccess,
+                proteinProduct,
+                sterileWater: needsDilution ? effectiveVolume - totalVolume1 : 0,
+                dextroseSolution,
+                proteinSolution,
+                protein,
+                dextrose,
+                electrolytes1: method1.electrolytes,
+                electrolytes2: method2.electrolytes,
+                addamelVol: document.getElementById("addamel").checked ? 10 : 0,
+                soluvitVol: document.getElementById("soluvit").checked ? 10 : 0,
+                cernevitVol: document.getElementById("cernevit").checked ? 5 : 0,
+                bcomplexVol: document.getElementById("bComplex").checked ? 2 : 0,
+                na, k, cl, ca, mg, po4,
+              };
+              document.getElementById("printBtn").disabled = false;
               lucide.createIcons();
             } catch (error) {
               alert("เกิดข้อผิดพลาดในการคำนวณ: " + error.message);
               console.error(error);
             }
+          }
+
+          // ─── PNG Export ────────────────────────────────────────────────
+
+          let currentPrintMethod = "1";
+
+          function printReport() {
+            if (!window.lastResult) return;
+            currentPrintMethod = "1";
+            document.getElementById("methodBtn1").classList.add("active");
+            document.getElementById("methodBtn2").classList.remove("active");
+            const canvas = document.getElementById("previewCanvas");
+            drawExportCanvas(canvas, currentPrintMethod);
+            document.getElementById("printPreviewModal").classList.add("active");
+            lucide.createIcons();
+          }
+
+          function selectPrintMethod(method) {
+            currentPrintMethod = method;
+            document.getElementById("methodBtn1").classList.toggle("active", method === "1");
+            document.getElementById("methodBtn2").classList.toggle("active", method === "2");
+            drawExportCanvas(document.getElementById("previewCanvas"), method);
+          }
+
+          function closePrintModal() {
+            document.getElementById("printPreviewModal").classList.remove("active");
+          }
+
+          function downloadPNG() {
+            const canvas = document.getElementById("previewCanvas");
+            canvas.toBlob(function (blob) {
+              const r = window.lastResult;
+              const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+              const idStr = r.patientId || "report";
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = "TPN_" + idStr + "_" + dateStr + ".png";
+              a.click();
+              URL.revokeObjectURL(a.href);
+            });
+          }
+
+          function drawExportCanvas(canvas, method) {
+            const r = window.lastResult;
+            if (!r) return;
+            const elec = method === "1" ? r.electrolytes1 : r.electrolytes2;
+            const ctx = canvas.getContext("2d");
+            const W = 1200, H = 900;
+            canvas.width = W;
+            canvas.height = H;
+
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, W, H);
+
+            const FONT = "Sarabun, sans-serif";
+            const BLACK = "#1a1a1a";
+            const GREY = "#888888";
+
+            function rowLine(label, value, unit, y, leftX, valX) {
+              ctx.textAlign = "left";
+              ctx.fillStyle = BLACK;
+              ctx.font = "16px " + FONT;
+              ctx.fillText(label, leftX, y);
+              ctx.textAlign = "right";
+              ctx.font = "600 16px " + FONT;
+              ctx.fillText(
+                (typeof value === "number" ? value.toFixed(2) : value) + "  " + unit,
+                valX, y
+              );
+            }
+
+            // ── Header ──
+            ctx.textAlign = "left";
+            ctx.font = "600 18px " + FONT;
+            ctx.fillStyle = BLACK;
+            const hn = r.patientId || "—";
+            const name = r.patientName || "—";
+            ctx.fillText("HN  " + hn + "      ชื่อ-สกุล  " + name, 50, 55);
+            ctx.fillText("BW  " + r.weight + "  kg", 50, 88);
+
+            // ── Access type (selected only, large) ──
+            const isCentral = r.venousAccess === "central";
+            const accessLabel = isCentral
+              ? "****** Central Line Use Only ******"
+              : "Peripheral Line Use";
+            ctx.textAlign = "center";
+            ctx.font = "700 22px " + FONT;
+            ctx.fillStyle = BLACK;
+            ctx.fillText(accessLabel, W / 2, 125);
+
+            // ── Horizontal rule ──
+            ctx.strokeStyle = "#333333";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(50, 142);
+            ctx.lineTo(W - 50, 142);
+            ctx.stroke();
+
+            // ── Vertical divider ──
+            ctx.strokeStyle = "#cccccc";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(618, 148);
+            ctx.lineTo(618, H - 45);
+            ctx.stroke();
+
+            // ─── LEFT COLUMN ───
+            const LX = 50, LVAL = 590;
+
+            ctx.textAlign = "left";
+            ctx.font = "700 17px " + FONT;
+            ctx.fillStyle = BLACK;
+            ctx.fillText("Ingredients:", LX, 168);
+
+            const proteinLabel = r.proteinProduct === "amiparen"
+              ? "Protein as Amiparen"
+              : "Protein as Aminoplasmal";
+
+            const leftRows = [
+              ["Sterile water", r.sterileWater, "ml", 198],
+              ["50% Glucose", r.dextroseSolution, "ml", 223],
+              [proteinLabel, r.proteinSolution, "ml", 248],
+            ];
+            leftRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+
+            const elecRows = [
+              ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", 283],
+              ["Glycophos", elec["Glycophos"] ?? 0, "ml", 308],
+              ["15% KCl", elec["15% KCl"] ?? 0, "ml", 333],
+              ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", 358],
+              ["24.6% Na Ac", elec["24.6% NaAc"] ?? 0, "ml", 383],
+              ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", 408],
+              ["Addamel", r.addamelVol, "ml", 433],
+              ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 458],
+            ];
+            elecRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+
+            ctx.textAlign = "left";
+            ctx.font = "700 17px " + FONT;
+            ctx.fillStyle = BLACK;
+            ctx.fillText("Add before administration", LX, 493);
+
+            const addRows = [
+              ["Soluvit", r.soluvitVol, "ml", 518],
+              ["Cernevit", r.cernevitVol, "ml", 543],
+              ["B complex", r.bcomplexVol, "ml", 568],
+            ];
+            addRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+
+            // ─── RIGHT COLUMN ───
+            const RX = 648, RVAL = 1150;
+
+            ctx.textAlign = "left";
+            ctx.font = "700 17px " + FONT;
+            ctx.fillStyle = BLACK;
+            ctx.fillText("Summary:", RX, 168);
+
+            const summaryRows = [
+              ["Protein", r.protein, "g", 203],
+              ["Glucose", r.dextrose, "g", 228],
+              ["Na", r.na, "mEq", 253],
+              ["K", r.k, "mEq", 278],
+              ["Cl", r.cl, "mEq", 303],
+              ["Ca", r.ca, "mEq", 328],
+              ["Mg", r.mg, "mEq", 353],
+              ["PO₄", r.po4, "mmol", 378],
+            ];
+            summaryRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, RX, RVAL));
+
+            // ── Footer ──
+            const dateLabel = new Date().toLocaleDateString("th-TH", {
+              year: "numeric", month: "long", day: "numeric"
+            });
+            ctx.textAlign = "center";
+            ctx.font = "13px " + FONT;
+            ctx.fillStyle = GREY;
+            ctx.fillText("TPN Calculator  |  " + dateLabel, W / 2, H - 22);
           }
         </script>
       </body>
