@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <!DOCTYPE html>
+    <!doctype html>
     <html lang="th">
       <head>
         <meta charset="UTF-8" />
@@ -71,15 +71,21 @@
             box-sizing: border-box;
           }
           body {
-            font-family: "Sarabun", -apple-system, BlinkMacSystemFont,
-              "Segoe UI", sans-serif;
+            font-family:
+              "Sarabun",
+              -apple-system,
+              BlinkMacSystemFont,
+              "Segoe UI",
+              sans-serif;
             background: var(--bg-primary);
             padding: 20px;
             padding-bottom: 100px;
             min-height: 100vh;
             color: var(--text-primary);
             font-size: 16px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition:
+              background-color 0.3s ease,
+              color 0.3s ease;
           }
           .container {
             max-width: 1200px;
@@ -714,8 +720,22 @@
             flex-shrink: 0;
             margin-left: 12px;
           }
-          [data-theme="dark"] .compat-pass { color: #6ee7b7; }
-          [data-theme="dark"] .compat-fail { color: #fca5a5; }
+          [data-theme="dark"] .compat-pass {
+            color: #6ee7b7;
+          }
+          [data-theme="dark"] .compat-fail {
+            color: #fca5a5;
+          }
+          .helper-text {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+          }
+          .helper-text.warn {
+            color: #f59e0b;
+            font-weight: 600;
+          }
           ::placeholder {
             color: var(--text-tertiary);
             opacity: 0.7;
@@ -943,6 +963,7 @@
                     step="0.1"
                     inputmode="decimal"
                     enterkeyhint="next"
+                    oninput="updateClHint()"
                     class="required-field"
                   />
                 </div>
@@ -955,6 +976,7 @@
                     step="0.1"
                     inputmode="decimal"
                     enterkeyhint="next"
+                    oninput="updateClHint()"
                     class="required-field"
                   />
                 </div>
@@ -967,8 +989,10 @@
                     step="0.1"
                     inputmode="decimal"
                     enterkeyhint="next"
+                    oninput="updateClHint()"
                     class="required-field"
                   />
+                  <small id="clMaxHint" class="helper-text"></small>
                 </div>
                 <div class="form-group hidden" id="clAutoGroup">
                   <label>Cl (mEq) — คำนวณอัตโนมัติ</label>
@@ -1007,6 +1031,7 @@
                     step="0.1"
                     inputmode="decimal"
                     enterkeyhint="done"
+                    oninput="updateClHint()"
                     class="required-field"
                   />
                 </div>
@@ -1082,13 +1107,23 @@
                 <div class="result-card">
                   <h3>IVLE Rate</h3>
                   <div class="value" id="ivleRateHr">-</div>
-                  <span class="unit">g/kg/hr <span style="font-size:0.75em;color:var(--text-tertiary)">(max 0.11)</span></span>
+                  <span class="unit"
+                    >g/kg/hr
+                    <span style="font-size: 0.75em; color: var(--text-tertiary)"
+                      >(max 0.11)</span
+                    ></span
+                  >
                   <div class="formula-details" id="formula-ivleRateHr"></div>
                 </div>
                 <div class="result-card">
                   <h3>IVLE Rate (รายวัน)</h3>
                   <div class="value" id="ivleRateDay">-</div>
-                  <span class="unit">g/kg/day <span style="font-size:0.75em;color:var(--text-tertiary)">(max 1.5)</span></span>
+                  <span class="unit"
+                    >g/kg/day
+                    <span style="font-size: 0.75em; color: var(--text-tertiary)"
+                      >(max 1.5)</span
+                    ></span
+                  >
                   <div class="formula-details" id="formula-ivleRateDay"></div>
                 </div>
               </div>
@@ -1377,7 +1412,7 @@
           }
           document.addEventListener("DOMContentLoaded", function () {
             const inputs = document.querySelectorAll(
-              "input:not([readonly]), select"
+              "input:not([readonly]), select",
             );
             inputs.forEach((input) => {
               input.addEventListener("keydown", function (e) {
@@ -1464,6 +1499,8 @@
             document.getElementById("acetateMode").value = "yes";
             onAcetateModeChange();
             document.getElementById("clAuto").value = "";
+            document.getElementById("clMaxHint").textContent = "";
+            document.getElementById("cl").removeAttribute("max");
             document.getElementById("dilutionCard").classList.add("hidden");
             document.getElementById("extraWaterCard").classList.add("hidden");
             document.querySelectorAll(".input-error").forEach((el) => {
@@ -1473,16 +1510,26 @@
           }
           function getNextInput(currentInput) {
             const inputs = Array.from(
-              document.querySelectorAll("input:not([readonly]), select")
+              document.querySelectorAll("input:not([readonly]), select"),
             );
             const currentIndex = inputs.indexOf(currentInput);
             return inputs[currentIndex + 1] || null;
           }
-          function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
+          function calculateElectrolytes(
+            method,
+            na,
+            k,
+            cl,
+            ca,
+            mg,
+            po4,
+            useAcetate,
+          ) {
             let electrolytes = {};
             let formulas = {};
             const cagluconate = ca / 0.5;
-            formulas["10% Ca Gluconate"] = `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
+            formulas["10% Ca Gluconate"] =
+              `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
             const mgso4 = mg / 4;
             formulas["50% MgSO₄"] = `${mg} ÷ 4 = ${mgso4.toFixed(2)}`;
             if (method === "k2hpo4") {
@@ -1498,18 +1545,24 @@
                 kac = (k - k2hpo4 - kcl * 2) / 3;
                 nacl = (cl - kcl * 2) / 0.5;
                 naac = (na - nacl * 0.5 - glycophos * 2) / 3;
-                formulas["15% KCl"] = `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
-                formulas["29.4% KAc"] = `(${k} - ${k2hpo4.toFixed(2)} - ${(kcl * 2).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
-                formulas["3% NaCl"] = `(${cl} - ${(kcl * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
-                formulas["24.6% NaAc"] = `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
+                formulas["15% KCl"] =
+                  `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+                formulas["29.4% KAc"] =
+                  `(${k} - ${k2hpo4.toFixed(2)} - ${(kcl * 2).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
+                formulas["3% NaCl"] =
+                  `(${cl} - ${(kcl * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+                formulas["24.6% NaAc"] =
+                  `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
               } else {
                 kcl = (k - k2hpo4) / 2;
                 kac = 0;
                 nacl = (na - glycophos * 2) / 0.5;
                 naac = 0;
-                formulas["15% KCl"] = `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+                formulas["15% KCl"] =
+                  `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
                 formulas["29.4% KAc"] = "ไม่ใช้ Acetate → 0";
-                formulas["3% NaCl"] = `(${na} - ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+                formulas["3% NaCl"] =
+                  `(${na} - ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
                 formulas["24.6% NaAc"] = "ไม่ใช้ Acetate → 0";
               }
               electrolytes = {
@@ -1534,17 +1587,22 @@
                 kcl = (cl - nacl * 0.5) / 2;
                 kac = (k - k2hpo4 - (cl - nacl * 0.5)) / 3;
                 naac = (na - nacl * 0.5 - glycophos * 2) / 3;
-                formulas["3% NaCl"] = `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
-                formulas["15% KCl"] = `(${cl} - ${(nacl * 0.5).toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
-                formulas["29.4% KAc"] = `(${k} - ${k2hpo4.toFixed(2)} - ${(cl - nacl * 0.5).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
-                formulas["24.6% NaAc"] = `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
+                formulas["3% NaCl"] =
+                  `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+                formulas["15% KCl"] =
+                  `(${cl} - ${(nacl * 0.5).toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+                formulas["29.4% KAc"] =
+                  `(${k} - ${k2hpo4.toFixed(2)} - ${(cl - nacl * 0.5).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
+                formulas["24.6% NaAc"] =
+                  `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
               } else {
                 nacl = na / 0.5;
                 kcl = (k - k2hpo4) / 2;
                 kac = 0;
                 naac = 0;
                 formulas["3% NaCl"] = `${na} ÷ 0.5 = ${nacl.toFixed(2)}`;
-                formulas["15% KCl"] = `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+                formulas["15% KCl"] =
+                  `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
                 formulas["29.4% KAc"] = "ไม่ใช้ Acetate → 0";
                 formulas["24.6% NaAc"] = "ไม่ใช้ Acetate → 0";
               }
@@ -1562,10 +1620,15 @@
             return { electrolytes, formulas };
           }
 
-          function renderElectrolyteHTML(electrolytes, formulas, allFormulasVisible) {
+          function renderElectrolyteHTML(
+            electrolytes,
+            formulas,
+            allFormulasVisible,
+          ) {
             return Object.entries(electrolytes)
               .filter(([, value]) => value > 0)
-              .map(([name, value]) => `
+              .map(
+                ([name, value]) => `
                 <div class="electrolyte-item">
                   <div class="electrolyte-header">
                     <span class="electrolyte-name">${name}</span>
@@ -1576,8 +1639,40 @@
                     <div class="formula-calculation">${formulas[name]}</div>
                   </div>
                 </div>
-              `)
+              `,
+              )
               .join("");
+          }
+          function computeClMax() {
+            const na = parseFloat(document.getElementById("na").value) || 0;
+            const k = parseFloat(document.getElementById("k").value) || 0;
+            const po4 = parseFloat(document.getElementById("po4").value) || 0;
+            const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
+            const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 : 0;
+            return na + k - k2hpo4 - glycophos * 2;
+          }
+          function updateClHint() {
+            const hint = document.getElementById("clMaxHint");
+            const clInput = document.getElementById("cl");
+            const mode = document.getElementById("acetateMode").value;
+            if (mode !== "yes") {
+              hint.textContent = "";
+              clInput.removeAttribute("max");
+              return;
+            }
+            const na = parseFloat(document.getElementById("na").value) || 0;
+            const k = parseFloat(document.getElementById("k").value) || 0;
+            if (na === 0 && k === 0) {
+              hint.textContent = "";
+              clInput.removeAttribute("max");
+              return;
+            }
+            const clMax = computeClMax();
+            const current = parseFloat(clInput.value) || 0;
+            clInput.setAttribute("max", clMax.toFixed(1));
+            hint.textContent = `ค่าสูงสุดที่ไม่ทำให้ติดลบ: ${clMax.toFixed(1)} mEq`;
+            hint.className =
+              current > clMax ? "helper-text warn" : "helper-text";
           }
           function onAcetateModeChange() {
             const mode = document.getElementById("acetateMode").value;
@@ -1593,6 +1688,7 @@
               clAutoGroup.classList.add("hidden");
               clInput.classList.add("required-field");
             }
+            updateClHint();
           }
           function calculate() {
             try {
@@ -1618,8 +1714,7 @@
                 document.getElementById("clinicalStatus").value;
               const venousAccess =
                 document.getElementById("venousAccess").value;
-              const acetateMode =
-                document.getElementById("acetateMode").value;
+              const acetateMode = document.getElementById("acetateMode").value;
               const useAcetate = acetateMode === "yes";
               // Compute Cl: user-entered or auto-derived when no acetate
               let cl;
@@ -1628,7 +1723,7 @@
               } else {
                 const _k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
                 const _glycophos = po4 > 0 && _k2hpo4 === 0 ? po4 : 0;
-                cl = (k - _k2hpo4) + (na - _glycophos * 2);
+                cl = k - _k2hpo4 + (na - _glycophos * 2);
                 document.getElementById("clAuto").value = cl.toFixed(2);
               }
               const proteinProduct =
@@ -1640,22 +1735,22 @@
                 proteinSolution = (protein * 100) / 10;
                 proteinConcentration = 10;
                 proteinFormula = `${protein} × 100 ÷ 10 = ${proteinSolution.toFixed(
-                  2
+                  2,
                 )}`;
               } else {
                 proteinSolution = (protein * 100) / 15;
                 proteinConcentration = 15;
                 proteinFormula = `${protein} × 100 ÷ 15 = ${proteinSolution.toFixed(
-                  2
+                  2,
                 )}`;
               }
               const dextroseSolution = (dextrose * 100) / 50;
               const dextroseFormula = `${dextrose} × 100 ÷ 50 = ${dextroseSolution.toFixed(
-                2
+                2,
               )}`;
               const lipidSolution = (lipid * 100) / 20;
               const lipidFormula = `${lipid} × 100 ÷ 20 = ${lipidSolution.toFixed(
-                2
+                2,
               )}`;
               const method1 = calculateElectrolytes(
                 "k2hpo4",
@@ -1665,7 +1760,7 @@
                 ca,
                 mg,
                 po4,
-                useAcetate
+                useAcetate,
               );
               const method2 = calculateElectrolytes(
                 "nacl",
@@ -1675,21 +1770,22 @@
                 ca,
                 mg,
                 po4,
-                useAcetate
+                useAcetate,
               );
               const totalElectrolyteVolume1 = Object.values(
-                method1.electrolytes
+                method1.electrolytes,
               ).reduce((a, b) => a + b, 0);
               const totalElectrolyteVolume2 = Object.values(
-                method2.electrolytes
+                method2.electrolytes,
               ).reduce((a, b) => a + b, 0);
               const totalVolume1 =
                 proteinSolution + dextroseSolution + totalElectrolyteVolume1;
               const totalVolume2 =
                 proteinSolution + dextroseSolution + totalElectrolyteVolume2;
-              const aminoAcidOsmolarity = proteinProduct === "amiparen"
-                ? proteinSolution * 0.960   // Amiparen 960 mOsm/L
-                : proteinSolution * 1.290;  // Aminoplasmal 1290 mOsm/L
+              const aminoAcidOsmolarity =
+                proteinProduct === "amiparen"
+                  ? proteinSolution * 0.96 // Amiparen 960 mOsm/L
+                  : proteinSolution * 1.29; // Aminoplasmal 1290 mOsm/L
               const osmolarity =
                 aminoAcidOsmolarity +
                 dextrose * 5 +
@@ -1703,7 +1799,8 @@
               const lipidCalories = lipid * 10;
               const totalCalories =
                 proteinCalories + dextroseCalories + lipidCalories;
-              const needsDilution = osmolarity > 900 && venousAccess === "peripheral";
+              const needsDilution =
+                osmolarity > 900 && venousAccess === "peripheral";
               const effectiveVolume = needsDilution
                 ? (osmolarity * totalVolume1) / 900
                 : totalVolume1;
@@ -1738,10 +1835,16 @@
               `;
               if (needsDilution) {
                 const extraWaterMl = effectiveVolume - totalVolume1;
-                document.getElementById("dilutionCard").classList.remove("hidden");
-                document.getElementById("extraWaterCard").classList.remove("hidden");
-                document.getElementById("dilutionV2").textContent = effectiveVolume.toFixed(1);
-                document.getElementById("extraWater").textContent = extraWaterMl.toFixed(1);
+                document
+                  .getElementById("dilutionCard")
+                  .classList.remove("hidden");
+                document
+                  .getElementById("extraWaterCard")
+                  .classList.remove("hidden");
+                document.getElementById("dilutionV2").textContent =
+                  effectiveVolume.toFixed(1);
+                document.getElementById("extraWater").textContent =
+                  extraWaterMl.toFixed(1);
                 document.getElementById("formula-dilutionV2").innerHTML = `
                   <div class="formula-label">สูตร: V₂ = (Osmolarity × Volume) ÷ 900</div>
                   <div class="formula-calculation">(${osmolarity.toFixed(0)} × ${totalVolume1.toFixed(1)}) ÷ 900 = ${effectiveVolume.toFixed(1)} mL</div>
@@ -1752,7 +1855,9 @@
                 `;
               } else {
                 document.getElementById("dilutionCard").classList.add("hidden");
-                document.getElementById("extraWaterCard").classList.add("hidden");
+                document
+                  .getElementById("extraWaterCard")
+                  .classList.add("hidden");
               }
               document.getElementById("totalElectrolyte1").textContent =
                 totalElectrolyteVolume1.toFixed(2) + " mL";
@@ -1785,27 +1890,28 @@
             <div class="formula-label">สูตร:</div>
             <div class="formula-calculation">Protein Sol + Dextrose Sol + K₂HPO₄ Electrolyte Sol</div>
             <div class="formula-calculation">${proteinSolution.toFixed(
-              2
+              2,
             )} + ${dextroseSolution.toFixed(
-                2
-              )} + ${totalElectrolyteVolume1.toFixed(
-                2
-              )} = ${totalVolume1.toFixed(1)} mL</div>
+              2,
+            )} + ${totalElectrolyteVolume1.toFixed(
+              2,
+            )} = ${totalVolume1.toFixed(1)} mL</div>
           `;
               document.getElementById("formula-volume2").innerHTML = `
             <div class="formula-label">สูตร:</div>
             <div class="formula-calculation">Protein Sol + Dextrose Sol + NaCl Electrolyte Sol</div>
             <div class="formula-calculation">${proteinSolution.toFixed(
-              2
+              2,
             )} + ${dextroseSolution.toFixed(
-                2
-              )} + ${totalElectrolyteVolume2.toFixed(
-                2
-              )} = ${totalVolume2.toFixed(1)} mL</div>
+              2,
+            )} + ${totalElectrolyteVolume2.toFixed(
+              2,
+            )} = ${totalVolume2.toFixed(1)} mL</div>
           `;
-              const aaOsmLabel = proteinProduct === "amiparen"
-                ? `${proteinSolution.toFixed(1)} mL × 0.960 mOsm/mL`
-                : `${proteinSolution.toFixed(1)} mL × 1.290 mOsm/mL`;
+              const aaOsmLabel =
+                proteinProduct === "amiparen"
+                  ? `${proteinSolution.toFixed(1)} mL × 0.960 mOsm/mL`
+                  : `${proteinSolution.toFixed(1)} mL × 1.290 mOsm/mL`;
               document.getElementById("formula-osmolarity").innerHTML = `
             <div class="formula-label">สูตร:</div>
             <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + (Na × 2) + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
@@ -1815,15 +1921,15 @@
             <div class="formula-label">สูตร:</div>
             <div class="formula-calculation">(Dextrose × 1000) ÷ (Weight × Duration × 60)</div>
             <div class="formula-calculation">(${dextrose} × 1000) ÷ (${weight} × ${infusionDuration} × 60) = ${gir.toFixed(
-                2
-              )}</div>
+              2,
+            )}</div>
           `;
               document.getElementById("formula-calories").innerHTML = `
             <div class="formula-label">สูตร:</div>
             <div class="formula-calculation">(Protein × 4) + (Dextrose × 3.4) + (Lipid × 10)</div>
             <div class="formula-calculation">(${protein} × 4) + (${dextrose} × 3.4) + (${lipid} × 10) = ${totalCalories.toFixed(
-                0
-              )} kcal</div>
+              0,
+            )} kcal</div>
           `;
               document.getElementById("formula-flowrate").innerHTML = `
             <div class="formula-label">สูตร:</div>
@@ -1831,17 +1937,25 @@
             <div class="formula-calculation">${effectiveVolume.toFixed(1)} ÷ ${infusionDuration} = ${flowRate.toFixed(1)} mL/hr</div>
           `;
               document.getElementById("electrolyteSolutions1").innerHTML =
-                renderElectrolyteHTML(method1.electrolytes, method1.formulas, allFormulasVisible);
+                renderElectrolyteHTML(
+                  method1.electrolytes,
+                  method1.formulas,
+                  allFormulasVisible,
+                );
               document.getElementById("electrolyteSolutions2").innerHTML =
-                renderElectrolyteHTML(method2.electrolytes, method2.formulas, allFormulasVisible);
+                renderElectrolyteHTML(
+                  method2.electrolytes,
+                  method2.formulas,
+                  allFormulasVisible,
+                );
               const macroHTML = `
             <div class="electrolyte-item">
               <div class="electrolyte-header">
                 <span class="electrolyte-name">${proteinConcentration}% ${
-                proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"
-              }</span>
+                  proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"
+                }</span>
                 <span class="electrolyte-value">${proteinSolution.toFixed(
-                  2
+                  2,
                 )} mL</span>
               </div>
               <div class="electrolyte-formula ${
@@ -1855,7 +1969,7 @@
               <div class="electrolyte-header">
                 <span class="electrolyte-name">50% Dextrose</span>
                 <span class="electrolyte-value">${dextroseSolution.toFixed(
-                  2
+                  2,
                 )} mL</span>
               </div>
               <div class="electrolyte-formula ${
@@ -1869,7 +1983,7 @@
               <div class="electrolyte-header">
                 <span class="electrolyte-name">20% Lipid Emulsion</span>
                 <span class="electrolyte-value">${lipidSolution.toFixed(
-                  2
+                  2,
                 )} mL</span>
               </div>
               <div class="electrolyte-formula ${
@@ -1884,8 +1998,12 @@
                 macroHTML;
               let alertsHTML = "";
               // Warn if any electrolyte value computed negative (imbalanced inputs)
-              const negKeys1 = Object.entries(method1.electrolytes).filter(([, v]) => v < 0).map(([k]) => k);
-              const negKeys2 = Object.entries(method2.electrolytes).filter(([, v]) => v < 0).map(([k]) => k);
+              const negKeys1 = Object.entries(method1.electrolytes)
+                .filter(([, v]) => v < 0)
+                .map(([k]) => k);
+              const negKeys2 = Object.entries(method2.electrolytes)
+                .filter(([, v]) => v < 0)
+                .map(([k]) => k);
               const allNegKeys = [...new Set([...negKeys1, ...negKeys2])];
               if (allNegKeys.length > 0) {
                 alertsHTML += `
@@ -1921,9 +2039,10 @@
             `;
               }
               const girThreshold = clinicalStatus === "critical" ? 5 : 7;
-              const girRangeLabel = clinicalStatus === "critical"
-                ? "Critical ill: ช่วงปกติ 4–5 mg/kg/min"
-                : "Stable: ช่วงปกติ 4–7 mg/kg/min";
+              const girRangeLabel =
+                clinicalStatus === "critical"
+                  ? "Critical ill: ช่วงปกติ 4–5 mg/kg/min"
+                  : "Stable: ช่วงปกติ 4–7 mg/kg/min";
               if (gir > girThreshold) {
                 alertsHTML += `
               <div class="alert alert-warning">
@@ -1958,7 +2077,12 @@
               </div>
             `;
               }
-              if (osmolarity <= 900 && gir <= girThreshold && ivleRateHr <= 0.11 && ivleRateDay <= 1.5) {
+              if (
+                osmolarity <= 900 &&
+                gir <= girThreshold &&
+                ivleRateHr <= 0.11 &&
+                ivleRateDay <= 1.5
+              ) {
                 alertsHTML += `
               <div class="alert alert-success">
                 <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
@@ -1979,14 +2103,15 @@
           `;
               document.getElementById("alerts").innerHTML = alertsHTML;
               const volL = totalVolume1 / 1000;
-              const ca_meqPerL   = ca / volL;
-              const ca_mmolPerL  = (ca * 0.5) / volL;
-              const po4_meqPerL  = (po4 * 2) / volL;
+              const ca_meqPerL = ca / volL;
+              const ca_mmolPerL = (ca * 0.5) / volL;
+              const po4_meqPerL = (po4 * 2) / volL;
               const po4_mmolPerL = po4 / volL;
-              const check1 = (ca_meqPerL + po4_meqPerL) <= 45;
+              const check1 = ca_meqPerL + po4_meqPerL <= 45;
               const check2 = ca_meqPerL <= 15 && po4_meqPerL <= 30;
-              const check3 = po4_mmolPerL > 0 ? (ca_mmolPerL / po4_mmolPerL) < 0.5 : true;
-              const check4 = (ca_mmolPerL * po4_mmolPerL) <= 75;
+              const check3 =
+                po4_mmolPerL > 0 ? ca_mmolPerL / po4_mmolPerL < 0.5 : true;
+              const check4 = ca_mmolPerL * po4_mmolPerL <= 75;
               const caPoChecks = [
                 {
                   label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45",
@@ -2016,7 +2141,7 @@
                 <div class="compat-check">
                   <span>${c.label}<br><small style="color:var(--text-secondary)">${c.detail}</small></span>
                   <span class="${c.pass ? "compat-pass" : "compat-fail"}">${c.pass ? "✓ ผ่าน" : "✗ ไม่ผ่าน"}</span>
-                </div>`
+                </div>`,
                 )
                 .join("");
               document.getElementById("caPO4Alert").innerHTML = allCaPoPass
@@ -2044,3 +2169,5 @@
         </script>
       </body>
     </html>
+  </body>
+</html>
