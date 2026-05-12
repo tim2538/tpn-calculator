@@ -746,6 +746,57 @@
             outline: 2px solid var(--accent-color);
             outline-offset: 2px;
           }
+          .subsection-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            margin-top: 16px;
+          }
+          .subsection-label:first-child {
+            margin-top: 0;
+          }
+          .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+          }
+          .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            padding: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: all 0.15s ease;
+          }
+          .checkbox-group input[type="checkbox"]:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+          .checkbox-group input[type="checkbox"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
+          }
+          .checkbox-group label {
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 1em;
+            margin-bottom: 0;
+          }
         </style>
       </head>
       <body>
@@ -1035,6 +1086,31 @@
                     class="required-field"
                   />
                 </div>
+              </div>
+            </div>
+            <!-- Additional -->
+            <div class="section">
+              <h2>
+                <i data-lucide="plus-circle"></i>
+                Additional
+              </h2>
+              <div class="subsection-label">Vitamin</div>
+              <div class="checkbox-group">
+                <input type="checkbox" id="cernevit" />
+                <label for="cernevit">Cernevit 5 ml</label>
+              </div>
+              <div class="checkbox-group">
+                <input type="checkbox" id="soluvit" />
+                <label for="soluvit">Soluvit 10 ml</label>
+              </div>
+              <div class="checkbox-group">
+                <input type="checkbox" id="bComplex" />
+                <label for="bComplex">B complex 2 ml</label>
+              </div>
+              <div class="subsection-label">Mineral</div>
+              <div class="checkbox-group">
+                <input type="checkbox" id="addamel" />
+                <label for="addamel">Addamel 10 ml</label>
               </div>
             </div>
             <!-- Results -->
@@ -1506,6 +1582,10 @@
             document.querySelectorAll(".input-error").forEach((el) => {
               el.classList.remove("input-error");
             });
+            document.getElementById("cernevit").checked = false;
+            document.getElementById("soluvit").checked = false;
+            document.getElementById("bComplex").checked = false;
+            document.getElementById("addamel").checked = false;
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
           function getNextInput(currentInput) {
