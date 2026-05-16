@@ -369,10 +369,13 @@ function calculate() {
       proteinProduct === "amiparen"
         ? proteinSolution * 0.96
         : proteinSolution * 1.29;
+    const glycophosVol = method1.electrolytes["Glycophos"] || 0;
+    const naFromGlycophos = glycophosVol * 2;
     const osmolarity =
       aminoAcidOsmolarity +
       dextrose * 5 +
-      na * 2 +
+      (na - naFromGlycophos) * 2 +
+      naFromGlycophos * 3 +
       k * 2 +
       mg * 1 +
       ca * 1.4;
@@ -489,10 +492,16 @@ function calculate() {
       proteinProduct === "amiparen"
         ? `${proteinSolution.toFixed(1)} mL × 0.960 mOsm/mL`
         : `${proteinSolution.toFixed(1)} mL × 1.290 mOsm/mL`;
+    const naFormulaLabel = glycophosVol > 0
+      ? `(Na_NaCl/NaAc × 2) + (Na_Glycophos × 3)`
+      : `(Na × 2)`;
+    const naFormulaCalc = glycophosVol > 0
+      ? `(${(na - naFromGlycophos).toFixed(2)} × 2) + (${naFromGlycophos.toFixed(2)} × 3)`
+      : `(${na} × 2)`;
     document.getElementById("formula-osmolarity").innerHTML = `
       <div class="formula-label">สูตร:</div>
-      <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + (Na × 2) + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
-      <div class="formula-calculation">${aaOsmLabel} + (${dextrose} × 5) + (${na} × 2) + (${k} × 2) + (${mg} × 1) + (${ca} × 1.4) = ${osmolarity.toFixed(0)} mOsm</div>
+      <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
+      <div class="formula-calculation">${aaOsmLabel} + (${dextrose} × 5) + ${naFormulaCalc} + (${k} × 2) + (${mg} × 1) + (${ca} × 1.4) = ${osmolarity.toFixed(0)} mOsm</div>
     `;
     document.getElementById("formula-gir").innerHTML = `
       <div class="formula-label">สูตร:</div>
