@@ -10,6 +10,7 @@ function printReport() {
   document
     .getElementById("printPreviewModal")
     .classList.add("active");
+  document.body.style.overflow = "hidden";
   lucide.createIcons();
 }
 
@@ -28,6 +29,7 @@ function closePrintModal() {
   document
     .getElementById("printPreviewModal")
     .classList.remove("active");
+  document.body.style.overflow = "";
 }
 
 function downloadPNG() {
@@ -206,13 +208,19 @@ function drawExportCanvas(canvas, method) {
   }
 
   // ── Footer ──
-  const dateLabel = new Date().toLocaleDateString("th-TH", {
+  const now = new Date();
+  const dateLabel = now.toLocaleDateString("th-TH", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+  const timeLabel = now.toLocaleTimeString("th-TH", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
   ctx.textAlign = "center";
   ctx.font = "13px " + FONT;
   ctx.fillStyle = GREY;
-  ctx.fillText("TPN Calculator  |  " + dateLabel, W / 2, 1175);
+  ctx.fillText("TPN Calculator  |  " + dateLabel + "  " + timeLabel, W / 2, 1175);
 }

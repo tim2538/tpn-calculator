@@ -608,7 +608,7 @@
       </div>
     </div>
     <!-- Print Preview Modal -->
-    <div class="print-modal-overlay" id="printPreviewModal">
+    <div class="print-modal-overlay" id="printPreviewModal" onclick="if(event.target === this) closePrintModal()">
       <div class="print-modal">
         <div class="print-modal-header">
           <h3>ตัวอย่างก่อนพิมพ์</h3>
@@ -630,7 +630,11 @@
         </div>
         <div class="print-modal-actions">
           <button class="btn btn-reset" onclick="closePrintModal()">
-            ปิด
+            <i data-lucide="x" class="btn-icon btn-icon-only"></i>
+            <span class="btn-text">
+              <i data-lucide="x" class="btn-icon"></i>
+              ปิด
+            </span>
           </button>
           <button class="btn" onclick="downloadPNG()">
             <i data-lucide="download" class="btn-icon"></i>
