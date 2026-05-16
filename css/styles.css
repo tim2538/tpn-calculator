@@ -614,6 +614,9 @@ input:read-only {
   font-variant-numeric: tabular-nums;
   font-size: 1.05em;
 }
+.electrolyte-value--negative {
+  color: #ef4444;
+}
 .electrolyte-formula {
   padding-top: 8px;
   font-size: 0.85em;

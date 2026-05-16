@@ -104,21 +104,28 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
 
 function renderElectrolyteHTML(electrolytes, formulas, allFormulasVisible) {
   return Object.entries(electrolytes)
-    .filter(([, value]) => value > 0)
-    .map(
-      ([name, value]) => `
+    .filter(([, value]) => value !== 0)
+    .map(([name, value]) => {
+      const isNeg = value < 0;
+      const valueClass = isNeg
+        ? "electrolyte-value electrolyte-value--negative"
+        : "electrolyte-value";
+      const icon = isNeg
+        ? `<i data-lucide="circle-alert" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i>`
+        : "";
+      return `
       <div class="electrolyte-item">
         <div class="electrolyte-header">
           <span class="electrolyte-name">${name}</span>
-          <span class="electrolyte-value">${value.toFixed(2)} mL</span>
+          <span class="${valueClass}">${icon}${value.toFixed(2)} mL</span>
         </div>
         <div class="electrolyte-formula ${allFormulasVisible ? "show" : ""}">
           <div class="formula-label">สูตร:</div>
           <div class="formula-calculation">${formulas[name]}</div>
         </div>
       </div>
-    `,
-    )
+    `;
+    })
     .join("");
 }
 
