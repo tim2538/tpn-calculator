@@ -32,11 +32,10 @@ document.addEventListener("DOMContentLoaded", function () {
   requiredFields.forEach((field) => {
     field.addEventListener("input", function () {
       if (field.tagName === "INPUT") {
-        if (
-          this.value &&
-          this.value !== "" &&
-          parseFloat(this.value) !== 0
-        ) {
+        const allowZero = this.dataset.allowZero === "true";
+        const val = parseFloat(this.value);
+        const filled = this.value !== "" && !isNaN(val);
+        if (filled && val >= 0 && (allowZero || val !== 0)) {
           this.classList.remove("input-error");
         }
       }
@@ -69,11 +68,13 @@ function handleCalculate() {
         isEmpty = true;
       }
     } else if (field.tagName === "INPUT") {
-      if (
-        !field.value ||
-        field.value === "" ||
-        parseFloat(field.value) === 0
-      ) {
+      const allowZero = field.dataset.allowZero === "true";
+      const val = parseFloat(field.value);
+      if (!field.value || field.value === "" || isNaN(val)) {
+        isEmpty = true;
+      } else if (!allowZero && val === 0) {
+        isEmpty = true;
+      } else if (val < 0) {
         isEmpty = true;
       }
     }
@@ -87,6 +88,31 @@ function handleCalculate() {
       field.classList.remove("input-error");
     }
   }
+
+  // If lipid = 0, ivleHours is not meaningful — clear its error
+  const lipidVal = parseFloat(document.getElementById("lipid").value);
+  if (lipidVal === 0) {
+    document.getElementById("ivleHours").classList.remove("input-error");
+    if (firstEmptyField && firstEmptyField.id === "ivleHours") {
+      hasError = document.querySelectorAll(".input-error").length > 0;
+      firstEmptyField = document.querySelector(".input-error");
+    }
+  }
+
+  // Extra range checks
+  const infusionVal = parseFloat(document.getElementById("infusionDuration").value);
+  if (!isNaN(infusionVal) && infusionVal > 24) {
+    document.getElementById("infusionDuration").classList.add("input-error");
+    if (!firstEmptyField) firstEmptyField = document.getElementById("infusionDuration");
+    hasError = true;
+  }
+  const ivleHoursVal = parseFloat(document.getElementById("ivleHours").value);
+  if (!isNaN(ivleHoursVal) && ivleHoursVal > 24) {
+    document.getElementById("ivleHours").classList.add("input-error");
+    if (!firstEmptyField) firstEmptyField = document.getElementById("ivleHours");
+    hasError = true;
+  }
+
   if (hasError && firstEmptyField) {
     firstEmptyField.focus();
     firstEmptyField.scrollIntoView({
