@@ -50,12 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-document
-  .getElementById("weight")
-  .addEventListener("input", calculateBMI);
-document
-  .getElementById("height")
-  .addEventListener("input", calculateBMI);
+document.getElementById("weight").addEventListener("input", calculateBMI);
+document.getElementById("height").addEventListener("input", calculateBMI);
 
 function handleCalculate() {
   const requiredFields = document.querySelectorAll(".required-field");
@@ -100,16 +96,20 @@ function handleCalculate() {
   }
 
   // Extra range checks
-  const infusionVal = parseFloat(document.getElementById("infusionDuration").value);
+  const infusionVal = parseFloat(
+    document.getElementById("infusionDuration").value,
+  );
   if (!isNaN(infusionVal) && infusionVal > 24) {
     document.getElementById("infusionDuration").classList.add("input-error");
-    if (!firstEmptyField) firstEmptyField = document.getElementById("infusionDuration");
+    if (!firstEmptyField)
+      firstEmptyField = document.getElementById("infusionDuration");
     hasError = true;
   }
   const ivleHoursVal = parseFloat(document.getElementById("ivleHours").value);
   if (!isNaN(ivleHoursVal) && ivleHoursVal > 24) {
     document.getElementById("ivleHours").classList.add("input-error");
-    if (!firstEmptyField) firstEmptyField = document.getElementById("ivleHours");
+    if (!firstEmptyField)
+      firstEmptyField = document.getElementById("ivleHours");
     hasError = true;
   }
 
@@ -125,9 +125,7 @@ function handleCalculate() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  const inputs = document.querySelectorAll(
-    "input:not([readonly]), select",
-  );
+  const inputs = document.querySelectorAll("input:not([readonly]), select");
   inputs.forEach((input) => {
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
@@ -140,10 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const nextInput = getNextInput(this);
           if (nextInput) {
             nextInput.focus();
-            if (
-              nextInput.tagName === "INPUT" &&
-              nextInput.type === "number"
-            ) {
+            if (nextInput.tagName === "INPUT" && nextInput.type === "number") {
               nextInput.select();
             }
           }
@@ -262,8 +257,7 @@ function updateClHint() {
   const current = parseFloat(clInput.value) || 0;
   clInput.setAttribute("max", clMax.toFixed(1));
   hint.textContent = `ค่าสูงสุดที่ไม่ทำให้ติดลบ: ${clMax.toFixed(1)} mEq`;
-  hint.className =
-    current > clMax ? "helper-text warn" : "helper-text";
+  hint.className = current > clMax ? "helper-text warn" : "helper-text";
 }
 
 function onAcetateModeChange() {
@@ -285,17 +279,12 @@ function onAcetateModeChange() {
 
 function calculate() {
   try {
-    const weight =
-      parseFloat(document.getElementById("weight").value) || 0;
-    const protein =
-      parseFloat(document.getElementById("protein").value) || 0;
-    const dextrose =
-      parseFloat(document.getElementById("dextrose").value) || 0;
-    const lipid =
-      parseFloat(document.getElementById("lipid").value) || 0;
+    const weight = parseFloat(document.getElementById("weight").value) || 0;
+    const protein = parseFloat(document.getElementById("protein").value) || 0;
+    const dextrose = parseFloat(document.getElementById("dextrose").value) || 0;
+    const lipid = parseFloat(document.getElementById("lipid").value) || 0;
     const infusionDuration =
-      parseFloat(document.getElementById("infusionDuration").value) ||
-      24;
+      parseFloat(document.getElementById("infusionDuration").value) || 24;
     const ivleHours =
       parseFloat(document.getElementById("ivleHours").value) || 0;
     const na = parseFloat(document.getElementById("na").value) || 0;
@@ -303,10 +292,8 @@ function calculate() {
     const ca = parseFloat(document.getElementById("ca").value) || 0;
     const mg = parseFloat(document.getElementById("mg").value) || 0;
     const po4 = parseFloat(document.getElementById("po4").value) || 0;
-    const clinicalStatus =
-      document.getElementById("clinicalStatus").value;
-    const venousAccess =
-      document.getElementById("venousAccess").value;
+    const clinicalStatus = document.getElementById("clinicalStatus").value;
+    const venousAccess = document.getElementById("venousAccess").value;
     const acetateMode = document.getElementById("acetateMode").value;
     const useAcetate = acetateMode === "yes";
     let cl;
@@ -318,8 +305,7 @@ function calculate() {
       cl = k - _k2hpo4 + (na - _glycophos * 2);
       document.getElementById("clAuto").value = cl.toFixed(2);
     }
-    const proteinProduct =
-      document.getElementById("proteinProduct").value;
+    const proteinProduct = document.getElementById("proteinProduct").value;
     let proteinSolution = 0;
     let proteinConcentration = 0;
     let proteinFormula = "";
@@ -356,12 +342,14 @@ function calculate() {
       po4,
       useAcetate,
     );
-    const totalElectrolyteVolume1 = Object.values(
-      method1.electrolytes,
-    ).reduce((a, b) => a + b, 0);
-    const totalElectrolyteVolume2 = Object.values(
-      method2.electrolytes,
-    ).reduce((a, b) => a + b, 0);
+    const totalElectrolyteVolume1 = Object.values(method1.electrolytes).reduce(
+      (a, b) => a + b,
+      0,
+    );
+    const totalElectrolyteVolume2 = Object.values(method2.electrolytes).reduce(
+      (a, b) => a + b,
+      0,
+    );
     const totalVolume1 =
       proteinSolution + dextroseSolution + totalElectrolyteVolume1;
     const totalVolume2 =
@@ -384,10 +372,8 @@ function calculate() {
     const proteinCalories = protein * 4;
     const dextroseCalories = dextrose * 3.4;
     const lipidCalories = lipid * 10;
-    const totalCalories =
-      proteinCalories + dextroseCalories + lipidCalories;
-    const needsDilution =
-      osmolarity > 900 && venousAccess === "peripheral";
+    const totalCalories = proteinCalories + dextroseCalories + lipidCalories;
+    const needsDilution = osmolarity > 900 && venousAccess === "peripheral";
     const effectiveVolume = needsDilution
       ? (osmolarity * totalVolume1) / 900
       : totalVolume1;
@@ -403,21 +389,16 @@ function calculate() {
       totalVolume1.toFixed(1);
     document.getElementById("totalVolume2").textContent =
       totalVolume2.toFixed(1);
-    document.getElementById("osmolarity").textContent =
-      osmolarity.toFixed(0);
+    document.getElementById("osmolarity").textContent = osmolarity.toFixed(0);
     document.getElementById("gir").textContent = gir.toFixed(2);
     document.getElementById("totalCalories").textContent =
       totalCalories.toFixed(0);
-    document.getElementById("rateHero1").textContent =
-      flowRate.toFixed(1);
-    document.getElementById("rateHero2").textContent =
-      flowRate2.toFixed(1);
+    document.getElementById("rateHero1").textContent = flowRate.toFixed(1);
+    document.getElementById("rateHero2").textContent = flowRate2.toFixed(1);
     const ivleRateHr = ivleHours > 0 ? lipid / weight / ivleHours : 0;
     const ivleRateDay = lipid / weight;
-    document.getElementById("ivleRateHr").textContent =
-      ivleRateHr.toFixed(3);
-    document.getElementById("ivleRateDay").textContent =
-      ivleRateDay.toFixed(3);
+    document.getElementById("ivleRateHr").textContent = ivleRateHr.toFixed(3);
+    document.getElementById("ivleRateDay").textContent = ivleRateDay.toFixed(3);
     document.getElementById("formula-ivleRateHr").innerHTML = `
       <div class="formula-label">สูตร: Lipid ÷ Weight ÷ IVLE Hours</div>
       <div class="formula-calculation">${lipid} ÷ ${weight} ÷ ${ivleHours} = ${ivleRateHr.toFixed(3)} g/kg/hr</div>
@@ -428,12 +409,8 @@ function calculate() {
     `;
     if (needsDilution) {
       const extraWaterMl = effectiveVolume - totalVolume1;
-      document
-        .getElementById("dilutionCard")
-        .classList.remove("hidden");
-      document
-        .getElementById("extraWaterCard")
-        .classList.remove("hidden");
+      document.getElementById("dilutionCard").classList.remove("hidden");
+      document.getElementById("extraWaterCard").classList.remove("hidden");
       document.getElementById("dilutionV2").textContent =
         effectiveVolume.toFixed(1);
       document.getElementById("extraWater").textContent =
@@ -448,9 +425,7 @@ function calculate() {
       `;
     } else {
       document.getElementById("dilutionCard").classList.add("hidden");
-      document
-        .getElementById("extraWaterCard")
-        .classList.add("hidden");
+      document.getElementById("extraWaterCard").classList.add("hidden");
     }
     document.getElementById("totalElectrolyte1").textContent =
       totalElectrolyteVolume1.toFixed(2) + " mL";
@@ -493,12 +468,12 @@ function calculate() {
       proteinProduct === "amiparen"
         ? `${proteinSolution.toFixed(1)} mL × 0.960 mOsm/mL`
         : `${proteinSolution.toFixed(1)} mL × 1.290 mOsm/mL`;
-    const naFormulaLabel = glycophosVol > 0
-      ? `(Na_NaCl/NaAc × 2) + (Na_Glycophos × 3)`
-      : `(Na × 2)`;
-    const naFormulaCalc = glycophosVol > 0
-      ? `(${(na - naFromGlycophos).toFixed(2)} × 2) + (${naFromGlycophos.toFixed(2)} × 3)`
-      : `(${na} × 2)`;
+    const naFormulaLabel =
+      glycophosVol > 0 ? `(Na_NaCl/NaAc × 2) + (Na_Glycophos × 3)` : `(Na × 2)`;
+    const naFormulaCalc =
+      glycophosVol > 0
+        ? `(${(na - naFromGlycophos).toFixed(2)} × 2) + (${naFromGlycophos.toFixed(2)} × 3)`
+        : `(${na} × 2)`;
     document.getElementById("formula-osmolarity").innerHTML = `
       <div class="formula-label">สูตร:</div>
       <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
@@ -560,8 +535,7 @@ function calculate() {
         </div>
       </div>
     `;
-    document.getElementById("macronutrientSolutions").innerHTML =
-      macroHTML;
+    document.getElementById("macronutrientSolutions").innerHTML = macroHTML;
     let alertsHTML = "";
     const negKeys1 = Object.entries(method1.electrolytes)
       .filter(([, v]) => v < 0)
@@ -674,8 +648,7 @@ function calculate() {
     const po4_mmolPerL = po4 / volL;
     const check1 = ca_meqPerL + po4_meqPerL <= 45;
     const check2 = ca_meqPerL <= 15 && po4_meqPerL <= 30;
-    const check3 =
-      po4_mmolPerL > 0 ? ca_mmolPerL / po4_mmolPerL < 0.5 : true;
+    const check3 = po4_mmolPerL > 0 ? ca_mmolPerL / po4_mmolPerL < 0.5 : true;
     const check4 = ca_mmolPerL * po4_mmolPerL <= 75;
     const caPoChecks = [
       {
@@ -719,9 +692,7 @@ function calculate() {
           <div><strong>อันตราย!</strong> Ca–PO₄ ไม่ผ่านเกณฑ์ความเข้ากันได้
             — อาจเกิด Calcium Phosphate Precipitation</div>
         </div>`;
-    document
-      .getElementById("resultsSection")
-      .classList.remove("hidden");
+    document.getElementById("resultsSection").classList.remove("hidden");
     document
       .getElementById("resultsSection")
       .scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -731,13 +702,53 @@ function calculate() {
     const needsSplit = venousAccess === "peripheral" && effectiveVolume > 1200;
     if (needsSplit) {
       ppnSplitSection.classList.remove("hidden");
-      const na2 = na / 2, k2 = k / 2, cl2 = cl / 2, po4_2 = po4 / 2;
-      const pSol2 = proteinSolution / 2, dSol2 = dextroseSolution / 2;
+      const na2 = na / 2,
+        k2 = k / 2,
+        cl2 = cl / 2,
+        po4_2 = po4 / 2;
+      const pSol2 = proteinSolution / 2,
+        dSol2 = dextroseSolution / 2;
 
-      const bagA1 = calculateElectrolytes("k2hpo4", na2, k2, cl2, ca, mg, po4_2, useAcetate);
-      const bagB1 = calculateElectrolytes("k2hpo4", na2, k2, cl2, 0, 0, po4_2, useAcetate);
-      const bagA2 = calculateElectrolytes("nacl", na2, k2, cl2, ca, mg, po4_2, useAcetate);
-      const bagB2 = calculateElectrolytes("nacl", na2, k2, cl2, 0, 0, po4_2, useAcetate);
+      const bagA1 = calculateElectrolytes(
+        "k2hpo4",
+        na2,
+        k2,
+        cl2,
+        ca,
+        mg,
+        po4_2,
+        useAcetate,
+      );
+      const bagB1 = calculateElectrolytes(
+        "k2hpo4",
+        na2,
+        k2,
+        cl2,
+        0,
+        0,
+        po4_2,
+        useAcetate,
+      );
+      const bagA2 = calculateElectrolytes(
+        "nacl",
+        na2,
+        k2,
+        cl2,
+        ca,
+        mg,
+        po4_2,
+        useAcetate,
+      );
+      const bagB2 = calculateElectrolytes(
+        "nacl",
+        na2,
+        k2,
+        cl2,
+        0,
+        0,
+        po4_2,
+        useAcetate,
+      );
 
       const sumVol = (elec) => Object.values(elec).reduce((s, v) => s + v, 0);
       const volA1 = pSol2 + dSol2 + sumVol(bagA1.electrolytes);
@@ -750,10 +761,26 @@ function calculate() {
       const glyB1 = (bagB1.electrolytes["Glycophos"] || 0) * 2;
       const glyA2 = (bagA2.electrolytes["Glycophos"] || 0) * 2;
       const glyB2 = (bagB2.electrolytes["Glycophos"] || 0) * 2;
-      const osmA1 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyA1) * 2 + glyA1 * 3 + k2 * 2 + mg + ca * 1.4;
-      const osmB1 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB1) * 2 + glyB1 * 3 + k2 * 2;
-      const osmA2 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyA2) * 2 + glyA2 * 3 + k2 * 2 + mg + ca * 1.4;
-      const osmB2 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB2) * 2 + glyB2 * 3 + k2 * 2;
+      const osmA1 =
+        aaOsm2 +
+        (dextrose / 2) * 5 +
+        (na2 - glyA1) * 2 +
+        glyA1 * 3 +
+        k2 * 2 +
+        mg +
+        ca * 1.4;
+      const osmB1 =
+        aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB1) * 2 + glyB1 * 3 + k2 * 2;
+      const osmA2 =
+        aaOsm2 +
+        (dextrose / 2) * 5 +
+        (na2 - glyA2) * 2 +
+        glyA2 * 3 +
+        k2 * 2 +
+        mg +
+        ca * 1.4;
+      const osmB2 =
+        aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB2) * 2 + glyB2 * 3 + k2 * 2;
 
       const effVolA1 = osmA1 > 900 ? (osmA1 * volA1) / 900 : volA1;
       const effVolB1 = osmB1 > 900 ? (osmB1 * volB1) / 900 : volB1;
@@ -771,12 +798,23 @@ function calculate() {
           → แบ่งเป็น 2 ถุง: ถุงที่ 1 ใส่ Ca + Mg ครบ, ถุงที่ 2 ไม่มี Ca + Mg</div>
         </div>`;
 
-      const renderBag = (pSol, dSol, elec, forms, vol, osm, effVol, extraWater) => {
+      const renderBag = (
+        pSol,
+        dSol,
+        elec,
+        forms,
+        vol,
+        osm,
+        effVol,
+        extraWater,
+      ) => {
         const needsDil = extraWater > 0;
         const finalOsm = needsDil ? 900 : osm;
         const osmBadge = `<span class="compat-pass">✓ Osm ${finalOsm.toFixed(0)} mOsm/L</span>`;
         return `
-          ${needsDil ? `
+          ${
+            needsDil
+              ? `
           <div class="electrolyte-item">
             <div class="electrolyte-header">
               <span class="electrolyte-name" style="color:var(--accent-color);">Sterile Water for Injection</span>
@@ -785,7 +823,9 @@ function calculate() {
             <div style="font-size:0.8em;color:var(--text-secondary);padding-top:2px;">
               เติมเพื่อลด Osm จาก ${osm.toFixed(0)} → 900 mOsm/L
             </div>
-          </div>` : ""}
+          </div>`
+              : ""
+          }
           <div class="electrolyte-item">
             <div class="electrolyte-header">
               <span class="electrolyte-name">${proteinConcentration}% ${proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"}</span>
@@ -812,33 +852,93 @@ function calculate() {
         `;
       };
 
-      document.getElementById("splitBagA1").innerHTML = renderBag(pSol2, dSol2, bagA1.electrolytes, bagA1.formulas, volA1, osmA1, effVolA1, xwA1);
-      document.getElementById("splitBagB1").innerHTML = renderBag(pSol2, dSol2, bagB1.electrolytes, bagB1.formulas, volB1, osmB1, effVolB1, xwB1);
-      document.getElementById("splitBagA2").innerHTML = renderBag(pSol2, dSol2, bagA2.electrolytes, bagA2.formulas, volA2, osmA2, effVolA2, xwA2);
-      document.getElementById("splitBagB2").innerHTML = renderBag(pSol2, dSol2, bagB2.electrolytes, bagB2.formulas, volB2, osmB2, effVolB2, xwB2);
+      document.getElementById("splitBagA1").innerHTML = renderBag(
+        pSol2,
+        dSol2,
+        bagA1.electrolytes,
+        bagA1.formulas,
+        volA1,
+        osmA1,
+        effVolA1,
+        xwA1,
+      );
+      document.getElementById("splitBagB1").innerHTML = renderBag(
+        pSol2,
+        dSol2,
+        bagB1.electrolytes,
+        bagB1.formulas,
+        volB1,
+        osmB1,
+        effVolB1,
+        xwB1,
+      );
+      document.getElementById("splitBagA2").innerHTML = renderBag(
+        pSol2,
+        dSol2,
+        bagA2.electrolytes,
+        bagA2.formulas,
+        volA2,
+        osmA2,
+        effVolA2,
+        xwA2,
+      );
+      document.getElementById("splitBagB2").innerHTML = renderBag(
+        pSol2,
+        dSol2,
+        bagB2.electrolytes,
+        bagB2.formulas,
+        volB2,
+        osmB2,
+        effVolB2,
+        xwB2,
+      );
 
       const vL = effVolA1 / 1000;
-      const ca_mL = ca / vL, ca_mol = (ca * 0.5) / vL;
-      const po4_mL = (po4_2 * 2) / vL, po4_mol = po4_2 / vL;
+      const ca_mL = ca / vL,
+        ca_mol = (ca * 0.5) / vL;
+      const po4_mL = (po4_2 * 2) / vL,
+        po4_mol = po4_2 / vL;
       const splitChecks = [
-        { label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45", detail: `${ca_mL.toFixed(2)} + ${po4_mL.toFixed(2)} = ${(ca_mL + po4_mL).toFixed(2)}`, pass: ca_mL + po4_mL <= 45 },
-        { label: "Ca (mEq/L) ≤ 15 และ PO₄ (mEq/L) ≤ 30", detail: `Ca = ${ca_mL.toFixed(2)}, PO₄ = ${po4_mL.toFixed(2)}`, pass: ca_mL <= 15 && po4_mL <= 30 },
-        { label: "Ca (mmol/L) / PO₄ (mmol/L) < 1/2", detail: `${ca_mol.toFixed(2)} / ${po4_mol.toFixed(2)} = ${po4_mol > 0 ? (ca_mol / po4_mol).toFixed(3) : "N/A"}`, pass: po4_mol > 0 ? ca_mol / po4_mol < 0.5 : true },
-        { label: "Ca (mmol/L) × P (mmol/L) ≤ 75", detail: `${ca_mol.toFixed(2)} × ${po4_mol.toFixed(2)} = ${(ca_mol * po4_mol).toFixed(2)}`, pass: ca_mol * po4_mol <= 75 },
+        {
+          label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45",
+          detail: `${ca_mL.toFixed(2)} + ${po4_mL.toFixed(2)} = ${(ca_mL + po4_mL).toFixed(2)}`,
+          pass: ca_mL + po4_mL <= 45,
+        },
+        {
+          label: "Ca (mEq/L) ≤ 15 และ PO₄ (mEq/L) ≤ 30",
+          detail: `Ca = ${ca_mL.toFixed(2)}, PO₄ = ${po4_mL.toFixed(2)}`,
+          pass: ca_mL <= 15 && po4_mL <= 30,
+        },
+        {
+          label: "Ca (mmol/L) / PO₄ (mmol/L) < 1/2",
+          detail: `${ca_mol.toFixed(2)} / ${po4_mol.toFixed(2)} = ${po4_mol > 0 ? (ca_mol / po4_mol).toFixed(3) : "N/A"}`,
+          pass: po4_mol > 0 ? ca_mol / po4_mol < 0.5 : true,
+        },
+        {
+          label: "Ca (mmol/L) × P (mmol/L) ≤ 75",
+          detail: `${ca_mol.toFixed(2)} × ${po4_mol.toFixed(2)} = ${(ca_mol * po4_mol).toFixed(2)}`,
+          pass: ca_mol * po4_mol <= 75,
+        },
       ];
       const allSplitPass = splitChecks.every((c) => c.pass);
       document.getElementById("splitCaPO4").innerHTML = `
         <div>
           <h3 style="margin-bottom:4px;"><i data-lucide="shield-check"></i> Ca&ndash;PO&#x2084; Compatibility Checks</h3>
           <p style="margin:0 0 10px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 1: Ca เต็ม, PO&#x2084;/2${xwA1 > 0 ? ` — หลังเติม Sterile Water ${xwA1.toFixed(1)} mL` : ""}</p>
-          ${splitChecks.map((c) => `
+          ${splitChecks
+            .map(
+              (c) => `
             <div class="compat-check">
               <span>${c.label}<br><small style="color:var(--text-secondary)">${c.detail}</small></span>
               <span class="${c.pass ? "compat-pass" : "compat-fail"}">${c.pass ? "✓ ผ่าน" : "✗ ไม่ผ่าน"}</span>
-            </div>`).join("")}
-          ${allSplitPass
-            ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ถุงที่ 1 ผ่านเกณฑ์ทุกข้อ</div></div>`
-            : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ถุงที่ 1 ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`}
+            </div>`,
+            )
+            .join("")}
+          ${
+            allSplitPass
+              ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ถุงที่ 1 ผ่านเกณฑ์ทุกข้อ</div></div>`
+              : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ถุงที่ 1 ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`
+          }
           <p style="margin-top:8px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 2 ไม่มี Ca → ไม่มีความเสี่ยง Ca–PO₄ Precipitation</p>
         </div>`;
     } else {
@@ -847,15 +947,11 @@ function calculate() {
 
     window.lastResult = {
       patientId: document.getElementById("patientId").value.trim(),
-      patientName: document
-        .getElementById("patientName")
-        .value.trim(),
+      patientName: document.getElementById("patientName").value.trim(),
       weight,
       venousAccess,
       proteinProduct,
-      sterileWater: needsDilution
-        ? effectiveVolume - totalVolume1
-        : 0,
+      sterileWater: needsDilution ? effectiveVolume - totalVolume1 : 0,
       dextroseSolution,
       proteinSolution,
       protein,
@@ -864,12 +960,8 @@ function calculate() {
       electrolytes2: method2.electrolytes,
       addamelVol: document.getElementById("addamel").checked ? 10 : 0,
       soluvitVol: document.getElementById("soluvit").checked ? 10 : 0,
-      cernevitVol: document.getElementById("cernevit").checked
-        ? 5
-        : 0,
-      bcomplexVol: document.getElementById("bComplex").checked
-        ? 2
-        : 0,
+      cernevitVol: document.getElementById("cernevit").checked ? 5 : 0,
+      bcomplexVol: document.getElementById("bComplex").checked ? 2 : 0,
       na,
       k,
       cl,
@@ -885,4 +977,141 @@ function calculate() {
     alert("เกิดข้อผิดพลาดในการคำนวณ: " + error.message);
     console.error(error);
   }
+}
+
+// ── QR Code Scanner ──
+let qrScanStream = null;
+let qrScanActive = false;
+
+function openQRScanner() {
+  const modal = document.getElementById("qrScannerModal");
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+  qrScanActive = true;
+  document.getElementById("qrStatus").textContent = "กำลังเปิดกล้อง...";
+  lucide.createIcons();
+
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: "environment" } })
+    .then((stream) => {
+      qrScanStream = stream;
+      const video = document.getElementById("qrVideo");
+      video.srcObject = stream;
+      video.play();
+      document.getElementById("qrStatus").textContent = "กำลังสแกน QR Code...";
+      requestAnimationFrame(scanQRFrame);
+    })
+    .catch(() => {
+      document.getElementById("qrStatus").textContent =
+        "ไม่สามารถเปิดกล้องได้ — กรุณาเลือกรูปภาพแทน";
+    });
+}
+
+function scanQRFrame() {
+  if (!qrScanActive) return;
+  const video = document.getElementById("qrVideo");
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(img.data, img.width, img.height);
+    if (code) {
+      try {
+        fillPatientFromQR(JSON.parse(code.data));
+        closeQRScanner();
+        return;
+      } catch (_) {
+        document.getElementById("qrStatus").textContent =
+          "QR Code ไม่ถูกรูปแบบ";
+      }
+    }
+  }
+  requestAnimationFrame(scanQRFrame);
+}
+
+function scanQRFromImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById("qrStatus");
+  const img = new Image();
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+    URL.revokeObjectURL(img.src);
+    if (code) {
+      try {
+        fillPatientFromQR(JSON.parse(code.data));
+        closeQRScanner();
+      } catch (_) {
+        status.textContent = "QR Code ไม่ถูกรูปแบบ";
+      }
+    } else {
+      status.textContent = "ไม่พบ QR Code ในรูปภาพ";
+    }
+  };
+  img.src = URL.createObjectURL(file);
+  input.value = "";
+}
+
+function closeQRScanner() {
+  qrScanActive = false;
+  document.getElementById("qrScannerModal").classList.remove("active");
+  document.body.style.overflow = "";
+  if (qrScanStream) {
+    qrScanStream.getTracks().forEach((t) => t.stop());
+    qrScanStream = null;
+  }
+}
+
+function fillPatientFromQR(d) {
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.value = val;
+  };
+  const setCheck = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined) el.checked = Boolean(val);
+  };
+
+  set("patientId", d.id);
+  set("patientName", d.name);
+  set("weight", d.weight);
+  set("height", d.height);
+  set("clinicalStatus", d.clinicalStatus);
+  set("venousAccess", d.venousAccess);
+
+  set("protein", d.protein);
+  set("proteinProduct", d.proteinProduct);
+  set("dextrose", d.dextrose);
+  set("infusionDuration", d.infusionDuration);
+  set("lipid", d.lipid);
+  set("ivleHours", d.ivleHours);
+
+  if (d.acetateMode) {
+    set("acetateMode", d.acetateMode);
+    onAcetateModeChange();
+  }
+  set("na", d.na);
+  set("k", d.k);
+  set("cl", d.cl);
+  set("ca", d.ca);
+  set("mg", d.mg);
+  set("po4", d.po4);
+  updateClHint();
+
+  setCheck("cernevit", d.cernevit);
+  setCheck("soluvit", d.soluvit);
+  setCheck("bComplex", d.bComplex);
+  setCheck("addamel", d.addamel);
+
+  document.getElementById("weight").dispatchEvent(new Event("input"));
+  document.getElementById("height").dispatchEvent(new Event("input"));
 }

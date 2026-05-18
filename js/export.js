@@ -7,9 +7,7 @@ function printReport() {
   document.getElementById("methodBtn2").classList.remove("active");
   const canvas = document.getElementById("previewCanvas");
   drawExportCanvas(canvas, currentPrintMethod);
-  document
-    .getElementById("printPreviewModal")
-    .classList.add("active");
+  document.getElementById("printPreviewModal").classList.add("active");
   document.body.style.overflow = "hidden";
   lucide.createIcons();
 }
@@ -26,9 +24,7 @@ function selectPrintMethod(method) {
 }
 
 function closePrintModal() {
-  document
-    .getElementById("printPreviewModal")
-    .classList.remove("active");
+  document.getElementById("printPreviewModal").classList.remove("active");
   document.body.style.overflow = "";
 }
 
@@ -36,10 +32,7 @@ function downloadPNG() {
   const canvas = document.getElementById("previewCanvas");
   canvas.toBlob(function (blob) {
     const r = window.lastResult;
-    const dateStr = new Date()
-      .toISOString()
-      .slice(0, 10)
-      .replace(/-/g, "");
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const idStr = r.patientId || "report";
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -74,9 +67,7 @@ function drawExportCanvas(canvas, method) {
     ctx.textAlign = "right";
     ctx.font = "600 18px " + FONT;
     ctx.fillText(
-      (typeof value === "number" ? value.toFixed(2) : value) +
-        "  " +
-        unit,
+      (typeof value === "number" ? value.toFixed(2) : value) + "  " + unit,
       valX,
       y,
     );
@@ -223,5 +214,55 @@ function drawExportCanvas(canvas, method) {
   ctx.textAlign = "center";
   ctx.font = "13px " + FONT;
   ctx.fillStyle = GREY;
-  ctx.fillText("TPN Calculator  |  " + dateLabel + "  " + timeLabel, W / 2, 1175);
+  ctx.fillText(
+    "TPN Calculator  |  " + dateLabel + "  " + timeLabel,
+    W / 2,
+    1175,
+  );
+}
+
+function downloadQRCode() {
+  const get = (id) => document.getElementById(id);
+  const payload = JSON.stringify({
+    id: get("patientId").value.trim(),
+    name: get("patientName").value.trim(),
+    weight: parseFloat(get("weight").value) || 0,
+    height: parseFloat(get("height").value) || 0,
+    clinicalStatus: get("clinicalStatus").value,
+    venousAccess: get("venousAccess").value,
+    protein: parseFloat(get("protein").value) || 0,
+    proteinProduct: get("proteinProduct").value,
+    dextrose: parseFloat(get("dextrose").value) || 0,
+    infusionDuration: parseFloat(get("infusionDuration").value) || 0,
+    lipid: parseFloat(get("lipid").value) || 0,
+    ivleHours: parseFloat(get("ivleHours").value) || 0,
+    acetateMode: get("acetateMode").value,
+    na: parseFloat(get("na").value) || 0,
+    k: parseFloat(get("k").value) || 0,
+    cl: parseFloat(get("cl").value) || 0,
+    ca: parseFloat(get("ca").value) || 0,
+    mg: parseFloat(get("mg").value) || 0,
+    po4: parseFloat(get("po4").value) || 0,
+    cernevit: get("cernevit").checked,
+    soluvit: get("soluvit").checked,
+    bComplex: get("bComplex").checked,
+    addamel: get("addamel").checked,
+  });
+
+  const canvas = document.createElement("canvas");
+  QRCode.toCanvas(canvas, payload, { width: 400, margin: 2 }, function (err) {
+    if (err) {
+      alert("ไม่สามารถสร้าง QR Code ได้");
+      return;
+    }
+    canvas.toBlob(function (blob) {
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const idStr = get("patientId").value.trim() || "patient";
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "QR_" + idStr + "_" + dateStr + ".png";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  });
 }

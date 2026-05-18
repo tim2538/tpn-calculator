@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TPN Calculator - เครื่องคำนวณโภชนบำบัดทางหลอดเลือด</title>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
@@ -23,19 +25,30 @@
           aria-label="Toggle dark mode"
         >
           <i data-lucide="sun" id="theme-icon-sun"></i>
-          <i
-            data-lucide="moon"
-            id="theme-icon-moon"
-            style="display: none"
-          ></i>
+          <i data-lucide="moon" id="theme-icon-moon" style="display: none"></i>
         </button>
       </div>
       <div class="content">
         <!-- Patient Information -->
         <div class="section">
-          <h2>
-            <i data-lucide="clipboard-list"></i>
-            ข้อมูลผู้ป่วย
+          <h2
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <span>
+              <i data-lucide="clipboard-list"></i>
+              ข้อมูลผู้ป่วย
+            </span>
+            <button
+              class="scan-qr-btn"
+              onclick="openQRScanner()"
+              title="สแกน QR Code"
+            >
+              <i data-lucide="scan"></i>
+            </button>
           </h2>
           <div class="form-group">
             <label
@@ -50,7 +63,7 @@
               placeholder="รหัสผู้ป่วย"
               inputmode="numeric"
               enterkeyhint="next"
-              oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+              oninput="this.value = this.value.replace(/[^0-9]/g, '')"
             />
           </div>
           <div class="form-group">
@@ -353,10 +366,7 @@
               <i data-lucide="bar-chart-3"></i>
               ผลการคำนวณ
             </h2>
-            <button
-              class="formula-toggle-main"
-              onclick="toggleAllFormulas()"
-            >
+            <button class="formula-toggle-main" onclick="toggleAllFormulas()">
               <i
                 data-lucide="square-function"
                 style="width: 18px; height: 18px"
@@ -496,9 +506,7 @@
                 <h4>Volume I (ไม่รวม Lipid)</h4>
                 <div>
                   <div class="summary-row">
-                    <span class="summary-row-label"
-                      >รวม Protein Solution:</span
-                    >
+                    <span class="summary-row-label">รวม Protein Solution:</span>
                     <span class="summary-row-value" id="summaryProtein"
                       >- mL</span
                     >
@@ -515,16 +523,12 @@
                     <span class="summary-row-label"
                       >รวม K₂HPO₄ First Method:</span
                     >
-                    <span class="summary-row-value" id="summaryK2"
-                      >- mL</span
-                    >
+                    <span class="summary-row-value" id="summaryK2">- mL</span>
                   </div>
                 </div>
                 <div class="summary-total-box">
                   <span class="summary-total-label">รวม:</span>
-                  <span class="summary-total-value" id="summaryVolI"
-                    >- mL</span
-                  >
+                  <span class="summary-total-value" id="summaryVolI">- mL</span>
                 </div>
               </div>
               <!-- Volume II -->
@@ -532,9 +536,7 @@
                 <h4>Volume II (ไม่รวม Lipid)</h4>
                 <div>
                   <div class="summary-row">
-                    <span class="summary-row-label"
-                      >รวม Protein Solution:</span
-                    >
+                    <span class="summary-row-label">รวม Protein Solution:</span>
                     <span class="summary-row-value" id="summaryProtein2"
                       >- mL</span
                     >
@@ -551,9 +553,7 @@
                     <span class="summary-row-label"
                       >รวม NaCl First Method:</span
                     >
-                    <span class="summary-row-value" id="summaryNaCl"
-                      >- mL</span
-                    >
+                    <span class="summary-row-value" id="summaryNaCl">- mL</span>
                   </div>
                 </div>
                 <div class="summary-total-box">
@@ -567,9 +567,7 @@
                 <h4>Volume รวม Lipid</h4>
                 <div>
                   <div class="summary-row">
-                    <span class="summary-row-label"
-                      >รวม Lipid Solution:</span
-                    >
+                    <span class="summary-row-label">รวม Lipid Solution:</span>
                     <span class="summary-row-value" id="summaryLipid"
                       >- mL</span
                     >
@@ -608,8 +606,10 @@
             <i data-lucide="package-2"></i>
             แบ่งถุง PPN (ปริมาตร &gt; 1,200 mL)
           </h2>
-          <div id="ppnSplitInfo" style="margin-bottom: 12px;"></div>
-          <div class="split-method-label">วิธีที่ 1: K&#x2082;HPO&#x2084; First</div>
+          <div id="ppnSplitInfo" style="margin-bottom: 12px"></div>
+          <div class="split-method-label">
+            วิธีที่ 1: K&#x2082;HPO&#x2084; First
+          </div>
           <div class="comparison-grid">
             <div class="comparison-section">
               <h4>ถุงที่ 1 (มี Ca + Mg)</h4>
@@ -631,7 +631,7 @@
               <div id="splitBagB2"></div>
             </div>
           </div>
-          <div class="electrolyte-results" style="margin-top: 16px;">
+          <div class="electrolyte-results" style="margin-top: 16px">
             <div id="splitCaPO4"></div>
           </div>
         </div>
@@ -665,8 +665,40 @@
         </button>
       </div>
     </div>
+    <!-- QR Scanner Modal -->
+    <div class="qr-scanner-overlay" id="qrScannerModal">
+      <div class="qr-scanner-modal">
+        <div class="qr-scanner-header">
+          <h3>สแกน QR Code</h3>
+          <button class="qr-close-btn" onclick="closeQRScanner()">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="qr-video-wrapper">
+          <video id="qrVideo" autoplay playsinline muted></video>
+          <div class="qr-viewfinder"></div>
+        </div>
+        <div class="qr-divider">หรือ</div>
+        <label class="btn btn-reset qr-upload-label">
+          <i data-lucide="image" class="btn-icon"></i>
+          เลือกรูปภาพ QR Code
+          <input
+            type="file"
+            id="qrImageInput"
+            accept="image/*"
+            style="display: none"
+            onchange="scanQRFromImage(this)"
+          />
+        </label>
+        <p id="qrStatus" class="qr-status">กำลังเปิดกล้อง...</p>
+      </div>
+    </div>
     <!-- Print Preview Modal -->
-    <div class="print-modal-overlay" id="printPreviewModal" onclick="if(event.target === this) closePrintModal()">
+    <div
+      class="print-modal-overlay"
+      id="printPreviewModal"
+      onclick="if (event.target === this) closePrintModal();"
+    >
       <div class="print-modal">
         <div class="print-modal-header">
           <h3>ตัวอย่างก่อนพิมพ์</h3>
@@ -694,6 +726,13 @@
               ปิด
             </span>
           </button>
+          <button class="btn btn-reset" onclick="downloadQRCode()">
+            <i data-lucide="qr-code" class="btn-icon btn-icon-only"></i>
+            <span class="btn-text">
+              <i data-lucide="qr-code" class="btn-icon"></i>
+              ดาวน์โหลด QR Code
+            </span>
+          </button>
           <button class="btn" onclick="downloadPNG()">
             <i data-lucide="download" class="btn-icon"></i>
             ดาวน์โหลด PNG
@@ -704,6 +743,8 @@
     <script src="js/calc.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/export.js"></script>
-    <script>lucide.createIcons();</script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>

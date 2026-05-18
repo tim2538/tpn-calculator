@@ -932,3 +932,136 @@ select:focus-visible {
   font-size: 1em;
   margin-bottom: 0;
 }
+
+/* ── QR Code Scanner ── */
+.scan-qr-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+.scan-qr-btn:hover {
+  opacity: 1;
+}
+.scan-qr-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.qr-scanner-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.qr-scanner-overlay.active {
+  display: flex;
+}
+
+.qr-scanner-modal {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px var(--shadow-lg);
+  padding: 24px;
+  width: 92vw;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.qr-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.qr-scanner-header h3 {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.qr-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.qr-video-wrapper {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: #000;
+  aspect-ratio: 1 / 1;
+}
+#qrVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.qr-viewfinder {
+  position: absolute;
+  inset: 20%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.qr-divider {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  position: relative;
+}
+.qr-divider::before,
+.qr-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: var(--border-color);
+}
+.qr-divider::before {
+  left: 0;
+}
+.qr-divider::after {
+  right: 0;
+}
+
+.qr-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  width: 100% !important;
+  min-width: unset !important;
+  flex: unset !important;
+  box-sizing: border-box;
+}
+
+.qr-status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}

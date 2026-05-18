@@ -69,8 +69,7 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
       kcl = (cl - nacl * 0.5) / 2;
       kac = (k - k2hpo4 - (cl - nacl * 0.5)) / 3;
       naac = (na - nacl * 0.5 - glycophos * 2) / 3;
-      formulas["3% NaCl"] =
-        `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+      formulas["3% NaCl"] = `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
       formulas["15% KCl"] =
         `(${cl} - ${(nacl * 0.5).toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] =
