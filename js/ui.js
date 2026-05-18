@@ -810,7 +810,7 @@ function calculate() {
       ) => {
         const needsDil = extraWater > 0;
         const finalOsm = needsDil ? 900 : osm;
-        const osmBadge = `<span class="compat-pass">✓ Osm ${finalOsm.toFixed(0)} mOsm/L</span>`;
+        const osmBadge = `<span class="compat-pass" style="margin-left:auto;">✓ Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`;
         return `
           ${
             needsDil
@@ -845,7 +845,6 @@ function calculate() {
               <span class="summary-value">${effVol.toFixed(1)} mL</span>
             </div>
             <div class="summary-item">
-              <span class="summary-label">Osmolarity:</span>
               ${osmBadge}
             </div>
           </div>
