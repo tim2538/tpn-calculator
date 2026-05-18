@@ -144,11 +144,12 @@ function drawExportCanvas(canvas, method) {
     ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", 390],
     ["Glycophos", elec["Glycophos"] ?? 0, "ml", 430],
     ["15% KCl", elec["15% KCl"] ?? 0, "ml", 470],
-    ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", 510],
-    ["24.6% Na Ac", elec["24.6% NaAc"] ?? 0, "ml", 550],
-    ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", 590],
-    ["Addamel", r.addamelVol, "ml", 630],
-    ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 670],
+    ["29.4% KAc", elec["29.4% KAc"] ?? 0, "ml", 510],
+    ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", 550],
+    ["24.6% NaAc", elec["24.6% NaAc"] ?? 0, "ml", 590],
+    ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", 630],
+    ["Addamel", r.addamelVol, "ml", 670],
+    ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 710],
   ];
   elecRows.forEach(([lbl, val, unit, y]) =>
     rowLine(lbl, val, unit, y, LX, LVAL),
@@ -157,12 +158,12 @@ function drawExportCanvas(canvas, method) {
   ctx.textAlign = "left";
   ctx.font = "700 20px " + FONT;
   ctx.fillStyle = BLACK;
-  ctx.fillText("Add before administration", LX, 728);
+  ctx.fillText("Add before administration", LX, 768);
 
   const addRows = [
-    ["Soluvit", r.soluvitVol, "ml", 778],
-    ["Cernevit", r.cernevitVol, "ml", 818],
-    ["B complex", r.bcomplexVol, "ml", 858],
+    ["Soluvit", r.soluvitVol, "ml", 818],
+    ["Cernevit", r.cernevitVol, "ml", 858],
+    ["B complex", r.bcomplexVol, "ml", 898],
   ];
   addRows.forEach(([lbl, val, unit, y]) =>
     rowLine(lbl, val, unit, y, LX, LVAL),
