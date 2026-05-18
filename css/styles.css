@@ -862,6 +862,25 @@ select:focus-visible {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
+.split-method-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.split-method-label::before,
+.split-method-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+#ppnSplitSection .comparison-section {
+  background: var(--bg-secondary);
+}
 .subsection-label {
   font-size: 0.85em;
   font-weight: 600;

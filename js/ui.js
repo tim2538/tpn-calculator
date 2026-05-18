@@ -228,6 +228,7 @@ function resetForm() {
   document.getElementById("addamel").checked = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
   document.getElementById("printBtn").disabled = true;
+  document.getElementById("ppnSplitSection").classList.add("hidden");
   window.lastResult = null;
   document.getElementById("rateHero1").textContent = "-";
   document.getElementById("rateHero2").textContent = "-";
@@ -724,6 +725,126 @@ function calculate() {
     document
       .getElementById("resultsSection")
       .scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    // --- PPN Split Bags ---
+    const ppnSplitSection = document.getElementById("ppnSplitSection");
+    const needsSplit = venousAccess === "peripheral" && effectiveVolume > 1200;
+    if (needsSplit) {
+      ppnSplitSection.classList.remove("hidden");
+      const na2 = na / 2, k2 = k / 2, cl2 = cl / 2, po4_2 = po4 / 2;
+      const pSol2 = proteinSolution / 2, dSol2 = dextroseSolution / 2;
+
+      const bagA1 = calculateElectrolytes("k2hpo4", na2, k2, cl2, ca, mg, po4_2, useAcetate);
+      const bagB1 = calculateElectrolytes("k2hpo4", na2, k2, cl2, 0, 0, po4_2, useAcetate);
+      const bagA2 = calculateElectrolytes("nacl", na2, k2, cl2, ca, mg, po4_2, useAcetate);
+      const bagB2 = calculateElectrolytes("nacl", na2, k2, cl2, 0, 0, po4_2, useAcetate);
+
+      const sumVol = (elec) => Object.values(elec).reduce((s, v) => s + v, 0);
+      const volA1 = pSol2 + dSol2 + sumVol(bagA1.electrolytes);
+      const volB1 = pSol2 + dSol2 + sumVol(bagB1.electrolytes);
+      const volA2 = pSol2 + dSol2 + sumVol(bagA2.electrolytes);
+      const volB2 = pSol2 + dSol2 + sumVol(bagB2.electrolytes);
+
+      const aaOsm2 = aminoAcidOsmolarity / 2;
+      const glyA1 = (bagA1.electrolytes["Glycophos"] || 0) * 2;
+      const glyB1 = (bagB1.electrolytes["Glycophos"] || 0) * 2;
+      const glyA2 = (bagA2.electrolytes["Glycophos"] || 0) * 2;
+      const glyB2 = (bagB2.electrolytes["Glycophos"] || 0) * 2;
+      const osmA1 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyA1) * 2 + glyA1 * 3 + k2 * 2 + mg + ca * 1.4;
+      const osmB1 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB1) * 2 + glyB1 * 3 + k2 * 2;
+      const osmA2 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyA2) * 2 + glyA2 * 3 + k2 * 2 + mg + ca * 1.4;
+      const osmB2 = aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB2) * 2 + glyB2 * 3 + k2 * 2;
+
+      const effVolA1 = osmA1 > 900 ? (osmA1 * volA1) / 900 : volA1;
+      const effVolB1 = osmB1 > 900 ? (osmB1 * volB1) / 900 : volB1;
+      const effVolA2 = osmA2 > 900 ? (osmA2 * volA2) / 900 : volA2;
+      const effVolB2 = osmB2 > 900 ? (osmB2 * volB2) / 900 : volB2;
+      const xwA1 = effVolA1 - volA1;
+      const xwB1 = effVolB1 - volB1;
+      const xwA2 = effVolA2 - volA2;
+      const xwB2 = effVolB2 - volB2;
+
+      document.getElementById("ppnSplitInfo").innerHTML = `
+        <div class="alert alert-warning">
+          <i data-lucide="info" style="width:20px;height:20px;"></i>
+          <div>ปริมาตรรวม <strong>${effectiveVolume.toFixed(0)} mL</strong> &gt; 1,200 mL
+          → แบ่งเป็น 2 ถุง: ถุงที่ 1 ใส่ Ca + Mg ครบ, ถุงที่ 2 ไม่มี Ca + Mg</div>
+        </div>`;
+
+      const renderBag = (pSol, dSol, elec, forms, vol, osm, effVol, extraWater) => {
+        const needsDil = extraWater > 0;
+        const finalOsm = needsDil ? 900 : osm;
+        const osmBadge = `<span class="compat-pass">✓ Osm ${finalOsm.toFixed(0)} mOsm/L</span>`;
+        return `
+          ${needsDil ? `
+          <div class="electrolyte-item">
+            <div class="electrolyte-header">
+              <span class="electrolyte-name" style="color:var(--accent-color);">Sterile Water for Injection</span>
+              <span class="electrolyte-value">${extraWater.toFixed(1)} mL</span>
+            </div>
+            <div style="font-size:0.8em;color:var(--text-secondary);padding-top:2px;">
+              เติมเพื่อลด Osm จาก ${osm.toFixed(0)} → 900 mOsm/L
+            </div>
+          </div>` : ""}
+          <div class="electrolyte-item">
+            <div class="electrolyte-header">
+              <span class="electrolyte-name">${proteinConcentration}% ${proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"}</span>
+              <span class="electrolyte-value">${pSol.toFixed(2)} mL</span>
+            </div>
+          </div>
+          <div class="electrolyte-item">
+            <div class="electrolyte-header">
+              <span class="electrolyte-name">50% Dextrose</span>
+              <span class="electrolyte-value">${dSol.toFixed(2)} mL</span>
+            </div>
+          </div>
+          ${renderElectrolyteHTML(elec, forms, allFormulasVisible)}
+          <div class="summary-box" style="margin-top:8px;">
+            <div class="summary-item">
+              <span class="summary-label">Volume${needsDil ? " (+ น้ำ)" : ""}:</span>
+              <span class="summary-value">${effVol.toFixed(1)} mL</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Osmolarity:</span>
+              ${osmBadge}
+            </div>
+          </div>
+        `;
+      };
+
+      document.getElementById("splitBagA1").innerHTML = renderBag(pSol2, dSol2, bagA1.electrolytes, bagA1.formulas, volA1, osmA1, effVolA1, xwA1);
+      document.getElementById("splitBagB1").innerHTML = renderBag(pSol2, dSol2, bagB1.electrolytes, bagB1.formulas, volB1, osmB1, effVolB1, xwB1);
+      document.getElementById("splitBagA2").innerHTML = renderBag(pSol2, dSol2, bagA2.electrolytes, bagA2.formulas, volA2, osmA2, effVolA2, xwA2);
+      document.getElementById("splitBagB2").innerHTML = renderBag(pSol2, dSol2, bagB2.electrolytes, bagB2.formulas, volB2, osmB2, effVolB2, xwB2);
+
+      const vL = effVolA1 / 1000;
+      const ca_mL = ca / vL, ca_mol = (ca * 0.5) / vL;
+      const po4_mL = (po4_2 * 2) / vL, po4_mol = po4_2 / vL;
+      const splitChecks = [
+        { label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45", detail: `${ca_mL.toFixed(2)} + ${po4_mL.toFixed(2)} = ${(ca_mL + po4_mL).toFixed(2)}`, pass: ca_mL + po4_mL <= 45 },
+        { label: "Ca (mEq/L) ≤ 15 และ PO₄ (mEq/L) ≤ 30", detail: `Ca = ${ca_mL.toFixed(2)}, PO₄ = ${po4_mL.toFixed(2)}`, pass: ca_mL <= 15 && po4_mL <= 30 },
+        { label: "Ca (mmol/L) / PO₄ (mmol/L) < 1/2", detail: `${ca_mol.toFixed(2)} / ${po4_mol.toFixed(2)} = ${po4_mol > 0 ? (ca_mol / po4_mol).toFixed(3) : "N/A"}`, pass: po4_mol > 0 ? ca_mol / po4_mol < 0.5 : true },
+        { label: "Ca (mmol/L) × P (mmol/L) ≤ 75", detail: `${ca_mol.toFixed(2)} × ${po4_mol.toFixed(2)} = ${(ca_mol * po4_mol).toFixed(2)}`, pass: ca_mol * po4_mol <= 75 },
+      ];
+      const allSplitPass = splitChecks.every((c) => c.pass);
+      document.getElementById("splitCaPO4").innerHTML = `
+        <div>
+          <h3 style="margin-bottom:4px;"><i data-lucide="shield-check"></i> Ca&ndash;PO&#x2084; Compatibility Checks</h3>
+          <p style="margin:0 0 10px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 1: Ca เต็ม, PO&#x2084;/2${xwA1 > 0 ? ` — หลังเติม Sterile Water ${xwA1.toFixed(1)} mL` : ""}</p>
+          ${splitChecks.map((c) => `
+            <div class="compat-check">
+              <span>${c.label}<br><small style="color:var(--text-secondary)">${c.detail}</small></span>
+              <span class="${c.pass ? "compat-pass" : "compat-fail"}">${c.pass ? "✓ ผ่าน" : "✗ ไม่ผ่าน"}</span>
+            </div>`).join("")}
+          ${allSplitPass
+            ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ถุงที่ 1 ผ่านเกณฑ์ทุกข้อ</div></div>`
+            : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ถุงที่ 1 ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`}
+          <p style="margin-top:8px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 2 ไม่มี Ca → ไม่มีความเสี่ยง Ca–PO₄ Precipitation</p>
+        </div>`;
+    } else {
+      ppnSplitSection.classList.add("hidden");
+    }
+
     window.lastResult = {
       patientId: document.getElementById("patientId").value.trim(),
       patientName: document
