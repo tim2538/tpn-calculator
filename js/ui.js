@@ -609,8 +609,8 @@ function calculate() {
         : "Stable: ช่วงปกติ 4–7 mg/kg/min";
     if (gir > girThreshold) {
       alertsHTML += `
-        <div class="alert alert-warning">
-          <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+        <div class="alert alert-danger">
+          <i data-lucide="circle-alert" style="width: 20px; height: 20px;"></i>
           <div>
             <strong>คำเตือน GIR:</strong> ${gir.toFixed(2)} mg/kg/min
             เกินค่าสูงสุด (${girThreshold} mg/kg/min) — ${girRangeLabel}
@@ -621,8 +621,8 @@ function calculate() {
     }
     if (ivleRateHr > 0.11) {
       alertsHTML += `
-        <div class="alert alert-warning">
-          <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+        <div class="alert alert-danger">
+          <i data-lucide="circle-alert" style="width: 20px; height: 20px;"></i>
           <div>
             <strong>คำเตือน IVLE:</strong> อัตราหยด ${ivleRateHr.toFixed(3)} g/kg/hr
             เกินค่าสูงสุดที่แนะนำ (0.11 g/kg/hr)
@@ -632,8 +632,8 @@ function calculate() {
     }
     if (ivleRateDay > 1.5) {
       alertsHTML += `
-        <div class="alert alert-warning">
-          <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+        <div class="alert alert-danger">
+          <i data-lucide="circle-alert" style="width: 20px; height: 20px;"></i>
           <div>
             <strong>คำเตือน IVLE:</strong> ขนาดรายวัน ${ivleRateDay.toFixed(3)} g/kg/day
             เกินค่าสูงสุดที่แนะนำ (1.5 g/kg/day)

@@ -617,6 +617,9 @@ input:read-only {
 .electrolyte-value--negative {
   color: #ef4444;
 }
+[data-theme="dark"] .electrolyte-value--negative {
+  color: #fca5a5;
+}
 .electrolyte-formula {
   padding-top: 8px;
   font-size: 0.85em;
