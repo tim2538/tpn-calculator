@@ -62,7 +62,7 @@ Else if PO₄ > 0 AND K = 0:
 Prioritises K₂HPO₄ for potassium, then distributes remaining K and Na:
 
 ```
-15% KCl (mL)   = (K − K₂HPO₄) ÷ 2
+15% KCl (mL)   = (K − K₂HPO₄) ÷ 2   [0 if K ≤ K₂HPO₄ or Cl = 0]
 29.4% KAc (mL) = (K − K₂HPO₄ − KCl×2) ÷ 3
 3% NaCl (mL)   = (Cl − KCl×2) ÷ 0.5
 24.6% NaAc (mL) = (Na − NaCl×0.5 − Glycophos×2) ÷ 3
@@ -118,10 +118,16 @@ Lipid is infused separately (IVLE bag); volumes are shown combined for reference
 Osmolarity (mOsm/L) =
   (Protein Sol mL × AA_factor)   ← product-specific
   + Dextrose (g) × 5
-  + Na (mEq) × 2
+  + Na_other (mEq) × 2           ← Na not from Glycophos
+  + Na_glycophos (mEq) × 3       ← Na from Glycophos (disodium salt, contributes extra anion)
   + K  (mEq) × 2
   + Mg (mEq) × 1
   + Ca (mEq) × 1.4
+
+Where:
+  Na_glycophos (mEq) = Glycophos (mL) × 2
+  Na_other (mEq)     = Na (total mEq) − Na_glycophos
+  When Glycophos = 0, the formula collapses to Na × 2.
 
 AA_factor:
   Amiparen 10%:    0.960 mOsm/mL  (960 mOsm/L)
@@ -261,10 +267,10 @@ Cl_max = Na + K − K₂HPO₄ − Glycophos×2
 | Negative electrolyte volume        | Danger — imbalanced inputs             |
 | Osmolarity > 900 + peripheral line | Danger — must dilute                   |
 | Osmolarity > 900 + central line    | Warning — central line required        |
-| GIR > threshold                    | Warning — hyperglycemia/steatosis risk |
-| IVLE hourly > 0.11 g/kg/hr         | Warning                                |
-| IVLE daily > 1.5 g/kg/day          | Warning                                |
+| GIR > threshold                    | Danger — hyperglycemia/steatosis risk  |
+| IVLE hourly > 0.11 g/kg/hr         | Danger                                 |
+| IVLE daily > 1.5 g/kg/day          | Danger                                 |
 | Ca–PO₄ check fails                 | Danger — precipitation risk            |
-| All checks pass                    | Success                                |
+| All checks pass (osmolarity, GIR, IVLE) | Success                           |
 
 Mixing order reminder is always shown: **Dextrose + AA → Phosphate → Electrolyte → Calcium** to prevent calcium phosphate precipitation.
