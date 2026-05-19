@@ -666,7 +666,11 @@
       </div>
     </div>
     <!-- QR Scanner Modal -->
-    <div class="qr-scanner-overlay" id="qrScannerModal">
+    <div
+      class="qr-scanner-overlay"
+      id="qrScannerModal"
+      onclick="if (event.target === this) closeQRScanner();"
+    >
       <div class="qr-scanner-modal">
         <div class="qr-scanner-header">
           <h3>สแกน QR Code</h3>
@@ -714,18 +718,14 @@
               วิธีที่ 2 (NaCl First)
             </button>
           </div>
+          <button class="qr-close-btn" onclick="closePrintModal()">
+            <i data-lucide="x"></i>
+          </button>
         </div>
         <div class="print-canvas-wrapper">
           <canvas id="previewCanvas" width="900" height="1200"></canvas>
         </div>
         <div class="print-modal-actions">
-          <button class="btn btn-reset" onclick="closePrintModal()">
-            <i data-lucide="x" class="btn-icon btn-icon-only"></i>
-            <span class="btn-text">
-              <i data-lucide="x" class="btn-icon"></i>
-              ปิด
-            </span>
-          </button>
           <button class="btn btn-reset" onclick="downloadQRCode()">
             <i data-lucide="qr-code" class="btn-icon btn-icon-only"></i>
             <span class="btn-text">
