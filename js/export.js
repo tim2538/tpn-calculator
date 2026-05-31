@@ -32,34 +32,29 @@ function printCanvas() {
   const r = window.lastResult;
 
   function doPrint(dataUrls) {
-    const iframe = document.createElement("iframe");
-    iframe.style.cssText = "position:fixed;width:0;height:0;border:0;top:0;left:0;";
-    document.body.appendChild(iframe);
-
+    const win = window.open("", "_blank");
+    if (!win) {
+      alert("กรุณาอนุญาต popup เพื่อใช้งานการพิมพ์");
+      return;
+    }
     const imgs = dataUrls
       .map((url, i) =>
         "<img src='" + url + "' style='width:100%;display:block;" +
         (i < dataUrls.length - 1 ? "page-break-after:always;" : "") + "'/>"
       )
       .join("");
-
-    function cleanup() { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }
-
-    iframe.onload = function () {
-      iframe.contentWindow.addEventListener("afterprint", cleanup, { once: true });
-      setTimeout(cleanup, 60000);
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(
+    win.document.write(
       "<!DOCTYPE html><html><head><style>" +
       "*{margin:0;padding:0;box-sizing:border-box}" +
+      "@media print{img{width:100%;page-break-after:always}img:last-child{page-break-after:avoid}}" +
       "</style></head><body>" + imgs + "</body></html>"
     );
-    doc.close();
+    win.document.close();
+    win.onload = function () {
+      win.focus();
+      win.addEventListener("afterprint", function () { win.close(); }, { once: true });
+      win.print();
+    };
   }
 
   if (r && r.needsSplit && r.split) {
