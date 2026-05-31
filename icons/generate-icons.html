@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generate TPN Calculator Icons</title>
+  <style>
+    body { font-family: sans-serif; padding: 32px; background: #f5f5f5; }
+    h1 { margin-bottom: 8px; }
+    p.subtitle { color: #555; margin-bottom: 24px; }
+    .section { margin-bottom: 40px; }
+    .section h2 { margin-bottom: 16px; font-size: 16px; color: #333; }
+    .icon-row { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-end; }
+    .icon-card { text-align: center; }
+    .icon-card canvas { display: block; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+    .icon-card p { font-size: 13px; color: #444; margin: 8px 0 4px; }
+    button { margin-top: 4px; padding: 6px 16px; cursor: pointer;
+             background: #37352f; color: white; border: none;
+             border-radius: 6px; font-size: 14px; }
+    button:hover { background: #2c2a26; }
+    #status { margin-top: 16px; color: #37352f; font-weight: 500; font-size: 14px; }
+    code { background: #e8e8e8; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>TPN Calculator — Icon Generator</h1>
+  <p class="subtitle">
+    Serve this page from the <code>icons/</code> directory via a local server, e.g.:<br>
+    <code>cd icons &amp;&amp; python3 -m http.server 8080</code><br>
+    Then open <code>http://localhost:8080/generate-icons.html</code>
+  </p>
+  <p class="subtitle">
+    Click each "Download" button. Move downloaded files into the <code>icons/</code> directory.
+  </p>
+
+  <div class="section">
+    <h2>Light Theme Icons</h2>
+    <div class="icon-row" id="lightRow"></div>
+  </div>
+
+  <div class="section">
+    <h2>Dark Theme Icons</h2>
+    <div class="icon-row" id="darkRow"></div>
+  </div>
+
+  <p id="status"></p>
+
+  <script>
+    const LIGHT_SVG = 'icon-light.svg';
+    const DARK_SVG = 'icon-dark.svg';
+
+    const LIGHT_SIZES = [
+      { size: 512, filename: 'icon-light-512.png' },
+      { size: 192, filename: 'icon-light-192.png' },
+      { size: 180, filename: 'apple-touch-icon-light.png' },
+    ];
+
+    const DARK_SIZES = [
+      { size: 512, filename: 'icon-dark-512.png' },
+      { size: 192, filename: 'icon-dark-192.png' },
+      { size: 180, filename: 'apple-touch-icon-dark.png' },
+    ];
+
+    function drawSvgToCanvas(svgUrl, size, callback) {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+        callback(canvas);
+      };
+      img.onerror = () => {
+        document.getElementById('status').textContent =
+          'Error loading ' + svgUrl + '. Make sure you\'re serving from a local server.';
+      };
+      img.src = svgUrl + '?t=' + Date.now();
+    }
+
+    function download(canvas, filename) {
+      const a = document.createElement('a');
+      a.download = filename;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    }
+
+    function buildRow(containerId, svgUrl, sizes) {
+      const container = document.getElementById(containerId);
+      sizes.forEach(({ size, filename }) => {
+        const card = document.createElement('div');
+        card.className = 'icon-card';
+
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = size;
+        previewCanvas.height = size;
+        const displaySize = Math.min(size, 128);
+        previewCanvas.style.width = displaySize + 'px';
+        previewCanvas.style.height = displaySize + 'px';
+
+        const label = document.createElement('p');
+        label.textContent = size + '×' + size + ' — ' + filename;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Download';
+        btn.onclick = () => {
+          drawSvgToCanvas(svgUrl, size, (c) => {
+            const ctx = previewCanvas.getContext('2d');
+            ctx.clearRect(0, 0, size, size);
+            ctx.drawImage(c, 0, 0);
+            download(c, filename);
+            document.getElementById('status').textContent = 'Downloaded ' + filename;
+          });
+        };
+
+        card.appendChild(previewCanvas);
+        card.appendChild(label);
+        card.appendChild(btn);
+        container.appendChild(card);
+
+        drawSvgToCanvas(svgUrl, size, (c) => {
+          const ctx = previewCanvas.getContext('2d');
+          ctx.drawImage(c, 0, 0);
+        });
+      });
+    }
+
+    buildRow('lightRow', LIGHT_SVG, LIGHT_SIZES);
+    buildRow('darkRow', DARK_SVG, DARK_SIZES);
+  </script>
+</body>
+</html>

@@ -7,7 +7,22 @@ function toggleTheme() {
   html.setAttribute("data-theme", newTheme);
   localStorage.setItem("theme", newTheme);
   syncThemeIcons(newTheme);
+  updateThemeAssets(newTheme);
   lucide.createIcons();
+}
+
+function updateThemeAssets(theme) {
+  const isDark = theme === "dark";
+  const color = isDark ? "#0f0f0f" : "#f7f6f3";
+  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+    m.setAttribute("content", color);
+  });
+  const appleIcon = document.getElementById("apple-icon");
+  if (appleIcon) {
+    appleIcon.href = isDark
+      ? "icons/apple-touch-icon-dark.png"
+      : "icons/apple-touch-icon-light.png";
+  }
 }
 
 function syncThemeIcons(theme) {
