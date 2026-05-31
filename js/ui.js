@@ -782,10 +782,10 @@ function calculate() {
       const osmB2 =
         aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB2) * 2 + glyB2 * 3 + k2 * 2;
 
-      const effVolA1 = osmA1 > 900 ? (osmA1 * volA1) / 900 : volA1;
-      const effVolB1 = osmB1 > 900 ? (osmB1 * volB1) / 900 : volB1;
-      const effVolA2 = osmA2 > 900 ? (osmA2 * volA2) / 900 : volA2;
-      const effVolB2 = osmB2 > 900 ? (osmB2 * volB2) / 900 : volB2;
+      const effVolA1 = osmA1 > (900 * volA1) / 1000 ? (osmA1 * 1000) / 900 : volA1;
+      const effVolB1 = osmB1 > (900 * volB1) / 1000 ? (osmB1 * 1000) / 900 : volB1;
+      const effVolA2 = osmA2 > (900 * volA2) / 1000 ? (osmA2 * 1000) / 900 : volA2;
+      const effVolB2 = osmB2 > (900 * volB2) / 1000 ? (osmB2 * 1000) / 900 : volB2;
       const xwA1 = effVolA1 - volA1;
       const xwB1 = effVolB1 - volB1;
       const xwA2 = effVolA2 - volA2;
