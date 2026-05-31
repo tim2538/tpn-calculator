@@ -31,34 +31,57 @@ function closePrintModal() {
 function printCanvas() {
   const r = window.lastResult;
 
-  function doPrint(dataUrls) {
+  function doPrint(canvases) {
     const existing = document.getElementById("print-frame");
     if (existing) existing.parentNode.removeChild(existing);
 
     const frame = document.createElement("div");
     frame.id = "print-frame";
-    dataUrls.forEach(function (url) {
-      const img = document.createElement("img");
-      img.src = url;
-      frame.appendChild(img);
-    });
     document.body.appendChild(frame);
+
+    const blobUrls = [];
 
     function cleanup() {
       const f = document.getElementById("print-frame");
       if (f) f.parentNode.removeChild(f);
+      blobUrls.forEach(function (u) { URL.revokeObjectURL(u); });
     }
     window.addEventListener("afterprint", cleanup, { once: true });
-    setTimeout(cleanup, 60000);
+    setTimeout(cleanup, 10000);
 
-    window.print();
+    var total = canvases.length;
+    var loaded = 0;
+
+    function onAllLoaded() {
+      requestAnimationFrame(function () {
+        window.print();
+      });
+    }
+
+    canvases.forEach(function (canvas) {
+      canvas.toBlob(function (blob) {
+        if (!blob) {
+          cleanup();
+          alert("ไม่สามารถเตรียมภาพสำหรับพิมพ์ได้");
+          return;
+        }
+        var url = URL.createObjectURL(blob);
+        blobUrls.push(url);
+        var img = document.createElement("img");
+        img.onload = function () {
+          loaded += 1;
+          if (loaded === total) onAllLoaded();
+        };
+        img.src = url;
+        frame.appendChild(img);
+      }, "image/png");
+    });
   }
 
   if (r && r.needsSplit && r.split) {
     const s = r.split;
     const method = currentPrintMethod;
-    const dataUrls = [];
-    ["1", "2"].forEach(function (bagNum) {
+    const canvases = ["1", "2"].map(function (bagNum) {
       const offCanvas = document.createElement("canvas");
       offCanvas.width = 900;
       offCanvas.height = 1200;
@@ -72,12 +95,12 @@ function printCanvas() {
         ? { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A }
         : { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
       drawLabel(ctx, 900, 0, bagData, summaryData, method, r, "ถุงที่ " + bagNum);
-      dataUrls.push(offCanvas.toDataURL("image/png"));
+      return offCanvas;
     });
-    doPrint(dataUrls);
+    doPrint(canvases);
   } else {
     const canvas = document.getElementById("previewCanvas");
-    doPrint([canvas.toDataURL("image/png")]);
+    doPrint([canvas]);
   }
 }
 

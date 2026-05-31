@@ -1183,6 +1183,6 @@ select:focus-visible {
     width: 100% !important;
     pointer-events: auto !important;
   }
-  #print-frame img { width: 100%; display: block; page-break-after: always; }
-  #print-frame img:last-child { page-break-after: avoid; }
+  #print-frame img { width: 100%; display: block; page-break-after: always; break-after: page; }
+  #print-frame img:last-child { page-break-after: avoid; break-after: avoid; }
 }
