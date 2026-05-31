@@ -28,6 +28,60 @@ function closePrintModal() {
   document.body.style.overflow = "";
 }
 
+function printCanvas() {
+  const r = window.lastResult;
+
+  function openPrintWindow(dataUrls) {
+    const win = window.open("", "_blank");
+    if (!win) {
+      alert("กรุณาอนุญาต popup เพื่อใช้งานการพิมพ์");
+      return;
+    }
+    const imgs = dataUrls
+      .map((url, i) =>
+        "<img src='" + url + "' style='max-width:100%;height:auto;display:block;" +
+        (i < dataUrls.length - 1 ? "page-break-after:always;" : "") + "'/>"
+      )
+      .join("");
+    win.document.write(
+      "<!DOCTYPE html><html><head><style>" +
+      "*{margin:0;padding:0;box-sizing:border-box}" +
+      "@media print{img{width:100%}}" +
+      "</style></head><body>" + imgs + "</body></html>"
+    );
+    win.document.close();
+    win.onload = function () { win.focus(); win.print(); };
+  }
+
+  if (r && r.needsSplit && r.split) {
+    const s = r.split;
+    const method = currentPrintMethod;
+    const dataUrls = [];
+
+    ["1", "2"].forEach(function (bagNum) {
+      const offCanvas = document.createElement("canvas");
+      offCanvas.width = 900;
+      offCanvas.height = 1200;
+      const ctx = offCanvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 900, 1200);
+      const bagData = bagNum === "1"
+        ? (method === "1" ? s.bagA1 : s.bagA2)
+        : (method === "1" ? s.bagB1 : s.bagB2);
+      const summaryData = bagNum === "1"
+        ? { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A }
+        : { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
+      drawLabel(ctx, 900, 0, bagData, summaryData, method, r, "ถุงที่ " + bagNum);
+      dataUrls.push(offCanvas.toDataURL("image/png"));
+    });
+
+    openPrintWindow(dataUrls);
+  } else {
+    const canvas = document.getElementById("previewCanvas");
+    openPrintWindow([canvas.toDataURL("image/png")]);
+  }
+}
+
 function downloadPNG() {
   const r = window.lastResult;
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
