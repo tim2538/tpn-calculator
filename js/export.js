@@ -226,6 +226,7 @@ function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
   rowLine("50% Glucose", dextroseSolution, "ml", base + 86, LX, LVAL);
   rowLine(proteinLabel, proteinSolution, "ml", base + 126, LX, LVAL);
 
+  const isBag2 = bagTitle === "ถุงที่ 2";
   const elecRows = [
     ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", base + 194],
     ["Glycophos", elec["Glycophos"] ?? 0, "ml", base + 234],
@@ -234,12 +235,12 @@ function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
     ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", base + 354],
     ["24.6% NaAc", elec["24.6% NaAc"] ?? 0, "ml", base + 394],
     ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", base + 434],
-    ["Addamel", r.addamelVol, "ml", base + 474],
-    ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", base + 514],
+    ...(!isBag2 ? [["Addamel", r.addamelVol, "ml", base + 474]] : []),
+    ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", isBag2 ? base + 474 : base + 514],
   ];
   elecRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
 
-  if (bagTitle !== "ถุงที่ 2") {
+  if (!isBag2) {
     ctx.textAlign = "left";
     ctx.font = "700 20px " + FONT;
     ctx.fillStyle = BLACK;
