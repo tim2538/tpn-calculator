@@ -13,16 +13,18 @@
       .btn        { fill: #37352f; }
     }
   </style>
-  <rect class="bg-outer" width="512" height="512" rx="112" ry="112"/>
-  <rect class="calc-body" x="122" y="56" width="268" height="388" rx="36" ry="36"/>
-  <rect class="screen" x="142" y="76" width="228" height="100" rx="14" ry="14"/>
-  <text class="screen-txt" x="256" y="126" font-family="sans-serif" font-size="72" font-weight="900" text-anchor="middle" dominant-baseline="central">TPN</text>
-  <circle class="btn" cx="176" cy="234" r="30"/>
-  <circle class="btn" cx="256" cy="234" r="30"/>
-  <circle cx="336" cy="234" r="30" fill="#e8720c"/>
-  <circle class="btn" cx="176" cy="314" r="30"/>
-  <circle class="btn" cx="256" cy="314" r="30"/>
-  <circle cx="336" cy="314" r="30" fill="#e8720c"/>
-  <rect class="btn" x="146" y="364" width="140" height="60" rx="30" ry="30"/>
-  <circle cx="336" cy="394" r="30" fill="#e8720c"/>
+  <g transform="translate(48, 48) scale(0.8125)">
+    <rect class="bg-outer" width="512" height="512" rx="112" ry="112"/>
+    <rect class="calc-body" x="122" y="56" width="268" height="388" rx="36" ry="36"/>
+    <rect class="screen" x="142" y="76" width="228" height="100" rx="14" ry="14"/>
+    <text class="screen-txt" x="256" y="126" font-family="sans-serif" font-size="72" font-weight="900" text-anchor="middle" dominant-baseline="central">TPN</text>
+    <circle class="btn" cx="176" cy="234" r="30"/>
+    <circle class="btn" cx="256" cy="234" r="30"/>
+    <circle cx="336" cy="234" r="30" fill="#e8720c"/>
+    <circle class="btn" cx="176" cy="314" r="30"/>
+    <circle class="btn" cx="256" cy="314" r="30"/>
+    <circle cx="336" cy="314" r="30" fill="#e8720c"/>
+    <rect class="btn" x="146" y="364" width="140" height="60" rx="30" ry="30"/>
+    <circle cx="336" cy="394" r="30" fill="#e8720c"/>
+  </g>
 </svg>
