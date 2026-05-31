@@ -13,7 +13,7 @@
       .btn        { fill: #37352f; }
     }
   </style>
-  <g transform="translate(40, 40) scale(0.84375)">
+  <g transform="translate(32, 32) scale(0.875)">
     <rect class="bg-outer" width="512" height="512" rx="112" ry="112"/>
     <rect class="calc-body" x="122" y="56" width="268" height="388" rx="36" ry="36"/>
     <rect class="screen" x="142" y="76" width="228" height="100" rx="14" ry="14"/>
