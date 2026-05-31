@@ -835,6 +835,7 @@ function calculate() {
         extraWater,
       ) => {
         const needsDil = extraWater > 0;
+        const initialOsm = osm / vol * 1000;
         const finalOsm = needsDil ? 900 : osm;
         const osmBadge = `<span class="compat-pass" style="margin-left:auto;">✓ Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`;
         return `
@@ -847,7 +848,7 @@ function calculate() {
               <span class="electrolyte-value">${extraWater.toFixed(1)} mL</span>
             </div>
             <div style="font-size:0.8em;color:var(--text-secondary);padding-top:2px;">
-              เติมเพื่อลด Osm จาก ${osm.toFixed(0)} → 900 mOsm/L
+              เติมเพื่อลดความเข้มข้น Osm จาก ${initialOsm.toFixed(0)} mOsm/L → ${finalOsm.toFixed(0)} mOsm/L
             </div>
           </div>`
               : ""
