@@ -39,12 +39,9 @@ function printCanvas() {
     frame.id = "print-frame";
     document.body.appendChild(frame);
 
-    const blobUrls = [];
-
     function cleanup() {
       const f = document.getElementById("print-frame");
       if (f) f.parentNode.removeChild(f);
-      blobUrls.forEach(function (u) { URL.revokeObjectURL(u); });
     }
     window.addEventListener("afterprint", cleanup, { once: true });
     setTimeout(cleanup, 10000);
@@ -58,23 +55,23 @@ function printCanvas() {
       });
     }
 
+    function onImgReady() {
+      loaded += 1;
+      if (loaded === total) onAllLoaded();
+    }
+
     canvases.forEach(function (canvas) {
-      canvas.toBlob(function (blob) {
-        if (!blob) {
-          cleanup();
-          alert("ไม่สามารถเตรียมภาพสำหรับพิมพ์ได้");
-          return;
-        }
-        var url = URL.createObjectURL(blob);
-        blobUrls.push(url);
-        var img = document.createElement("img");
-        img.onload = function () {
-          loaded += 1;
-          if (loaded === total) onAllLoaded();
-        };
-        img.src = url;
-        frame.appendChild(img);
-      }, "image/png");
+      var url = canvas.toDataURL("image/png");
+      var img = document.createElement("img");
+      img.onload = onImgReady;
+      img.src = url;
+      frame.appendChild(img);
+      // Some browsers decode data: URLs synchronously; if so, complete is already
+      // true and onload will never fire — handle it here.
+      if (img.complete) {
+        img.onload = null;
+        onImgReady();
+      }
     });
   }
 
