@@ -839,7 +839,7 @@ function calculate() {
             </div>
           </div>
           ${renderElectrolyteHTML(elec, forms, allFormulasVisible)}
-          <div class="summary-box" style="margin-top:8px;">
+          <div class="summary-box">
             <div class="summary-item">
               <span class="summary-label">Volume${needsDil ? " (+ น้ำ)" : ""}:</span>
               <span class="summary-value">${effVol.toFixed(1)} mL</span>
