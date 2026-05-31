@@ -346,6 +346,8 @@ input:read-only {
 }
 .print-modal-overlay.active {
   display: flex;
+  overflow-y: auto;
+  align-items: flex-start;
 }
 .print-modal {
   background: var(--bg-secondary);
@@ -355,6 +357,8 @@ input:read-only {
   width: 92vw;
   max-width: 960px;
   max-height: 90vh;
+  max-height: 90dvh;
+  margin: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
