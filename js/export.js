@@ -29,35 +29,69 @@ function closePrintModal() {
 }
 
 function downloadPNG() {
-  const canvas = document.getElementById("previewCanvas");
-  canvas.toBlob(function (blob) {
-    const r = window.lastResult;
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    const idStr = r.patientId || "report";
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "TPN_" + idStr + "_" + dateStr + ".png";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
+  const r = window.lastResult;
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const idStr = r.patientId || "report";
+
+  if (r.needsSplit && r.split) {
+    // Render and download each bag as a separate image
+    ["1", "2"].forEach((bagNum) => {
+      const offCanvas = document.createElement("canvas");
+      const s = r.split;
+      const method = currentPrintMethod;
+      const bagData = bagNum === "1"
+        ? (method === "1" ? s.bagA1 : s.bagA2)
+        : (method === "1" ? s.bagB1 : s.bagB2);
+      const summaryData = bagNum === "1"
+        ? { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A }
+        : { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
+
+      offCanvas.width = 900;
+      offCanvas.height = 1200;
+      const ctx = offCanvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 900, 1200);
+      drawLabel(ctx, 900, 0, bagData, summaryData, method, r, "ถุงที่ " + bagNum);
+
+      offCanvas.toBlob(function (blob) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "TPN_" + idStr + "_Bag" + bagNum + "_" + dateStr + ".png";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+    });
+  } else {
+    const canvas = document.getElementById("previewCanvas");
+    canvas.toBlob(function (blob) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "TPN_" + idStr + "_" + dateStr + ".png";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  }
 }
 
-function drawExportCanvas(canvas, method) {
-  const r = window.lastResult;
-  if (!r) return;
-  const elec = method === "1" ? r.electrolytes1 : r.electrolytes2;
-  const ctx = canvas.getContext("2d");
-  const W = 900,
-    H = 1200;
-  canvas.width = W;
-  canvas.height = H;
-
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, W, H);
-
+function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
   const FONT = "Sarabun, sans-serif";
   const BLACK = "#1a1a1a";
   const GREY = "#888888";
+
+  const elec = bagData ? bagData.electrolytes : (method === "1" ? r.electrolytes1 : r.electrolytes2);
+  const proteinSolution = bagData ? bagData.proteinSolution : r.proteinSolution;
+  const dextroseSolution = bagData ? bagData.dextroseSolution : r.dextroseSolution;
+  const sterileWater = bagData ? bagData.sterileWater : r.sterileWater;
+  const flowRate = bagData ? bagData.flowRate : (method === "1" ? r.flowRate1 : r.flowRate2);
+
+  const protein = summaryData.protein;
+  const dextrose = summaryData.dextrose;
+  const na = summaryData.na;
+  const k = summaryData.k;
+  const cl = summaryData.cl;
+  const ca = summaryData.ca;
+  const mg = summaryData.mg;
+  const po4 = summaryData.po4;
 
   function rowLine(label, value, unit, y, leftX, valX) {
     ctx.textAlign = "left";
@@ -79,10 +113,10 @@ function drawExportCanvas(canvas, method) {
   ctx.fillStyle = BLACK;
   const hn = r.patientId || "—";
   const name = r.patientName || "—";
-  ctx.fillText("HN  " + hn + "      ชื่อ-สกุล  " + name, 50, 70);
-  ctx.fillText("BW  " + r.weight + "  kg", 50, 108);
+  ctx.fillText("HN  " + hn + "      ชื่อ-สกุล  " + name, 50, yOff + 70);
+  ctx.fillText("BW  " + r.weight + "  kg", 50, yOff + 108);
 
-  // ── Access type (selected only, large) ──
+  // ── Access type ──
   const isCentral = r.venousAccess === "central";
   const accessLabel = isCentral
     ? "****** Central Line Use Only ******"
@@ -90,75 +124,80 @@ function drawExportCanvas(canvas, method) {
   ctx.textAlign = "center";
   ctx.font = "700 26px " + FONT;
   ctx.fillStyle = BLACK;
-  ctx.fillText(accessLabel, W / 2, 152);
+  ctx.fillText(accessLabel, W / 2, yOff + 152);
+
+  // ── Bag title (split only) ──
+  let contentYShift = 0;
+  if (bagTitle) {
+    ctx.textAlign = "center";
+    ctx.font = "700 32px " + FONT;
+    ctx.fillStyle = BLACK;
+    ctx.fillText(bagTitle, W / 2, yOff + 192);
+    contentYShift = 40;
+  }
 
   // ── Horizontal rule ──
+  const hrY = yOff + 172 + contentYShift;
   ctx.strokeStyle = "#333333";
   ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.moveTo(50, 172);
-  ctx.lineTo(W - 50, 172);
+  ctx.moveTo(50, hrY);
+  ctx.lineTo(W - 50, hrY);
   ctx.stroke();
 
   // ── Vertical divider ──
   ctx.strokeStyle = "#cccccc";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(448, 172);
-  ctx.lineTo(448, 1155);
+  ctx.moveTo(448, hrY);
+  ctx.lineTo(448, yOff + 1155);
   ctx.stroke();
 
   // ─── LEFT COLUMN ───
   const LX = 50,
     LVAL = 420;
+  const base = hrY + 24;
 
   ctx.textAlign = "left";
   ctx.font = "700 20px " + FONT;
   ctx.fillStyle = BLACK;
-  ctx.fillText("Ingredients:", LX, 196);
+  ctx.fillText("Ingredients:", LX, base);
 
   const proteinLabel =
     r.proteinProduct === "amiparen"
       ? "Protein as Amiparen"
       : "Protein as Aminoplasmal";
 
-  const leftRows = [
-    ["Sterile water", r.sterileWater, "ml", 242],
-    ["50% Glucose", r.dextroseSolution, "ml", 282],
-    [proteinLabel, r.proteinSolution, "ml", 322],
-  ];
-  leftRows.forEach(([lbl, val, unit, y]) =>
-    rowLine(lbl, val, unit, y, LX, LVAL),
-  );
+  rowLine("Sterile water", sterileWater, "ml", base + 46, LX, LVAL);
+  rowLine("50% Glucose", dextroseSolution, "ml", base + 86, LX, LVAL);
+  rowLine(proteinLabel, proteinSolution, "ml", base + 126, LX, LVAL);
 
   const elecRows = [
-    ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", 390],
-    ["Glycophos", elec["Glycophos"] ?? 0, "ml", 430],
-    ["15% KCl", elec["15% KCl"] ?? 0, "ml", 470],
-    ["29.4% KAc", elec["29.4% KAc"] ?? 0, "ml", 510],
-    ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", 550],
-    ["24.6% NaAc", elec["24.6% NaAc"] ?? 0, "ml", 590],
-    ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", 630],
-    ["Addamel", r.addamelVol, "ml", 670],
-    ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", 710],
+    ["8.71% K₂HPO₄", elec["8.71% K₂HPO₄"] ?? 0, "ml", base + 194],
+    ["Glycophos", elec["Glycophos"] ?? 0, "ml", base + 234],
+    ["15% KCl", elec["15% KCl"] ?? 0, "ml", base + 274],
+    ["29.4% KAc", elec["29.4% KAc"] ?? 0, "ml", base + 314],
+    ["3% NaCl", elec["3% NaCl"] ?? 0, "ml", base + 354],
+    ["24.6% NaAc", elec["24.6% NaAc"] ?? 0, "ml", base + 394],
+    ["50% MgSO₄", elec["50% MgSO₄"] ?? 0, "ml", base + 434],
+    ["Addamel", r.addamelVol, "ml", base + 474],
+    ["10% Ca gluconate", elec["10% Ca Gluconate"] ?? 0, "ml", base + 514],
   ];
-  elecRows.forEach(([lbl, val, unit, y]) =>
-    rowLine(lbl, val, unit, y, LX, LVAL),
-  );
+  elecRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
 
-  ctx.textAlign = "left";
-  ctx.font = "700 20px " + FONT;
-  ctx.fillStyle = BLACK;
-  ctx.fillText("Add before administration", LX, 768);
+  if (bagTitle !== "ถุงที่ 2") {
+    ctx.textAlign = "left";
+    ctx.font = "700 20px " + FONT;
+    ctx.fillStyle = BLACK;
+    ctx.fillText("Add before administration", LX, base + 572);
 
-  const addRows = [
-    ["Soluvit", r.soluvitVol, "ml", 818],
-    ["Cernevit", r.cernevitVol, "ml", 858],
-    ["B complex", r.bcomplexVol, "ml", 898],
-  ];
-  addRows.forEach(([lbl, val, unit, y]) =>
-    rowLine(lbl, val, unit, y, LX, LVAL),
-  );
+    const addRows = [
+      ["Soluvit", r.soluvitVol, "ml", base + 622],
+      ["Cernevit", r.cernevitVol, "ml", base + 662],
+      ["B complex", r.bcomplexVol, "ml", base + 702],
+    ];
+    addRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, LX, LVAL));
+  }
 
   // ─── RIGHT COLUMN ───
   const RX = 468,
@@ -167,36 +206,33 @@ function drawExportCanvas(canvas, method) {
   ctx.textAlign = "left";
   ctx.font = "700 20px " + FONT;
   ctx.fillStyle = BLACK;
-  ctx.fillText("Summary:", RX, 196);
+  ctx.fillText("Summary:", RX, base);
 
   const summaryRows = [
-    ["Protein", r.protein, "g", 242],
-    ["Glucose", r.dextrose, "g", 282],
-    ["Na", r.na, "mEq", 322],
-    ["K", r.k, "mEq", 362],
-    ["Cl", r.cl, "mEq", 402],
-    ["Ca", r.ca, "mEq", 442],
-    ["Mg", r.mg, "mEq", 482],
-    ["PO₄", r.po4, "mmol", 522],
+    ["Protein", protein, "g", base + 46],
+    ["Glucose", dextrose, "g", base + 86],
+    ["Na", na, "mEq", base + 126],
+    ["K", k, "mEq", base + 166],
+    ["Cl", cl, "mEq", base + 206],
+    ["Ca", ca, "mEq", base + 246],
+    ["Mg", mg, "mEq", base + 286],
+    ["PO₄", po4, "mmol", base + 326],
   ];
-  summaryRows.forEach(([lbl, val, unit, y]) =>
-    rowLine(lbl, val, unit, y, RX, RVAL),
-  );
+  summaryRows.forEach(([lbl, val, unit, y]) => rowLine(lbl, val, unit, y, RX, RVAL));
 
-  // ── Rate (right column, below summary) ──
-  const rate = method === "1" ? r.flowRate1 : r.flowRate2;
-  if (rate != null) {
+  // ── Rate ──
+  if (flowRate != null) {
     ctx.textAlign = "left";
     ctx.font = "600 20px " + FONT;
     ctx.fillStyle = BLACK;
-    ctx.fillText("Rate", RX, 572);
+    ctx.fillText("Rate", RX, base + 376);
     ctx.textAlign = "right";
     ctx.font = "700 36px " + FONT;
-    ctx.fillText(rate.toFixed(1), RVAL - 56, 620);
+    ctx.fillText(flowRate.toFixed(1), RVAL - 56, base + 424);
     ctx.textAlign = "left";
     ctx.font = "18px " + FONT;
     ctx.fillStyle = GREY;
-    ctx.fillText("ml/hr", RVAL - 50, 620);
+    ctx.fillText("ml/hr", RVAL - 50, base + 424);
   }
 
   // ── Footer ──
@@ -217,8 +253,60 @@ function drawExportCanvas(canvas, method) {
   ctx.fillText(
     "TPN Calculator  |  " + dateLabel + "  " + timeLabel,
     W / 2,
-    1175,
+    yOff + 1175,
   );
+}
+
+function drawExportCanvas(canvas, method) {
+  const r = window.lastResult;
+  if (!r) return;
+  const W = 900;
+
+  if (r.needsSplit && r.split) {
+    const s = r.split;
+    const bagA = method === "1" ? s.bagA1 : s.bagA2;
+    const bagB = method === "1" ? s.bagB1 : s.bagB2;
+    const summaryA = { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A };
+    const summaryB = { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
+
+    const GAP_TOP = 1200;
+    const GAP_H = 24;
+    const BAG2_Y = GAP_TOP + GAP_H;
+    const H = BAG2_Y + 1200;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+
+    drawLabel(ctx, W, 0, bagA, summaryA, method, r, "ถุงที่ 1");
+
+    // Page-break spacer using --background CSS variable
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--background").trim() || "#f3f4f6";
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, GAP_TOP, W, GAP_H);
+
+    drawLabel(ctx, W, BAG2_Y, bagB, summaryB, method, r, "ถุงที่ 2");
+  } else {
+    const H = 1200;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+
+    const summaryData = {
+      protein: r.protein,
+      dextrose: r.dextrose,
+      na: r.na,
+      k: r.k,
+      cl: r.cl,
+      ca: r.ca,
+      mg: r.mg,
+      po4: r.po4,
+    };
+    drawLabel(ctx, W, 0, null, summaryData, method, r, null);
+  }
 }
 
 function downloadQRCode() {

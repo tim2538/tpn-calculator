@@ -726,6 +726,7 @@ function calculate() {
     // --- PPN Split Bags ---
     const ppnSplitSection = document.getElementById("ppnSplitSection");
     const needsSplit = venousAccess === "peripheral" && effectiveVolume > 1200;
+    let splitData = null;
     if (needsSplit) {
       ppnSplitSection.classList.remove("hidden");
       const na2 = na / 2,
@@ -816,6 +817,21 @@ function calculate() {
       const xwB1 = effVolB1 - volB1;
       const xwA2 = effVolA2 - volA2;
       const xwB2 = effVolB2 - volB2;
+
+      splitData = {
+        bagA1: { electrolytes: bagA1.electrolytes, sterileWater: xwA1, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolA1, flowRate: effVolA1 / infusionDuration },
+        bagB1: { electrolytes: bagB1.electrolytes, sterileWater: xwB1, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolB1, flowRate: effVolB1 / infusionDuration },
+        bagA2: { electrolytes: bagA2.electrolytes, sterileWater: xwA2, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolA2, flowRate: effVolA2 / infusionDuration },
+        bagB2: { electrolytes: bagB2.electrolytes, sterileWater: xwB2, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolB2, flowRate: effVolB2 / infusionDuration },
+        naA: na2, naB: na2,
+        kA: k2, kB: k2,
+        clA: cl2, clB: cl2,
+        caA: ca, caB: 0,
+        mgA: mg, mgB: 0,
+        po4A: po4_2, po4B: po4_2,
+        proteinA: protein / 2, proteinB: protein / 2,
+        dextroseA: dextrose / 2, dextroseB: dextrose / 2,
+      };
 
       document.getElementById("ppnSplitInfo").innerHTML = `
         <div class="alert alert-warning">
@@ -996,6 +1012,8 @@ function calculate() {
       po4,
       flowRate1: flowRate,
       flowRate2,
+      needsSplit,
+      split: splitData,
     };
     document.getElementById("printBtn").disabled = false;
     lucide.createIcons();
