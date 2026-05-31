@@ -826,6 +826,27 @@ input:read-only {
       "toggle toggle";
   }
 }
+@media (max-width: 600px) {
+  body {
+    padding: 0;
+    padding-bottom: 77px;
+  }
+  .container {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .header {
+    padding: 12px;
+    gap: 12px;
+  }
+  .content {
+    padding: 12px;
+    gap: 12px;
+  }
+  .section {
+    padding: 12px;
+  }
+}
 .hidden {
   display: none;
 }
