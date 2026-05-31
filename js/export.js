@@ -31,33 +31,28 @@ function closePrintModal() {
 function printCanvas() {
   const r = window.lastResult;
 
-  function openPrintWindow(dataUrls) {
-    const win = window.open("", "_blank");
-    if (!win) {
-      alert("กรุณาอนุญาต popup เพื่อใช้งานการพิมพ์");
-      return;
-    }
-    const imgs = dataUrls
-      .map((url, i) =>
-        "<img src='" + url + "' style='max-width:100%;height:auto;display:block;" +
-        (i < dataUrls.length - 1 ? "page-break-after:always;" : "") + "'/>"
-      )
-      .join("");
-    win.document.write(
-      "<!DOCTYPE html><html><head><style>" +
-      "*{margin:0;padding:0;box-sizing:border-box}" +
-      "@media print{img{width:100%}}" +
-      "</style></head><body>" + imgs + "</body></html>"
-    );
-    win.document.close();
-    win.onload = function () { win.focus(); win.print(); };
+  function doPrint(dataUrls) {
+    const frame = document.createElement("div");
+    frame.id = "print-frame";
+    frame.style.display = "none";
+    dataUrls.forEach(function (url) {
+      const img = document.createElement("img");
+      img.src = url;
+      frame.appendChild(img);
+    });
+    document.body.appendChild(frame);
+
+    function cleanup() { if (frame.parentNode) frame.parentNode.removeChild(frame); }
+    window.addEventListener("afterprint", cleanup, { once: true });
+    setTimeout(cleanup, 60000);
+
+    window.print();
   }
 
   if (r && r.needsSplit && r.split) {
     const s = r.split;
     const method = currentPrintMethod;
     const dataUrls = [];
-
     ["1", "2"].forEach(function (bagNum) {
       const offCanvas = document.createElement("canvas");
       offCanvas.width = 900;
@@ -74,11 +69,10 @@ function printCanvas() {
       drawLabel(ctx, 900, 0, bagData, summaryData, method, r, "ถุงที่ " + bagNum);
       dataUrls.push(offCanvas.toDataURL("image/png"));
     });
-
-    openPrintWindow(dataUrls);
+    doPrint(dataUrls);
   } else {
     const canvas = document.getElementById("previewCanvas");
-    openPrintWindow([canvas.toDataURL("image/png")]);
+    doPrint([canvas.toDataURL("image/png")]);
   }
 }
 
