@@ -6,28 +6,35 @@ function toggleTheme() {
   const newTheme = currentTheme === "dark" ? "light" : "dark";
   html.setAttribute("data-theme", newTheme);
   localStorage.setItem("theme", newTheme);
-  const sunIcon = document.getElementById("theme-icon-sun");
-  const moonIcon = document.getElementById("theme-icon-moon");
-  if (newTheme === "dark") {
-    sunIcon.style.display = "none";
-    moonIcon.style.display = "block";
-  } else {
-    sunIcon.style.display = "block";
-    moonIcon.style.display = "none";
-  }
+  syncThemeIcons(newTheme);
   lucide.createIcons();
+}
+
+function syncThemeIcons(theme) {
+  const isDark = theme === "dark";
+  document.getElementById("theme-icon-sun").style.display = isDark ? "none" : "block";
+  document.getElementById("theme-icon-moon").style.display = isDark ? "block" : "none";
+  document.getElementById("sticky-theme-icon-sun").style.display = isDark ? "none" : "block";
+  document.getElementById("sticky-theme-icon-moon").style.display = isDark ? "block" : "none";
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   const savedTheme = localStorage.getItem("theme") || "light";
   document.documentElement.setAttribute("data-theme", savedTheme);
-  const sunIcon = document.getElementById("theme-icon-sun");
-  const moonIcon = document.getElementById("theme-icon-moon");
-  if (savedTheme === "dark") {
-    sunIcon.style.display = "none";
-    moonIcon.style.display = "block";
-  }
+  syncThemeIcons(savedTheme);
   lucide.createIcons();
+
+  const scanBtn = document.querySelector(".section .scan-qr-btn");
+  const stickyHeader = document.getElementById("stickyHeader");
+  if (scanBtn && stickyHeader) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        stickyHeader.classList.toggle("visible", !entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "0px" }
+    );
+    observer.observe(scanBtn);
+  }
   const requiredFields = document.querySelectorAll(".required-field");
   requiredFields.forEach((field) => {
     field.addEventListener("input", function () {

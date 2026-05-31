@@ -10,6 +10,30 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
+    <!-- Sticky floating header -->
+    <div class="sticky-header" id="stickyHeader">
+      <div class="sticky-header-left">
+        <i data-lucide="hospital"></i>
+        <span>TPN Calculator</span>
+      </div>
+      <div class="sticky-header-right">
+        <button
+          class="scan-qr-btn"
+          onclick="openQRScanner()"
+          title="สแกน QR Code"
+        >
+          <i data-lucide="scan"></i>
+        </button>
+        <button
+          class="theme-toggle"
+          onclick="toggleTheme()"
+          aria-label="Toggle dark mode"
+        >
+          <i data-lucide="sun" id="sticky-theme-icon-sun"></i>
+          <i data-lucide="moon" id="sticky-theme-icon-moon" style="display: none"></i>
+        </button>
+      </div>
+    </div>
     <div class="container">
       <div class="header">
         <div class="header-content">
