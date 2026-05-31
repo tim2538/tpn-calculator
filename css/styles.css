@@ -1167,3 +1167,22 @@ select:focus-visible {
     padding: 16px;
   }
 }
+
+#print-frame {
+  position: fixed;
+  left: -100vw;
+  top: 0;
+  width: 100vw;
+  pointer-events: none;
+}
+@media print {
+  body > *:not(#print-frame) { display: none !important; }
+  #print-frame {
+    position: static !important;
+    left: 0 !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+  }
+  #print-frame img { width: 100%; display: block; page-break-after: always; }
+  #print-frame img:last-child { page-break-after: avoid; }
+}
