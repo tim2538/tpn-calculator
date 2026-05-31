@@ -50,11 +50,13 @@ function printCanvas() {
       "</style></head><body>" + imgs + "</body></html>"
     );
     win.document.close();
-    win.onload = function () {
-      win.focus();
-      win.addEventListener("afterprint", function () { win.close(); }, { once: true });
-      win.print();
-    };
+    win.focus();
+    setTimeout(function () {
+      if (!win.closed) {
+        win.addEventListener("afterprint", function () { win.close(); }, { once: true });
+        win.print();
+      }
+    }, 500);
   }
 
   if (r && r.needsSplit && r.split) {
