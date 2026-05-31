@@ -32,21 +32,34 @@ function printCanvas() {
   const r = window.lastResult;
 
   function doPrint(dataUrls) {
-    const frame = document.createElement("div");
-    frame.id = "print-frame";
-    frame.style.display = "none";
-    dataUrls.forEach(function (url) {
-      const img = document.createElement("img");
-      img.src = url;
-      frame.appendChild(img);
-    });
-    document.body.appendChild(frame);
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;width:0;height:0;border:0;top:0;left:0;";
+    document.body.appendChild(iframe);
 
-    function cleanup() { if (frame.parentNode) frame.parentNode.removeChild(frame); }
-    window.addEventListener("afterprint", cleanup, { once: true });
-    setTimeout(cleanup, 60000);
+    const imgs = dataUrls
+      .map((url, i) =>
+        "<img src='" + url + "' style='width:100%;display:block;" +
+        (i < dataUrls.length - 1 ? "page-break-after:always;" : "") + "'/>"
+      )
+      .join("");
 
-    window.print();
+    function cleanup() { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }
+
+    iframe.onload = function () {
+      iframe.contentWindow.addEventListener("afterprint", cleanup, { once: true });
+      setTimeout(cleanup, 60000);
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(
+      "<!DOCTYPE html><html><head><style>" +
+      "*{margin:0;padding:0;box-sizing:border-box}" +
+      "</style></head><body>" + imgs + "</body></html>"
+    );
+    doc.close();
   }
 
   if (r && r.needsSplit && r.split) {

@@ -1167,10 +1167,3 @@ select:focus-visible {
     padding: 16px;
   }
 }
-
-@media print {
-  body > *:not(#print-frame) { display: none !important; }
-  #print-frame { display: block !important; }
-  #print-frame img { width: 100%; display: block; page-break-after: always; }
-  #print-frame img:last-child { page-break-after: avoid; }
-}
