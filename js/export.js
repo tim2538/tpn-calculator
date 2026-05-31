@@ -37,22 +37,39 @@ function printCanvas() {
 
     const frame = document.createElement("div");
     frame.id = "print-frame";
+    frame.style.display = "none";
     document.body.appendChild(frame);
 
-    function cleanup() {
-      const f = document.getElementById("print-frame");
-      if (f) f.parentNode.removeChild(f);
-    }
-    window.addEventListener("afterprint", cleanup, { once: true });
-    setTimeout(cleanup, 10000);
-
-    var total = canvases.length;
     var loaded = 0;
+    var total = canvases.length;
 
     function onAllLoaded() {
-      requestAnimationFrame(function () {
-        window.print();
-      });
+      var saved = [];
+
+      function showForPrint() {
+        frame.style.display = "block";
+        Array.from(document.body.children).forEach(function (child) {
+          if (child !== frame) {
+            saved.push([child, child.getAttribute("style")]);
+            child.style.setProperty("display", "none", "important");
+          }
+        });
+      }
+
+      function restoreAfterPrint() {
+        if (frame.parentNode) frame.parentNode.removeChild(frame);
+        saved.forEach(function (entry) {
+          var child = entry[0], prevStyle = entry[1];
+          if (prevStyle === null) child.removeAttribute("style");
+          else child.setAttribute("style", prevStyle);
+        });
+      }
+
+      window.addEventListener("beforeprint", showForPrint, { once: true });
+      window.addEventListener("afterprint", restoreAfterPrint, { once: true });
+      setTimeout(restoreAfterPrint, 10000);
+
+      window.print();
     }
 
     function onImgReady() {
@@ -66,8 +83,7 @@ function printCanvas() {
       img.onload = onImgReady;
       img.src = url;
       frame.appendChild(img);
-      // Some browsers decode data: URLs synchronously; if so, complete is already
-      // true and onload will never fire — handle it here.
+      // data: URLs may decode synchronously — img.complete already true
       if (img.complete) {
         img.onload = null;
         onImgReady();
