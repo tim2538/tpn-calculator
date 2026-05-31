@@ -115,7 +115,7 @@ Lipid is infused separately (IVLE bag); volumes are shown combined for reference
 ### 4. Osmolarity
 
 ```
-Osmolarity (mOsm/L) =
+Osmolarity (mOsm) =
   (Protein Sol mL × AA_factor)   ← product-specific
   + Dextrose (g) × 5
   + Na_other (mEq) × 2           ← Na not from Glycophos
@@ -240,6 +240,87 @@ Cl_max = Na + K − K₂HPO₄ − Glycophos×2
 
 ---
 
+### 11. PPN Split Bags (Peripheral, effectiveVolume > 1,200 mL)
+
+Triggered when `venous access = peripheral` AND `effectiveVolume > 1,200 mL`.
+The total solution is split into two equal bags to stay within peripheral-line volume limits.
+
+#### Input splitting
+
+```
+Each bag receives half of: Na, K, Cl, PO₄, Protein Solution, Dextrose Solution
+
+Bag A — receives all Ca and Mg (full dose)
+Bag B — Ca = 0, Mg = 0  (no divalent cations → no precipitation risk)
+```
+
+#### Electrolyte calculation per bag
+
+Each bag runs `calculateElectrolytes()` independently with its halved inputs:
+
+```
+Bag A: calculateElectrolytes(method, Na/2, K/2, Cl/2, Ca, Mg, PO₄/2, useAcetate)
+Bag B: calculateElectrolytes(method, Na/2, K/2, Cl/2, 0,  0,  PO₄/2, useAcetate)
+```
+
+Both Method 1 (K₂HPO₄ first) and Method 2 (NaCl first) are computed for each bag.
+
+#### Per-bag volume
+
+```
+vol_Bag (mL) = (Protein Solution ÷ 2) + (Dextrose Solution ÷ 2) + Σ Electrolyte Vol (bag)
+```
+
+#### Per-bag osmolarity
+
+Same formula as Section 4, applied to each bag's halved inputs.
+`aminoAcidOsmolarity` is halved; Mg and Ca are full in Bag A, zero in Bag B.
+
+```
+osm_BagA (mOsm) = (aminoAcidOsmolarity ÷ 2)
+                + (Dextrose ÷ 2) × 5
+                + (Na/2 − Na_glycophos_A) × 2
+                + Na_glycophos_A × 3
+                + (K/2) × 2
+                + Mg × 1
+                + Ca × 1.4
+
+osm_BagB (mOsm) = (aminoAcidOsmolarity ÷ 2)
+                + (Dextrose ÷ 2) × 5
+                + (Na/2 − Na_glycophos_B) × 2
+                + Na_glycophos_B × 3
+                + (K/2) × 2
+```
+
+Note: these are total mOsm, not mOsm/L. Concentration in mOsm/L = `osm_Bag × 1000 ÷ vol_Bag`.
+
+#### Per-bag peripheral dilution
+
+Each bag is independently diluted if its concentration exceeds 900 mOsm/L:
+
+```
+If (osm_Bag × 1000 ÷ vol_Bag) > 900:
+  effVol_Bag (mL) = osm_Bag × 1000 ÷ 900
+  extraWater (mL) = effVol_Bag − vol_Bag
+Else:
+  effVol_Bag = vol_Bag, extraWater = 0
+```
+
+#### Ca–PO₄ compatibility check (Bag A only)
+
+Checked against Bag A's effective volume. Ca is the full patient dose; PO₄ is halved.
+
+```
+Ca (mEq/L)   = Ca (mEq) ÷ (effVol_BagA ÷ 1000)
+Ca (mmol/L)  = Ca (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
+PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
+PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)
+```
+
+The same four criteria from Section 9 apply. Bag B has Ca = 0 → no precipitation risk.
+
+---
+
 ## Outputs Summary
 
 | Output               | Formula                                          | Unit      |
@@ -248,7 +329,7 @@ Cl_max = Na + K − K₂HPO₄ − Glycophos×2
 | Total Volume II      | Protein + Dextrose + Electrolyte (NaCl method)   | mL        |
 | Volume I with Lipid  | Total Volume I + Lipid Sol                       | mL        |
 | Volume II with Lipid | Total Volume II + Lipid Sol                      | mL        |
-| Osmolarity           | AA + Dextrose×5 + Na×2 + K×2 + Mg×1 + Ca×1.4     | mOsm/L    |
+| Osmolarity           | AA + Dextrose×5 + Na×2 + K×2 + Mg×1 + Ca×1.4     | mOsm      |
 | V₂ (diluted)         | Osmolarity × Vol I ÷ 900                         | mL        |
 | Extra Water          | V₂ − Vol I                                       | mL        |
 | Rate I               | Effective Volume I ÷ Duration  (K₂HPO₄ method)   | mL/hr     |
