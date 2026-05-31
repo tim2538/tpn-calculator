@@ -10,9 +10,6 @@
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   box-shadow: 0 2px 8px var(--shadow-lg);
   transform: translateY(-100%);
   opacity: 0;
@@ -38,6 +35,7 @@
 .sticky-header-left svg {
   width: 22px;
   height: 22px;
+  margin-left: 8px;
 }
 .sticky-header-right {
   display: flex;
@@ -264,6 +262,13 @@ input:read-only {
   z-index: 1000;
   border-top: 1px solid var(--border-color);
   transition: background-color 0.3s ease;
+}
+.sticky-header .container-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .fixed-bottom-btn .container-inner {
   max-width: 1200px;
