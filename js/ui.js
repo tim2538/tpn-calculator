@@ -400,11 +400,13 @@ function calculate() {
     document.getElementById("ivleRateHr").textContent = ivleRateHr.toFixed(3);
     document.getElementById("ivleRateDay").textContent = ivleRateDay.toFixed(3);
     document.getElementById("formula-ivleRateHr").innerHTML = `
-      <div class="formula-label">สูตร: Lipid ÷ Weight ÷ IVLE Hours</div>
+      <div class="formula-label">สูตร:</div>
+      <div class="formula-calculation">Lipid ÷ Weight ÷ IVLE Hours</div>
       <div class="formula-calculation">${lipid} ÷ ${weight} ÷ ${ivleHours} = ${ivleRateHr.toFixed(3)} g/kg/hr</div>
     `;
     document.getElementById("formula-ivleRateDay").innerHTML = `
-      <div class="formula-label">สูตร: Lipid ÷ Weight</div>
+      <div class="formula-label">สูตร:</div>
+      <div class="formula-calculation">Lipid ÷ Weight</div>
       <div class="formula-calculation">${lipid} ÷ ${weight} = ${ivleRateDay.toFixed(3)} g/kg/day</div>
     `;
     if (needsDilution) {
@@ -416,11 +418,13 @@ function calculate() {
       document.getElementById("extraWater").textContent =
         extraWaterMl.toFixed(1);
       document.getElementById("formula-dilutionV2").innerHTML = `
-        <div class="formula-label">สูตร: V₂ = (Osmolarity × Volume) ÷ 900</div>
+        <div class="formula-label">สูตร:</div>
+        <div class="formula-calculation">(Osmolarity × Volume) ÷ 900</div>
         <div class="formula-calculation">(${osmolarity.toFixed(0)} × ${totalVolume1.toFixed(1)}) ÷ 900 = ${effectiveVolume.toFixed(1)} mL</div>
       `;
       document.getElementById("formula-extraWater").innerHTML = `
-        <div class="formula-label">สูตร: Extra Water = V₂ − Volume</div>
+        <div class="formula-label">สูตร:</div>
+        <div class="formula-calculation">V₂ − Volume</div>
         <div class="formula-calculation">${effectiveVolume.toFixed(1)} − ${totalVolume1.toFixed(1)} = ${extraWaterMl.toFixed(1)} mL</div>
       `;
     } else {
