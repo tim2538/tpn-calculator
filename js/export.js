@@ -44,31 +44,10 @@ function printCanvas() {
     var total = canvases.length;
 
     function onAllLoaded() {
-      var saved = [];
-
-      function showForPrint() {
-        frame.style.display = "block";
-        Array.from(document.body.children).forEach(function (child) {
-          if (child !== frame) {
-            saved.push([child, child.getAttribute("style")]);
-            child.style.setProperty("display", "none", "important");
-          }
-        });
-      }
-
-      function restoreAfterPrint() {
-        if (frame.parentNode) frame.parentNode.removeChild(frame);
-        saved.forEach(function (entry) {
-          var child = entry[0], prevStyle = entry[1];
-          if (prevStyle === null) child.removeAttribute("style");
-          else child.setAttribute("style", prevStyle);
-        });
-      }
-
-      window.addEventListener("beforeprint", showForPrint, { once: true });
-      window.addEventListener("afterprint", restoreAfterPrint, { once: true });
-      setTimeout(restoreAfterPrint, 10000);
-
+      // Show/hide is handled entirely by the @media print CSS rules — no JS
+      // display-swapping or teardown timer, which on mobile could remove the
+      // content before the OS rasterized the final output (blank pages).
+      window.focus();
       window.print();
     }
 
