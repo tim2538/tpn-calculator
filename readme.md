@@ -334,6 +334,28 @@ The same four criteria from Section 9 apply.
 
 ---
 
+### 12. Custom Bag Volume & Final Osmolarity (Print)
+
+In the print preview, each label (one per bag when split, per method) has a total-volume input.
+The calculated volume is the **minimum**; a larger value is filled up with sterile water.
+It only affects the label (preview, PNG, print), not the main results.
+
+```
+V_base  = Protein Sol + Dextrose Sol + Σ Electrolyte Sol   (no water, no lipid)
+V_min   = Effective Volume (V₂ if diluted, else V_base)    — per bag / per method
+V_final = max(V_custom, V_min)                              (default V_min)
+
+Sterile Water (mL)      = V_final − V_base
+Rate (mL/hr)            = V_final ÷ Infusion Duration
+Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final
+```
+
+Single bag uses Osmolarity from Section 4; split bags use `osm_Bag` from Section 11.
+The label shows **Total volume** and **Osmolarity (mOsm/L)** under the Rate.
+Custom values reset whenever the calculation is re-run.
+
+---
+
 ## Outputs Summary
 
 | Output               | Formula                                          | Unit      |
@@ -346,6 +368,7 @@ The same four criteria from Section 9 apply.
 | N₁                   | Osmolarity × 1000 ÷ Vol (per method, no lipid)   | mOsm/L    |
 | V₂ (diluted)         | N₁ × Vol ÷ 900 (per method)                      | mL        |
 | Extra Water          | V₂ − Vol (per method; printed on label)          | mL        |
+| Final Osmolarity     | Osmolarity × 1000 ÷ V_final (label)              | mOsm/L    |
 | Rate I               | Effective Volume I ÷ Duration  (K₂HPO₄ method)   | mL/hr     |
 | Rate II              | Effective Volume II ÷ Duration (NaCl method)      | mL/hr     |
 | GIR                  | Dextrose×1000 ÷ (Weight×Duration×60)             | mg/kg/min |

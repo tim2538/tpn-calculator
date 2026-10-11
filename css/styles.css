@@ -405,6 +405,15 @@ input:read-only {
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
+.print-volume-inputs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.print-volume-inputs .form-group {
+  flex: 1 1 200px;
+  margin-bottom: 0;
+}
 .print-canvas-wrapper {
   overflow: auto;
   border: 1px solid var(--border-color);

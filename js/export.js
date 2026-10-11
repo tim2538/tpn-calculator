@@ -5,6 +5,7 @@ function printReport() {
   currentPrintMethod = "1";
   document.getElementById("methodBtn1").classList.add("active");
   document.getElementById("methodBtn2").classList.remove("active");
+  renderVolumeInputs();
   const canvas = document.getElementById("previewCanvas");
   drawExportCanvas(canvas, currentPrintMethod);
   document.getElementById("printPreviewModal").classList.add("active");
@@ -20,7 +21,116 @@ function selectPrintMethod(method) {
   document
     .getElementById("methodBtn2")
     .classList.toggle("active", method === "2");
+  renderVolumeInputs();
   drawExportCanvas(document.getElementById("previewCanvas"), method);
+}
+
+// ข้อมูลของฉลากแต่ละใบ (bagNum = null สำหรับถุงเดียว, "1" / "2" เมื่อแบ่งถุง)
+function getLabelParts(r, method, bagNum) {
+  const key = method + "-" + (bagNum || "single");
+  if (!bagNum) {
+    return {
+      key,
+      bagData: null,
+      bagTitle: null,
+      summaryData: { protein: r.protein, dextrose: r.dextrose, na: r.na, k: r.k, cl: r.cl, ca: r.ca, mg: r.mg, po4: r.po4 },
+      osm: r.osmolarity,
+      baseVolume: method === "1" ? r.baseVolume1 : r.baseVolume2,
+      minVolume: method === "1" ? r.minVolume1 : r.minVolume2,
+    };
+  }
+  const s = r.split;
+  const bagData = bagNum === "1"
+    ? (method === "1" ? s.bagA1 : s.bagA2)
+    : (method === "1" ? s.bagB1 : s.bagB2);
+  const summaryData = bagNum === "1"
+    ? { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A }
+    : { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
+  return {
+    key,
+    bagData,
+    bagTitle: "ถุงที่ " + bagNum,
+    summaryData,
+    osm: bagData.osm,
+    baseVolume: bagData.baseVolume,
+    minVolume: bagData.volume,
+  };
+}
+
+function getLabelBagNums(r) {
+  return r.needsSplit && r.split ? ["1", "2"] : [null];
+}
+
+// ปริมาตรสุดท้าย = max(ค่าที่กรอกเอง, ค่าขั้นต่ำจากสูตร); ส่วนที่เกิน V_base เติมเป็น Sterile water
+function getBagFigures(r, parts) {
+  const custom = (r.customVolumes || {})[parts.key];
+  const finalVolume = custom != null ? Math.max(custom, parts.minVolume) : parts.minVolume;
+  return {
+    finalVolume,
+    sterileWater: Math.max(finalVolume - parts.baseVolume, 0),
+    flowRate: finalVolume / r.infusionDuration,
+    finalOsm: finalVolume > 0 ? (parts.osm * 1000) / finalVolume : 0,
+  };
+}
+
+function volumeHintText(parts, fig, belowMin) {
+  const prefix = belowMin
+    ? "ต่ำกว่าขั้นต่ำ — ใช้ " + parts.minVolume.toFixed(1) + " mL"
+    : "ขั้นต่ำ " + parts.minVolume.toFixed(1) + " mL";
+  return prefix + " · น้ำ " + fig.sterileWater.toFixed(1) + " mL · " + fig.finalOsm.toFixed(0) + " mOsm/L";
+}
+
+function renderVolumeInputs() {
+  const r = window.lastResult;
+  const container = document.getElementById("printVolumeInputs");
+  if (!r || !container) return;
+  r.customVolumes = r.customVolumes || {};
+  container.innerHTML = getLabelBagNums(r)
+    .map(function (bagNum) {
+      const parts = getLabelParts(r, currentPrintMethod, bagNum);
+      const fig = getBagFigures(r, parts);
+      const custom = r.customVolumes[parts.key];
+      const value = custom != null ? custom : parts.minVolume.toFixed(1);
+      const label = bagNum ? "ปริมาตรรวม ถุงที่ " + bagNum + " (mL)" : "ปริมาตรรวม (mL)";
+      return `
+        <div class="form-group">
+          <label for="customVol-${parts.key}">${label}</label>
+          <input type="number" id="customVol-${parts.key}" inputmode="decimal" step="0.1"
+            min="${parts.minVolume.toFixed(1)}" value="${value}"
+            oninput="onCustomVolumeInput('${bagNum || ""}', this)"
+            onchange="onCustomVolumeChange('${bagNum || ""}', this)" />
+          <small id="customVolHint-${parts.key}" class="helper-text">${volumeHintText(parts, fig, false)}</small>
+        </div>`;
+    })
+    .join("");
+}
+
+function onCustomVolumeInput(bagNum, el) {
+  const r = window.lastResult;
+  if (!r) return;
+  const parts = getLabelParts(r, currentPrintMethod, bagNum || null);
+  const val = parseFloat(el.value);
+  // ยอมให้ต่ำกว่าได้ 0.05 เพราะค่าขั้นต่ำแสดงเป็นทศนิยม 1 ตำแหน่ง
+  const belowMin = !isNaN(val) && val < parts.minVolume - 0.05;
+  if (isNaN(val) || belowMin) {
+    delete r.customVolumes[parts.key];
+  } else {
+    r.customVolumes[parts.key] = val;
+  }
+  const hint = document.getElementById("customVolHint-" + parts.key);
+  hint.textContent = volumeHintText(parts, getBagFigures(r, parts), belowMin);
+  hint.className = belowMin ? "helper-text warn" : "helper-text";
+  drawExportCanvas(document.getElementById("previewCanvas"), currentPrintMethod);
+}
+
+function onCustomVolumeChange(bagNum, el) {
+  const r = window.lastResult;
+  if (!r) return;
+  const parts = getLabelParts(r, currentPrintMethod, bagNum || null);
+  if (r.customVolumes[parts.key] == null) {
+    el.value = parts.minVolume.toFixed(1);
+    onCustomVolumeInput(bagNum, el);
+  }
 }
 
 function closePrintModal() {
@@ -71,7 +181,6 @@ function printCanvas() {
   }
 
   if (r && r.needsSplit && r.split) {
-    const s = r.split;
     const method = currentPrintMethod;
     const canvases = ["1", "2"].map(function (bagNum) {
       const offCanvas = document.createElement("canvas");
@@ -80,13 +189,7 @@ function printCanvas() {
       const ctx = offCanvas.getContext("2d");
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, 900, 1200);
-      const bagData = bagNum === "1"
-        ? (method === "1" ? s.bagA1 : s.bagA2)
-        : (method === "1" ? s.bagB1 : s.bagB2);
-      const summaryData = bagNum === "1"
-        ? { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A }
-        : { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
-      drawLabel(ctx, 900, 0, bagData, summaryData, method, r, "ถุงที่ " + bagNum);
+      drawLabel(ctx, 900, 0, getLabelParts(r, method, bagNum), method, r);
       return offCanvas;
     });
     doPrint(canvases);
@@ -105,21 +208,13 @@ function downloadPNG() {
     // Render and download each bag as a separate image
     ["1", "2"].forEach((bagNum) => {
       const offCanvas = document.createElement("canvas");
-      const s = r.split;
       const method = currentPrintMethod;
-      const bagData = bagNum === "1"
-        ? (method === "1" ? s.bagA1 : s.bagA2)
-        : (method === "1" ? s.bagB1 : s.bagB2);
-      const summaryData = bagNum === "1"
-        ? { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A }
-        : { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
-
       offCanvas.width = 900;
       offCanvas.height = 1200;
       const ctx = offCanvas.getContext("2d");
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, 900, 1200);
-      drawLabel(ctx, 900, 0, bagData, summaryData, method, r, "ถุงที่ " + bagNum);
+      drawLabel(ctx, 900, 0, getLabelParts(r, method, bagNum), method, r);
 
       offCanvas.toBlob(function (blob) {
         const a = document.createElement("a");
@@ -141,7 +236,8 @@ function downloadPNG() {
   }
 }
 
-function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
+function drawLabel(ctx, W, yOff, parts, method, r) {
+  const { bagData, summaryData, bagTitle } = parts;
   const FONT = "Sarabun, sans-serif";
   const BLACK = "#1a1a1a";
   const GREY = "#888888";
@@ -149,8 +245,9 @@ function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
   const elec = bagData ? bagData.electrolytes : (method === "1" ? r.electrolytes1 : r.electrolytes2);
   const proteinSolution = bagData ? bagData.proteinSolution : r.proteinSolution;
   const dextroseSolution = bagData ? bagData.dextroseSolution : r.dextroseSolution;
-  const sterileWater = bagData ? bagData.sterileWater : (method === "1" ? r.sterileWater1 : r.sterileWater2);
-  const flowRate = bagData ? bagData.flowRate : (method === "1" ? r.flowRate1 : r.flowRate2);
+  const fig = getBagFigures(r, parts);
+  const sterileWater = fig.sterileWater;
+  const flowRate = fig.flowRate;
 
   const protein = summaryData.protein;
   const dextrose = summaryData.dextrose;
@@ -304,6 +401,10 @@ function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
     ctx.fillText("ml/hr", RVAL - 50, base + 424);
   }
 
+  // ── Final volume & osmolarity ──
+  rowLine("Total volume", fig.finalVolume.toFixed(1), "ml", base + 480, RX, RVAL);
+  rowLine("Osmolarity", fig.finalOsm.toFixed(0), "mOsm/L", base + 520, RX, RVAL);
+
   // ── Footer ──
   const now = new Date();
   const dateLabel = now.toLocaleDateString("th-TH", {
@@ -332,12 +433,6 @@ function drawExportCanvas(canvas, method) {
   const W = 900;
 
   if (r.needsSplit && r.split) {
-    const s = r.split;
-    const bagA = method === "1" ? s.bagA1 : s.bagA2;
-    const bagB = method === "1" ? s.bagB1 : s.bagB2;
-    const summaryA = { protein: s.proteinA, dextrose: s.dextroseA, na: s.naA, k: s.kA, cl: s.clA, ca: s.caA, mg: s.mgA, po4: s.po4A };
-    const summaryB = { protein: s.proteinB, dextrose: s.dextroseB, na: s.naB, k: s.kB, cl: s.clB, ca: s.caB, mg: s.mgB, po4: s.po4B };
-
     const GAP_TOP = 1200;
     const GAP_H = 24;
     const BAG2_Y = GAP_TOP + GAP_H;
@@ -348,14 +443,14 @@ function drawExportCanvas(canvas, method) {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, W, H);
 
-    drawLabel(ctx, W, 0, bagA, summaryA, method, r, "ถุงที่ 1");
+    drawLabel(ctx, W, 0, getLabelParts(r, method, "1"), method, r);
 
     // Page-break spacer using --background CSS variable
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--background").trim() || "#f3f4f6";
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, GAP_TOP, W, GAP_H);
 
-    drawLabel(ctx, W, BAG2_Y, bagB, summaryB, method, r, "ถุงที่ 2");
+    drawLabel(ctx, W, BAG2_Y, getLabelParts(r, method, "2"), method, r);
   } else {
     const H = 1200;
     canvas.width = W;
@@ -363,18 +458,7 @@ function drawExportCanvas(canvas, method) {
     const ctx = canvas.getContext("2d");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, W, H);
-
-    const summaryData = {
-      protein: r.protein,
-      dextrose: r.dextrose,
-      na: r.na,
-      k: r.k,
-      cl: r.cl,
-      ca: r.ca,
-      mg: r.mg,
-      po4: r.po4,
-    };
-    drawLabel(ctx, W, 0, null, summaryData, method, r, null);
+    drawLabel(ctx, W, 0, getLabelParts(r, method, null), method, r);
   }
 }
 
