@@ -251,7 +251,8 @@ Cl_max = Na + K − K₂HPO₄ − Glycophos×2
 
 ### 11. PPN Split Bags (Peripheral, effectiveVolume > 1,200 mL)
 
-Triggered when `venous access = peripheral` AND `effectiveVolume > 1,200 mL`.
+Triggered when `venous access = peripheral` AND `max(effectiveVolume, effectiveVolume2) > 1,200 mL`.
+Vol I (K₂HPO₄) and Vol II (NaCl) can differ when Acetate or Glycophos is used; if either one exceeds 1,200 mL, both methods are split.
 The total solution is split into two equal bags to stay within peripheral-line volume limits.
 
 #### Input splitting

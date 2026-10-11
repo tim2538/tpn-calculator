@@ -764,7 +764,9 @@ function calculate(opts = {}) {
 
     // --- PPN Split Bags ---
     const ppnSplitSection = document.getElementById("ppnSplitSection");
-    const needsSplit = venousAccess === "peripheral" && effectiveVolume > 1200;
+    // แบ่งถุงเมื่อวิธีใดวิธีหนึ่งเกิน 1,200 mL (Vol I / Vol II อาจไม่เท่ากันเมื่อใช้ Acetate หรือ Glycophos)
+    const splitTriggerVolume = Math.max(effectiveVolume, effectiveVolume2);
+    const needsSplit = venousAccess === "peripheral" && splitTriggerVolume > 1200;
     let splitData = null;
     if (needsSplit) {
       ppnSplitSection.classList.remove("hidden");
@@ -889,10 +891,16 @@ function calculate(opts = {}) {
         dextroseA: dextrose / 2, dextroseB: dextrose / 2,
       };
 
+      const vol1Text = effectiveVolume.toFixed(0);
+      const vol2Text = effectiveVolume2.toFixed(0);
+      const splitVolumeText =
+        vol1Text === vol2Text
+          ? `<strong>${vol1Text} mL</strong>`
+          : `Vol I <strong>${vol1Text} mL</strong> / Vol II <strong>${vol2Text} mL</strong>`;
       document.getElementById("ppnSplitInfo").innerHTML = `
         <div class="alert alert-warning">
           <i data-lucide="info" style="width:20px;height:20px;"></i>
-          <div>ปริมาตรรวม <strong>${effectiveVolume.toFixed(0)} mL</strong> &gt; 1,200 mL
+          <div>ปริมาตรรวม ${splitVolumeText} &gt; 1,200 mL
           → แบ่งเป็น 2 ถุง: ${
             isEqualSplit
               ? "Ca + Mg แบ่งครึ่งเท่ากันทั้ง 2 ถุง"
@@ -918,7 +926,7 @@ function calculate(opts = {}) {
       ) => {
         const needsDil = extraWater > 0;
         const initialOsm = osm / vol * 1000;
-        const finalOsm = needsDil ? 900 : osm;
+        const finalOsm = needsDil ? 900 : initialOsm;
         const osmBadge = `<span class="compat-pass" style="margin-left:auto;">✓ Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`;
         return `
           ${
