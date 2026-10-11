@@ -1,4 +1,21 @@
 let allFormulasVisible = false;
+// PPN split: "separate" = Ca + Mg เต็มในถุงที่ 1, "equal" = Ca + Mg แบ่งครึ่งทั้ง 2 ถุง
+let splitMode = "separate";
+
+function syncSplitModeButtons() {
+  document
+    .getElementById("splitModeBtnSeparate")
+    .classList.toggle("active", splitMode === "separate");
+  document
+    .getElementById("splitModeBtnEqual")
+    .classList.toggle("active", splitMode === "equal");
+}
+
+function setSplitMode(mode) {
+  splitMode = mode;
+  syncSplitModeButtons();
+  calculate({ scroll: false });
+}
 
 function toggleTheme() {
   const html = document.documentElement;
@@ -246,6 +263,8 @@ function resetForm() {
   window.scrollTo({ top: 0, behavior: "smooth" });
   document.getElementById("printBtn").disabled = true;
   document.getElementById("ppnSplitSection").classList.add("hidden");
+  splitMode = "separate";
+  syncSplitModeButtons();
   window.lastResult = null;
   document.getElementById("rateHero1").textContent = "-";
   document.getElementById("rateHero2").textContent = "-";
@@ -299,7 +318,7 @@ function onAcetateModeChange() {
   updateClHint();
 }
 
-function calculate() {
+function calculate(opts = {}) {
   try {
     const weight = parseFloat(document.getElementById("weight").value) || 0;
     const protein = parseFloat(document.getElementById("protein").value) || 0;
@@ -737,9 +756,11 @@ function calculate() {
             — อาจเกิด Calcium Phosphate Precipitation</div>
         </div>`;
     document.getElementById("resultsSection").classList.remove("hidden");
-    document
-      .getElementById("resultsSection")
-      .scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (opts.scroll !== false) {
+      document
+        .getElementById("resultsSection")
+        .scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
 
     // --- PPN Split Bags ---
     const ppnSplitSection = document.getElementById("ppnSplitSection");
@@ -753,14 +774,19 @@ function calculate() {
         po4_2 = po4 / 2;
       const pSol2 = proteinSolution / 2,
         dSol2 = dextroseSolution / 2;
+      const isEqualSplit = splitMode === "equal";
+      const caA = isEqualSplit ? ca / 2 : ca,
+        caB = isEqualSplit ? ca / 2 : 0;
+      const mgA = isEqualSplit ? mg / 2 : mg,
+        mgB = isEqualSplit ? mg / 2 : 0;
 
       const bagA1 = calculateElectrolytes(
         "k2hpo4",
         na2,
         k2,
         cl2,
-        ca,
-        mg,
+        caA,
+        mgA,
         po4_2,
         useAcetate,
       );
@@ -769,8 +795,8 @@ function calculate() {
         na2,
         k2,
         cl2,
-        0,
-        0,
+        caB,
+        mgB,
         po4_2,
         useAcetate,
       );
@@ -779,8 +805,8 @@ function calculate() {
         na2,
         k2,
         cl2,
-        ca,
-        mg,
+        caA,
+        mgA,
         po4_2,
         useAcetate,
       );
@@ -789,8 +815,8 @@ function calculate() {
         na2,
         k2,
         cl2,
-        0,
-        0,
+        caB,
+        mgB,
         po4_2,
         useAcetate,
       );
@@ -812,20 +838,32 @@ function calculate() {
         (na2 - glyA1) * 2 +
         glyA1 * 3 +
         k2 * 2 +
-        mg +
-        ca * 1.4;
+        mgA +
+        caA * 1.4;
       const osmB1 =
-        aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB1) * 2 + glyB1 * 3 + k2 * 2;
+        aaOsm2 +
+        (dextrose / 2) * 5 +
+        (na2 - glyB1) * 2 +
+        glyB1 * 3 +
+        k2 * 2 +
+        mgB +
+        caB * 1.4;
       const osmA2 =
         aaOsm2 +
         (dextrose / 2) * 5 +
         (na2 - glyA2) * 2 +
         glyA2 * 3 +
         k2 * 2 +
-        mg +
-        ca * 1.4;
+        mgA +
+        caA * 1.4;
       const osmB2 =
-        aaOsm2 + (dextrose / 2) * 5 + (na2 - glyB2) * 2 + glyB2 * 3 + k2 * 2;
+        aaOsm2 +
+        (dextrose / 2) * 5 +
+        (na2 - glyB2) * 2 +
+        glyB2 * 3 +
+        k2 * 2 +
+        mgB +
+        caB * 1.4;
 
       const effVolA1 = osmA1 > (900 * volA1) / 1000 ? (osmA1 * 1000) / 900 : volA1;
       const effVolB1 = osmB1 > (900 * volB1) / 1000 ? (osmB1 * 1000) / 900 : volB1;
@@ -844,8 +882,8 @@ function calculate() {
         naA: na2, naB: na2,
         kA: k2, kB: k2,
         clA: cl2, clB: cl2,
-        caA: ca, caB: 0,
-        mgA: mg, mgB: 0,
+        caA, caB,
+        mgA, mgB,
         po4A: po4_2, po4B: po4_2,
         proteinA: protein / 2, proteinB: protein / 2,
         dextroseA: dextrose / 2, dextroseB: dextrose / 2,
@@ -855,8 +893,18 @@ function calculate() {
         <div class="alert alert-warning">
           <i data-lucide="info" style="width:20px;height:20px;"></i>
           <div>ปริมาตรรวม <strong>${effectiveVolume.toFixed(0)} mL</strong> &gt; 1,200 mL
-          → แบ่งเป็น 2 ถุง: ถุงที่ 1 ใส่ Ca + Mg ครบ, ถุงที่ 2 ไม่มี Ca + Mg</div>
+          → แบ่งเป็น 2 ถุง: ${
+            isEqualSplit
+              ? "Ca + Mg แบ่งครึ่งเท่ากันทั้ง 2 ถุง"
+              : "ถุงที่ 1 ใส่ Ca + Mg ครบ, ถุงที่ 2 ไม่มี Ca + Mg"
+          }</div>
         </div>`;
+      const titleA = isEqualSplit ? "ถุงที่ 1 (½Ca + ½Mg)" : "ถุงที่ 1 (มี Ca + Mg)";
+      const titleB = isEqualSplit ? "ถุงที่ 2 (½Ca + ½Mg)" : "ถุงที่ 2 (ไม่มี Ca + Mg)";
+      document.getElementById("splitBagA1Title").textContent = titleA;
+      document.getElementById("splitBagA2Title").textContent = titleA;
+      document.getElementById("splitBagB1Title").textContent = titleB;
+      document.getElementById("splitBagB2Title").textContent = titleB;
 
       const renderBag = (
         pSol,
@@ -954,8 +1002,8 @@ function calculate() {
       );
 
       const vL = effVolA1 / 1000;
-      const ca_mL = ca / vL,
-        ca_mol = (ca * 0.5) / vL;
+      const ca_mL = caA / vL,
+        ca_mol = (caA * 0.5) / vL;
       const po4_mL = (po4_2 * 2) / vL,
         po4_mol = po4_2 / vL;
       const splitChecks = [
@@ -981,10 +1029,14 @@ function calculate() {
         },
       ];
       const allSplitPass = splitChecks.every((c) => c.pass);
+      const checkScope = isEqualSplit
+        ? "ถุงที่ 1 และ 2 (องค์ประกอบเท่ากัน): Ca/2, PO&#x2084;/2"
+        : "ถุงที่ 1: Ca เต็ม, PO&#x2084;/2";
+      const alertScope = isEqualSplit ? "ทั้ง 2 ถุง" : "ถุงที่ 1";
       document.getElementById("splitCaPO4").innerHTML = `
         <div>
           <h3 style="margin-bottom:4px;"><i data-lucide="shield-check"></i> Ca&ndash;PO&#x2084; Compatibility Checks</h3>
-          <p style="margin:0 0 10px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 1: Ca เต็ม, PO&#x2084;/2${xwA1 > 0 ? ` — หลังเติม Sterile Water ${xwA1.toFixed(1)} mL` : ""}</p>
+          <p style="margin:0 0 10px;font-size:0.85em;color:var(--text-secondary);">${checkScope}${xwA1 > 0 ? ` — หลังเติม Sterile Water ${xwA1.toFixed(1)} mL` : ""}</p>
           ${splitChecks
             .map(
               (c) => `
@@ -996,10 +1048,14 @@ function calculate() {
             .join("")}
           ${
             allSplitPass
-              ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ถุงที่ 1 ผ่านเกณฑ์ทุกข้อ</div></div>`
-              : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ถุงที่ 1 ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`
+              ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ${alertScope} ผ่านเกณฑ์ทุกข้อ</div></div>`
+              : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ${alertScope} ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`
           }
-          <p style="margin-top:8px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 2 ไม่มี Ca → ไม่มีความเสี่ยง Ca–PO₄ Precipitation</p>
+          ${
+            isEqualSplit
+              ? ""
+              : `<p style="margin-top:8px;font-size:0.85em;color:var(--text-secondary);">ถุงที่ 2 ไม่มี Ca → ไม่มีความเสี่ยง Ca–PO₄ Precipitation</p>`
+          }
         </div>`;
     } else {
       ppnSplitSection.classList.add("hidden");

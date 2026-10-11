@@ -400,6 +400,11 @@ input:read-only {
   color: var(--button-text);
   border-color: var(--button-bg);
 }
+.split-mode-toggle {
+  grid-area: auto;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
 .print-canvas-wrapper {
   overflow: auto;
   border: 1px solid var(--border-color);

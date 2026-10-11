@@ -258,18 +258,25 @@ The total solution is split into two equal bags to stay within peripheral-line v
 
 ```
 Each bag receives half of: Na, K, Cl, PO₄, Protein Solution, Dextrose Solution
-
-Bag A — receives all Ca and Mg (full dose)
-Bag B — Ca = 0, Mg = 0  (no divalent cations → no precipitation risk)
 ```
+
+Ca and Mg distribution is chosen with a toggle in the split section (after calculating).
+Default is **separate**; switching re-runs the calculation without scrolling.
+
+| Mode       | Bag A (ถุงที่ 1)        | Bag B (ถุงที่ 2)        |
+| ---------- | ----------------------- | ----------------------- |
+| `separate` | Ca_A = Ca, Mg_A = Mg    | Ca_B = 0, Mg_B = 0      |
+| `equal`    | Ca_A = Ca/2, Mg_A = Mg/2 | Ca_B = Ca/2, Mg_B = Mg/2 |
+
+Addamel and vitamins (Soluvit, Cernevit, B complex) are always on Bag A's label only.
 
 #### Electrolyte calculation per bag
 
-Each bag runs `calculateElectrolytes()` independently with its halved inputs:
+Each bag runs `calculateElectrolytes()` independently with its own inputs:
 
 ```
-Bag A: calculateElectrolytes(method, Na/2, K/2, Cl/2, Ca, Mg, PO₄/2, useAcetate)
-Bag B: calculateElectrolytes(method, Na/2, K/2, Cl/2, 0,  0,  PO₄/2, useAcetate)
+Bag A: calculateElectrolytes(method, Na/2, K/2, Cl/2, Ca_A, Mg_A, PO₄/2, useAcetate)
+Bag B: calculateElectrolytes(method, Na/2, K/2, Cl/2, Ca_B, Mg_B, PO₄/2, useAcetate)
 ```
 
 Both Method 1 (K₂HPO₄ first) and Method 2 (NaCl first) are computed for each bag.
@@ -282,23 +289,17 @@ vol_Bag (mL) = (Protein Solution ÷ 2) + (Dextrose Solution ÷ 2) + Σ Electroly
 
 #### Per-bag osmolarity
 
-Same formula as Section 4, applied to each bag's halved inputs.
-`aminoAcidOsmolarity` is halved; Mg and Ca are full in Bag A, zero in Bag B.
+Same formula as Section 4, applied to each bag's own inputs.
+`aminoAcidOsmolarity` is halved; Ca/Mg follow the selected mode.
 
 ```
-osm_BagA (mOsm) = (aminoAcidOsmolarity ÷ 2)
-                + (Dextrose ÷ 2) × 5
-                + (Na/2 − Na_glycophos_A) × 2
-                + Na_glycophos_A × 3
-                + (K/2) × 2
-                + Mg × 1
-                + Ca × 1.4
-
-osm_BagB (mOsm) = (aminoAcidOsmolarity ÷ 2)
-                + (Dextrose ÷ 2) × 5
-                + (Na/2 − Na_glycophos_B) × 2
-                + Na_glycophos_B × 3
-                + (K/2) × 2
+osm_Bag (mOsm) = (aminoAcidOsmolarity ÷ 2)
+               + (Dextrose ÷ 2) × 5
+               + (Na/2 − Na_glycophos_Bag) × 2
+               + Na_glycophos_Bag × 3
+               + (K/2) × 2
+               + Mg_Bag × 1
+               + Ca_Bag × 1.4
 ```
 
 Note: these are total mOsm, not mOsm/L. Concentration in mOsm/L = `osm_Bag × 1000 ÷ vol_Bag`.
@@ -315,18 +316,21 @@ Else:
   effVol_Bag = vol_Bag, extraWater = 0
 ```
 
-#### Ca–PO₄ compatibility check (Bag A only)
+#### Ca–PO₄ compatibility check
 
-Checked against Bag A's effective volume. Ca is the full patient dose; PO₄ is halved.
+Checked against Bag A's effective volume (Method 1), using Ca_A and halved PO₄.
 
 ```
-Ca (mEq/L)   = Ca (mEq) ÷ (effVol_BagA ÷ 1000)
-Ca (mmol/L)  = Ca (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
+Ca (mEq/L)   = Ca_A (mEq) ÷ (effVol_BagA ÷ 1000)
+Ca (mmol/L)  = Ca_A (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)
 ```
 
-The same four criteria from Section 9 apply. Bag B has Ca = 0 → no precipitation risk.
+The same four criteria from Section 9 apply.
+
+- `separate`: Bag B has Ca = 0 → no precipitation risk.
+- `equal`: Bag A and Bag B have identical composition, so one check covers both bags.
 
 ---
 
