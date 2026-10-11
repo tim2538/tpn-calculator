@@ -395,13 +395,21 @@ function calculate() {
     const dextroseCalories = dextrose * 3.4;
     const lipidCalories = lipid * 10;
     const totalCalories = proteinCalories + dextroseCalories + lipidCalories;
-    const needsDilution = osmolarity > 900 && venousAccess === "peripheral";
-    const effectiveVolume = needsDilution
-      ? (osmolarity * totalVolume1) / 900
+    // N1 (mOsm/L) = mOsm ÷ V1 (ไม่รวมไขมัน), แล้วเจือจางด้วย N1V1 = N2V2 (N2 = 900)
+    const osmPerL1 = totalVolume1 > 0 ? (osmolarity * 1000) / totalVolume1 : 0;
+    const osmPerL2 = totalVolume2 > 0 ? (osmolarity * 1000) / totalVolume2 : 0;
+    const maxOsmPerL = Math.max(osmPerL1, osmPerL2);
+    const needsDilution1 = venousAccess === "peripheral" && osmPerL1 > 900;
+    const needsDilution2 = venousAccess === "peripheral" && osmPerL2 > 900;
+    const needsDilution = needsDilution1 || needsDilution2;
+    const effectiveVolume = needsDilution1
+      ? (osmPerL1 * totalVolume1) / 900
       : totalVolume1;
-    const effectiveVolume2 = needsDilution
-      ? (osmolarity * totalVolume2) / 900
+    const effectiveVolume2 = needsDilution2
+      ? (osmPerL2 * totalVolume2) / 900
       : totalVolume2;
+    const extraWater1 = effectiveVolume - totalVolume1;
+    const extraWater2 = effectiveVolume2 - totalVolume2;
     const flowRate = effectiveVolume / infusionDuration;
     const flowRate2 = effectiveVolume2 / infusionDuration;
     const volumeIWithLipid = totalVolume1 + lipidSolution;
@@ -432,22 +440,29 @@ function calculate() {
       <div class="formula-calculation">${lipid} ÷ ${weight} = ${ivleRateDay.toFixed(3)} g/kg/day</div>
     `;
     if (needsDilution) {
-      const extraWaterMl = effectiveVolume - totalVolume1;
       document.getElementById("dilutionCard").classList.remove("hidden");
       document.getElementById("extraWaterCard").classList.remove("hidden");
       document.getElementById("dilutionV2").textContent =
         effectiveVolume.toFixed(1);
       document.getElementById("extraWater").textContent =
-        extraWaterMl.toFixed(1);
+        `${extraWater1.toFixed(1)} / ${extraWater2.toFixed(1)}`;
+      const v2Line = (label, n1, v1, v2, dil) =>
+        dil
+          ? `<div class="formula-calculation">${label}: (${n1.toFixed(0)} × ${v1.toFixed(1)}) ÷ 900 = ${v2.toFixed(1)} mL</div>`
+          : `<div class="formula-calculation">${label}: ${n1.toFixed(0)} mOsm/L ≤ 900 ไม่ต้องเจือจาง</div>`;
+      const waterLine = (label, v1, v2) =>
+        `<div class="formula-calculation">${label}: ${v2.toFixed(1)} − ${v1.toFixed(1)} = ${(v2 - v1).toFixed(1)} mL</div>`;
       document.getElementById("formula-dilutionV2").innerHTML = `
         <div class="formula-label">สูตร:</div>
-        <div class="formula-calculation">(Osmolarity × Volume) ÷ 900</div>
-        <div class="formula-calculation">(${osmolarity.toFixed(0)} × ${totalVolume1.toFixed(1)}) ÷ 900 = ${effectiveVolume.toFixed(1)} mL</div>
+        <div class="formula-calculation">N₁V₁ = N₂V₂ → V₂ = (N₁ × V₁) ÷ 900</div>
+        ${v2Line("Vol I", osmPerL1, totalVolume1, effectiveVolume, needsDilution1)}
+        ${v2Line("Vol II", osmPerL2, totalVolume2, effectiveVolume2, needsDilution2)}
       `;
       document.getElementById("formula-extraWater").innerHTML = `
         <div class="formula-label">สูตร:</div>
-        <div class="formula-calculation">V₂ − Volume</div>
-        <div class="formula-calculation">${effectiveVolume.toFixed(1)} − ${totalVolume1.toFixed(1)} = ${extraWaterMl.toFixed(1)} mL</div>
+        <div class="formula-calculation">V₂ − V₁</div>
+        ${waterLine("Vol I", totalVolume1, effectiveVolume)}
+        ${waterLine("Vol II", totalVolume2, effectiveVolume2)}
       `;
     } else {
       document.getElementById("dilutionCard").classList.add("hidden");
@@ -504,6 +519,9 @@ function calculate() {
       <div class="formula-label">สูตร:</div>
       <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
       <div class="formula-calculation">${aaOsmLabel} + (${dextrose} × 5) + ${naFormulaCalc} + (${k} × 2) + (${mg} × 1) + (${ca} × 1.4) = ${osmolarity.toFixed(0)} mOsm</div>
+      <div class="formula-label">mOsm/L (N₁) = mOsm × 1000 ÷ V₁ (ไม่รวม IVLE):</div>
+      <div class="formula-calculation">Vol I: ${osmolarity.toFixed(0)} × 1000 ÷ ${totalVolume1.toFixed(1)} = ${osmPerL1.toFixed(0)} mOsm/L</div>
+      <div class="formula-calculation">Vol II: ${osmolarity.toFixed(0)} × 1000 ÷ ${totalVolume2.toFixed(1)} = ${osmPerL2.toFixed(0)} mOsm/L</div>
     `;
     document.getElementById("formula-gir").innerHTML = `
       <div class="formula-label">สูตร:</div>
@@ -581,23 +599,23 @@ function calculate() {
         </div>
       `;
     }
-    if (osmolarity > 900 && venousAccess === "peripheral") {
+    if (maxOsmPerL > 900 && venousAccess === "peripheral") {
       alertsHTML += `
         <div class="alert alert-danger">
           <i data-lucide="circle-alert" style="width: 20px; height: 20px;"></i>
           <div>
-            <strong>อันตราย!</strong> Osmolarity > 900 mOsm/L (${osmolarity.toFixed(0)} mOsm/L)
+            <strong>อันตราย!</strong> Osmolarity > 900 mOsm/L (Vol I ${osmPerL1.toFixed(0)} / Vol II ${osmPerL2.toFixed(0)} mOsm/L)
             ต้องใช้ Central Line เท่านั้น แต่ผู้ป่วยมี Peripheral Line
             — ต้องเจือจางด้วยน้ำ (ดูผล V₂ และน้ำที่ต้องเพิ่มด้านบน)
           </div>
         </div>
       `;
-    } else if (osmolarity > 900) {
+    } else if (maxOsmPerL > 900) {
       alertsHTML += `
         <div class="alert alert-warning">
           <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
           <div>
-            <strong>คำเตือน:</strong> Osmolarity > 900 mOsm/L (${osmolarity.toFixed(0)} mOsm/L)
+            <strong>คำเตือน:</strong> Osmolarity > 900 mOsm/L (Vol I ${osmPerL1.toFixed(0)} / Vol II ${osmPerL2.toFixed(0)} mOsm/L)
             ต้องให้ทาง Central Line เท่านั้น
           </div>
         </div>
@@ -643,7 +661,7 @@ function calculate() {
       `;
     }
     if (
-      osmolarity <= 900 &&
+      maxOsmPerL <= 900 &&
       gir <= girThreshold &&
       ivleRateHr <= 0.11 &&
       ivleRateDay <= 1.5
@@ -993,7 +1011,8 @@ function calculate() {
       weight,
       venousAccess,
       proteinProduct,
-      sterileWater: needsDilution ? effectiveVolume - totalVolume1 : 0,
+      sterileWater1: extraWater1,
+      sterileWater2: extraWater2,
       dextroseSolution,
       proteinSolution,
       protein,

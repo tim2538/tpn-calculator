@@ -149,7 +149,7 @@ function drawLabel(ctx, W, yOff, bagData, summaryData, method, r, bagTitle) {
   const elec = bagData ? bagData.electrolytes : (method === "1" ? r.electrolytes1 : r.electrolytes2);
   const proteinSolution = bagData ? bagData.proteinSolution : r.proteinSolution;
   const dextroseSolution = bagData ? bagData.dextroseSolution : r.dextroseSolution;
-  const sterileWater = bagData ? bagData.sterileWater : r.sterileWater;
+  const sterileWater = bagData ? bagData.sterileWater : (method === "1" ? r.sterileWater1 : r.sterileWater2);
   const flowRate = bagData ? bagData.flowRate : (method === "1" ? r.flowRate1 : r.flowRate2);
 
   const protein = summaryData.protein;

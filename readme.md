@@ -138,14 +138,23 @@ AA_factor:
 
 ### 5. Peripheral Dilution (when needed)
 
-Triggered when `Osmolarity > 900 mOsm/L` AND venous access is `peripheral`.
+Osmolarity from Section 4 is a total (mOsm). It is first converted to a concentration
+using the volume **without lipid** (V₁), separately for each method:
 
 ```
-V₂ (mL)         = (Osmolarity × Total Volume I) ÷ 900
-Extra Water (mL) = V₂ − Total Volume I
+N₁ (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V₁
+  V₁ = Total Volume I  (Method 1)  or  Total Volume II (Method 2)
 ```
 
-If central line or osmolarity ≤ 900, effective volumes equal the total volumes directly.
+Dilution is triggered per method when `N₁ > 900 mOsm/L` AND venous access is `peripheral`.
+It uses N₁V₁ = N₂V₂ with N₂ = 900 mOsm/L:
+
+```
+V₂ (mL)          = N₁ × V₁ ÷ 900        (= Osmolarity × 1000 ÷ 900)
+Extra Water (mL) = V₂ − V₁
+```
+
+If central line or N₁ ≤ 900, effective volume equals the total volume directly.
 
 ---
 
@@ -154,8 +163,8 @@ If central line or osmolarity ≤ 900, effective volumes equal the total volumes
 Both methods produce a rate. Each uses its own effective volume:
 
 ```
-Effective Volume I  = needsDilution ? (Osmolarity × Total Volume I)  ÷ 900 : Total Volume I
-Effective Volume II = needsDilution ? (Osmolarity × Total Volume II) ÷ 900 : Total Volume II
+Effective Volume I  = N₁(I)  > 900 && peripheral ? N₁(I)  × Total Volume I  ÷ 900 : Total Volume I
+Effective Volume II = N₁(II) > 900 && peripheral ? N₁(II) × Total Volume II ÷ 900 : Total Volume II
 
 Rate I  (mL/hr) = Effective Volume I  ÷ Infusion Duration
 Rate II (mL/hr) = Effective Volume II ÷ Infusion Duration
@@ -330,8 +339,9 @@ The same four criteria from Section 9 apply. Bag B has Ca = 0 → no precipitati
 | Volume I with Lipid  | Total Volume I + Lipid Sol                       | mL        |
 | Volume II with Lipid | Total Volume II + Lipid Sol                      | mL        |
 | Osmolarity           | AA + Dextrose×5 + Na×2 + K×2 + Mg×1 + Ca×1.4     | mOsm      |
-| V₂ (diluted)         | Osmolarity × Vol I ÷ 900                         | mL        |
-| Extra Water          | V₂ − Vol I                                       | mL        |
+| N₁                   | Osmolarity × 1000 ÷ Vol (per method, no lipid)   | mOsm/L    |
+| V₂ (diluted)         | N₁ × Vol ÷ 900 (per method)                      | mL        |
+| Extra Water          | V₂ − Vol (per method; printed on label)          | mL        |
 | Rate I               | Effective Volume I ÷ Duration  (K₂HPO₄ method)   | mL/hr     |
 | Rate II              | Effective Volume II ÷ Duration (NaCl method)      | mL/hr     |
 | GIR                  | Dextrose×1000 ÷ (Weight×Duration×60)             | mg/kg/min |
@@ -346,8 +356,8 @@ The same four criteria from Section 9 apply. Bag B has Ca = 0 → no precipitati
 | Condition                          | Alert Level                            |
 | ---------------------------------- | -------------------------------------- |
 | Negative electrolyte volume        | Danger — imbalanced inputs             |
-| Osmolarity > 900 + peripheral line | Danger — must dilute                   |
-| Osmolarity > 900 + central line    | Warning — central line required        |
+| N₁ > 900 mOsm/L + peripheral line  | Danger — must dilute                   |
+| N₁ > 900 mOsm/L + central line     | Warning — central line required        |
 | GIR > threshold                    | Danger — hyperglycemia/steatosis risk  |
 | IVLE hourly > 0.11 g/kg/hr         | Danger                                 |
 | IVLE daily > 1.5 g/kg/day          | Danger                                 |
