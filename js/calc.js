@@ -7,19 +7,36 @@ function calculateBMI() {
   }
 }
 
+// PO4 จาก K₂HPO₄ ก่อน (ไม่เกิน K ที่สั่ง) ส่วนที่ขาดเติมจาก Glycophos (หัก Na ภายหลัง)
+function computePhosphateSources(k, po4) {
+  const k2hpo4Full = po4 / 0.5;
+  const k2hpo4 = po4 > 0 && k > 0 ? Math.min(k2hpo4Full, k) : 0;
+  const glycophos = po4 > 0 ? po4 - k2hpo4 * 0.5 : 0;
+  const isSplit = k2hpo4 > 0 && glycophos > 0;
+  return { k2hpo4, glycophos, isSplit };
+}
+
+function phosphateFormulas(formulas, k, po4, k2hpo4, glycophos, isSplit) {
+  formulas["8.71% K₂HPO₄"] = isSplit
+    ? `min(${po4} ÷ 0.5, K ${k}) = ${k2hpo4.toFixed(2)}`
+    : `${po4} ÷ 0.5 = ${k2hpo4.toFixed(2)}`;
+  formulas["Glycophos"] = isSplit
+    ? `(${po4} - ${k2hpo4.toFixed(2)} × 0.5) ÷ 1 = ${glycophos.toFixed(2)}`
+    : glycophos > 0
+      ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}`
+      : "0";
+}
+
 function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
   let electrolytes = {};
   let formulas = {};
+  const { k2hpo4, glycophos, isSplit } = computePhosphateSources(k, po4);
+  phosphateFormulas(formulas, k, po4, k2hpo4, glycophos, isSplit);
   const cagluconate = ca / 0.5;
   formulas["10% Ca Gluconate"] = `${ca} ÷ 0.5 = ${cagluconate.toFixed(2)}`;
   const mgso4 = mg / 4;
   formulas["50% MgSO₄"] = `${mg} ÷ 4 = ${mgso4.toFixed(2)}`;
   if (method === "k2hpo4") {
-    const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
-    formulas["8.71% K₂HPO₄"] = `${po4} ÷ 0.5 = ${k2hpo4.toFixed(2)}`;
-    const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 : 0;
-    formulas["Glycophos"] =
-      glycophos > 0 ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}` : "0";
     let kcl, kac, nacl, naac;
     if (useAcetate) {
       const kcl_temp = k - k2hpo4;
@@ -58,11 +75,6 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
       "50% MgSO₄": mgso4,
     };
   } else {
-    const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
-    formulas["8.71% K₂HPO₄"] = `${po4} ÷ 0.5 = ${k2hpo4.toFixed(2)}`;
-    const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 : 0;
-    formulas["Glycophos"] =
-      glycophos > 0 ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}` : "0";
     let kcl, kac, nacl, naac;
     if (useAcetate) {
       nacl = Math.min(na, cl) / 0.5;
@@ -132,7 +144,6 @@ function computeClMax() {
   const na = parseFloat(document.getElementById("na").value) || 0;
   const k = parseFloat(document.getElementById("k").value) || 0;
   const po4 = parseFloat(document.getElementById("po4").value) || 0;
-  const k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
-  const glycophos = po4 > 0 && k2hpo4 === 0 ? po4 : 0;
+  const { k2hpo4, glycophos } = computePhosphateSources(k, po4);
   return na + k - k2hpo4 - glycophos * 2;
 }

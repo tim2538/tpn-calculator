@@ -48,14 +48,20 @@ Two parallel methods are computed and presented side-by-side.
 
 #### Phosphate source selection
 
+K₂HPO₄ is used first, limited by the ordered K (1 mEq K per mL); any remaining PO₄ comes from Glycophos (1 mmol PO₄ + 2 mEq Na per mL).
+
 ```
-If PO₄ > 0 AND K > 0:
-  8.71% K₂HPO₄ (mL) = PO₄ (mmol) ÷ 0.5      → provides 2 mEq K per mmol PO₄
-  Glycophos = 0
-Else if PO₄ > 0 AND K = 0:
-  Glycophos (mL) = PO₄ (mmol) ÷ 1
-  8.71% K₂HPO₄ = 0
+8.71% K₂HPO₄ (mL) = min(PO₄ (mmol) ÷ 0.5, K (mEq))   [0 if PO₄ = 0 or K = 0]
+Glycophos (mL)    = PO₄ (mmol) − K₂HPO₄ × 0.5
+
+  K ≥ PO₄×2      → K₂HPO₄ = PO₄ ÷ 0.5, Glycophos = 0
+  0 < K < PO₄×2  → K₂HPO₄ = K, Glycophos = PO₄ − K×0.5   (split; prevents negative KAc/KCl)
+  K = 0          → K₂HPO₄ = 0, Glycophos = PO₄
 ```
+
+Na from Glycophos (Glycophos × 2) is subtracted from Na in the NaAc / NaCl formulas below.
+
+Example: K 20, PO₄ 12 → K₂HPO₄ = min(24, 20) = 20 mL, Glycophos = 12 − 10 = 2 mL (Na 4 mEq).
 
 #### Method 1 — K₂HPO₄ First (with acetate)
 
@@ -243,9 +249,10 @@ When acetate is enabled, a live hint prevents Cl from creating negative electrol
 
 ```
 Cl_max = Na + K − K₂HPO₄ − Glycophos×2
-       = Na + K − (PO₄ ÷ 0.5)    [when K > 0]
-       = Na + K − PO₄×2           [simplified]
+       = Na + K − PO₄×2           [since K₂HPO₄ + Glycophos×2 = PO₄×2 in every case]
 ```
+
+K₂HPO₄ and Glycophos follow the phosphate source selection in Section 2.
 
 ---
 
@@ -281,6 +288,7 @@ Bag B: calculateElectrolytes(method, Na/2, K/2, Cl/2, Ca_B, Mg_B, PO₄/2, useAc
 ```
 
 Both Method 1 (K₂HPO₄ first) and Method 2 (NaCl first) are computed for each bag.
+The phosphate source selection (Section 2) is applied per bag with K/2 and PO₄/2, so the K₂HPO₄ / Glycophos ratio is the same as the single-bag result.
 
 #### Per-bag volume
 
@@ -365,7 +373,7 @@ Custom values reset whenever the calculation is re-run.
 | Total Volume II      | Protein + Dextrose + Electrolyte (NaCl method)   | mL        |
 | Volume I with Lipid  | Total Volume I + Lipid Sol                       | mL        |
 | Volume II with Lipid | Total Volume II + Lipid Sol                      | mL        |
-| Osmolarity           | AA + Dextrose×5 + Na×2 + K×2 + Mg×1 + Ca×1.4     | mOsm      |
+| Osmolarity           | AA + Dextrose×5 + Na_other×2 + Na_glycophos×3 + K×2 + Mg×1 + Ca×1.4 | mOsm |
 | N₁                   | Osmolarity × 1000 ÷ Vol (per method, no lipid)   | mOsm/L    |
 | V₂ (diluted)         | N₁ × Vol ÷ 900 (per method)                      | mL        |
 | Extra Water          | V₂ − Vol (per method; printed on label)          | mL        |

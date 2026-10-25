@@ -341,8 +341,8 @@ function calculate(opts = {}) {
     if (useAcetate) {
       cl = parseFloat(document.getElementById("cl").value) || 0;
     } else {
-      const _k2hpo4 = po4 > 0 && k > 0 ? po4 / 0.5 : 0;
-      const _glycophos = po4 > 0 && _k2hpo4 === 0 ? po4 : 0;
+      const { k2hpo4: _k2hpo4, glycophos: _glycophos } =
+        computePhosphateSources(k, po4);
       cl = k - _k2hpo4 + (na - _glycophos * 2);
       document.getElementById("clAuto").value = cl.toFixed(2);
     }
