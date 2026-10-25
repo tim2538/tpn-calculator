@@ -765,8 +765,11 @@ function calculate(opts = {}) {
     // --- PPN Split Bags ---
     const ppnSplitSection = document.getElementById("ppnSplitSection");
     // แบ่งถุงเมื่อวิธีใดวิธีหนึ่งเกิน 1,200 mL (Vol I / Vol II อาจไม่เท่ากันเมื่อใช้ Acetate หรือ Glycophos)
+    // Central line ไม่มีการเจือจาง จึงเท่ากับ max(totalVolume1, totalVolume2)
     const splitTriggerVolume = Math.max(effectiveVolume, effectiveVolume2);
-    const needsSplit = venousAccess === "peripheral" && splitTriggerVolume > 1200;
+    const isPeripheral = venousAccess === "peripheral";
+    const needsSplit =
+      (isPeripheral || venousAccess === "central") && splitTriggerVolume > 1200;
     let splitData = null;
     if (needsSplit) {
       ppnSplitSection.classList.remove("hidden");
@@ -867,10 +870,13 @@ function calculate(opts = {}) {
         mgB +
         caB * 1.4;
 
-      const effVolA1 = osmA1 > (900 * volA1) / 1000 ? (osmA1 * 1000) / 900 : volA1;
-      const effVolB1 = osmB1 > (900 * volB1) / 1000 ? (osmB1 * 1000) / 900 : volB1;
-      const effVolA2 = osmA2 > (900 * volA2) / 1000 ? (osmA2 * 1000) / 900 : volA2;
-      const effVolB2 = osmB2 > (900 * volB2) / 1000 ? (osmB2 * 1000) / 900 : volB2;
+      // เจือจางให้ ≤ 900 mOsm/L เฉพาะ peripheral; central เติมน้ำเองภายหลังที่หน้าพิมพ์
+      const dilute = (osm, vol) =>
+        isPeripheral && osm > (900 * vol) / 1000 ? (osm * 1000) / 900 : vol;
+      const effVolA1 = dilute(osmA1, volA1);
+      const effVolB1 = dilute(osmB1, volB1);
+      const effVolA2 = dilute(osmA2, volA2);
+      const effVolB2 = dilute(osmB2, volB2);
       const xwA1 = effVolA1 - volA1;
       const xwB1 = effVolB1 - volB1;
       const xwA2 = effVolA2 - volA2;
@@ -905,8 +911,15 @@ function calculate(opts = {}) {
             isEqualSplit
               ? "Ca + Mg แบ่งครึ่งเท่ากันทั้ง 2 ถุง"
               : "ถุงที่ 1 ใส่ Ca + Mg ครบ, ถุงที่ 2 ไม่มี Ca + Mg"
+          }${
+            isPeripheral
+              ? ""
+              : "<br>Central line: ไม่เจือจางตาม Osmolarity — เติม Sterile water ได้ภายหลังที่หน้าพิมพ์"
           }</div>
         </div>`;
+      document.getElementById("ppnSplitTitle").innerHTML = isPeripheral
+        ? "แบ่งถุง PPN (ปริมาตร &gt; 1,200 mL)"
+        : "แบ่งถุง TPN (Central, ปริมาตร &gt; 1,200 mL)";
       const titleA = isEqualSplit ? "ถุงที่ 1 (½Ca + ½Mg)" : "ถุงที่ 1 (มี Ca + Mg)";
       const titleB = isEqualSplit ? "ถุงที่ 2 (½Ca + ½Mg)" : "ถุงที่ 2 (ไม่มี Ca + Mg)";
       document.getElementById("splitBagA1Title").textContent = titleA;
@@ -927,7 +940,9 @@ function calculate(opts = {}) {
         const needsDil = extraWater > 0;
         const initialOsm = osm / vol * 1000;
         const finalOsm = needsDil ? 900 : initialOsm;
-        const osmBadge = `<span class="compat-pass" style="margin-left:auto;">✓ Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`;
+        const osmBadge = isPeripheral
+          ? `<span class="compat-pass" style="margin-left:auto;">✓ Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`
+          : `<span style="margin-left:auto;color:var(--text-secondary);">Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`;
         return `
           ${
             needsDil

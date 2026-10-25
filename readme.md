@@ -256,11 +256,12 @@ K₂HPO₄ and Glycophos follow the phosphate source selection in Section 2.
 
 ---
 
-### 11. PPN Split Bags (Peripheral, effectiveVolume > 1,200 mL)
+### 11. Split Bags (Peripheral or Central, volume > 1,200 mL)
 
-Triggered when `venous access = peripheral` AND `max(effectiveVolume, effectiveVolume2) > 1,200 mL`.
+Triggered when `venous access = peripheral or central` AND `max(effectiveVolume, effectiveVolume2) > 1,200 mL`.
+For central line there is no dilution, so this equals `max(totalVolume1, totalVolume2)`.
 Vol I (K₂HPO₄) and Vol II (NaCl) can differ when Acetate or Glycophos is used; if either one exceeds 1,200 mL, both methods are split.
-The total solution is split into two equal bags to stay within peripheral-line volume limits.
+The total solution is split into two equal bags to stay within the 1,200 mL per-bag volume limit.
 
 #### Input splitting
 
@@ -315,7 +316,8 @@ Note: these are total mOsm, not mOsm/L. Concentration in mOsm/L = `osm_Bag × 10
 
 #### Per-bag peripheral dilution
 
-Each bag is independently diluted if its concentration exceeds 900 mOsm/L:
+Peripheral only: each bag is independently diluted if its concentration exceeds 900 mOsm/L.
+Central-line bags are not diluted (`effVol_Bag = vol_Bag`, extraWater = 0); the osmolarity badge is informational only, and sterile water can be added later via the custom bag volume in the print modal.
 
 ```
 If (osm_Bag × 1000 ÷ vol_Bag) > 900:
