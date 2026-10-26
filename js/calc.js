@@ -39,13 +39,14 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
   if (method === "k2hpo4") {
     let kcl, kac, nacl, naac;
     if (useAcetate) {
-      const kcl_temp = k - k2hpo4;
-      kcl = kcl_temp > 0 && cl > 0 ? kcl_temp / 2 : 0;
-      kac = (k - k2hpo4 - kcl * 2) / 3;
+      const kRemain = k - k2hpo4;
+      // KCl ใช้ Cl ได้ไม่เกิน Cl ที่สั่ง ป้องกัน NaCl ติดลบ; K ที่เหลือไปลง KAc
+      kcl = kRemain > 0 && cl > 0 ? Math.min(kRemain, cl) / 2 : 0;
+      kac = (kRemain - kcl * 2) / 3;
       nacl = (cl - kcl * 2) / 0.5;
       naac = (na - nacl * 0.5 - glycophos * 2) / 3;
       formulas["15% KCl"] =
-        `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+        `min(${k} - ${k2hpo4.toFixed(2)}, ${cl}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] =
         `(${k} - ${k2hpo4.toFixed(2)} - ${(kcl * 2).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
       formulas["3% NaCl"] =

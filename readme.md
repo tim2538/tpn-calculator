@@ -68,11 +68,15 @@ Example: K 20, PO₄ 12 → K₂HPO₄ = min(24, 20) = 20 mL, Glycophos = 12 −
 Prioritises K₂HPO₄ for potassium, then distributes remaining K and Na:
 
 ```
-15% KCl (mL)   = (K − K₂HPO₄) ÷ 2   [0 if K ≤ K₂HPO₄ or Cl = 0]
+15% KCl (mL)   = min(K − K₂HPO₄, Cl) ÷ 2   [0 if K ≤ K₂HPO₄ or Cl = 0]
 29.4% KAc (mL) = (K − K₂HPO₄ − KCl×2) ÷ 3
 3% NaCl (mL)   = (Cl − KCl×2) ÷ 0.5
 24.6% NaAc (mL) = (Na − NaCl×0.5 − Glycophos×2) ÷ 3
 ```
+
+KCl is capped by Cl so NaCl never goes negative; any K left over goes to KAc.
+
+Example: Na 20, K 100, Cl 40, PO₄ 12 → K₂HPO₄ 24, KCl = min(76, 40) ÷ 2 = 20, KAc = (76 − 40) ÷ 3 = 12, NaCl = 0, NaAc = 20 ÷ 3 = 6.67.
 
 #### Method 1 — K₂HPO₄ First (no acetate)
 
