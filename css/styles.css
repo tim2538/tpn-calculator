@@ -43,6 +43,8 @@
   gap: 8px;
 }
 :root {
+  /* ให้ scrollbar และ native control ของเบราว์เซอร์ตาม theme */
+  color-scheme: light;
   --bg-primary: #f7f6f3;
   --bg-secondary: white;
   --bg-tertiary: #fafaf9;
@@ -66,6 +68,7 @@
   --shadow-lg: rgba(0, 0, 0, 0.1);
 }
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg-primary: #0f0f0f;
   --bg-secondary: #1f1f1f;
   --bg-tertiary: #1a1a1a;
