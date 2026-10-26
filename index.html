@@ -25,6 +25,13 @@
         <div class="sticky-header-right">
           <button
             class="scan-qr-btn"
+            onclick="openManual()"
+            title="คู่มือสูตรคำนวณ"
+          >
+            <i data-lucide="book-open"></i>
+          </button>
+          <button
+            class="scan-qr-btn"
             onclick="openQRScanner()"
             title="สแกน QR Code"
           >
@@ -50,14 +57,23 @@
           </h1>
           <p>เครื่องคำนวณโภชนบำบัดทางหลอดเลือด (Parenteral Nutrition)</p>
         </div>
-        <button
-          class="theme-toggle"
-          onclick="toggleTheme()"
-          aria-label="Toggle dark mode"
-        >
-          <i data-lucide="sun" id="theme-icon-sun"></i>
-          <i data-lucide="moon" id="theme-icon-moon" style="display: none"></i>
-        </button>
+        <div class="header-actions">
+          <button
+            class="theme-toggle"
+            onclick="openManual()"
+            title="คู่มือสูตรคำนวณ"
+          >
+            <i data-lucide="book-open"></i>
+          </button>
+          <button
+            class="theme-toggle"
+            onclick="toggleTheme()"
+            aria-label="Toggle dark mode"
+          >
+            <i data-lucide="sun" id="theme-icon-sun"></i>
+            <i data-lucide="moon" id="theme-icon-moon" style="display: none"></i>
+          </button>
+        </div>
       </div>
       <div class="content">
         <!-- Patient Information -->
@@ -792,9 +808,34 @@
         </div>
       </div>
     </div>
+    <!-- Calculation Manual Modal -->
+    <div
+      class="print-modal-overlay"
+      id="manualModal"
+      onclick="if (event.target === this) closeManual();"
+    >
+      <div class="print-modal manual-modal">
+        <div class="qr-scanner-header">
+          <h3>คู่มือสูตรคำนวณ</h3>
+          <button class="qr-close-btn" onclick="closeManual()">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="manual-body" id="manualBody"></div>
+        <button
+          class="manual-top-btn"
+          id="manualTopBtn"
+          onclick="scrollManualTop()"
+          title="กลับขึ้นด้านบน"
+        >
+          <i data-lucide="arrow-up"></i>
+        </button>
+      </div>
+    </div>
     <script src="js/calc.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/export.js"></script>
+    <script src="js/manual.js"></script>
     <script>
       lucide.createIcons();
     </script>
