@@ -103,9 +103,10 @@ Cl auto-derived: Cl = K − K₂HPO₄ + Na − Glycophos×2</pre>
 24.6% NaAc (mL) = (Na − NaCl×0.5 − Glycophos×2) ÷ 3</pre>
 
 <h4>Method 2 — NaCl First (ไม่ใช้ acetate)</h4>
-<pre>3% NaCl (mL) = Na ÷ 0.5
+<pre>3% NaCl (mL) = (Na − Glycophos×2) ÷ 0.5
 15% KCl (mL) = (K − K₂HPO₄) ÷ 2
 KAc = 0, NaAc = 0</pre>
+<p>เมื่อใช้ acetate และกรอก Cl เท่ากับ Cl ที่คำนวณอัตโนมัติ ทั้งสองวิธีจะได้ปริมาตรเท่ากับโหมดไม่ใช้ acetate</p>
 
 <h3 id="manual-s3">3. Total Volumes</h3>
 <pre>Total Volume I  (mL) = Protein Sol + Dextrose Sol + Σ Electrolyte Sol (Method 1)

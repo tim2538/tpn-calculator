@@ -90,11 +90,12 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
       formulas["24.6% NaAc"] =
         `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
     } else {
-      nacl = na / 0.5;
+      nacl = (na - glycophos * 2) / 0.5;
       kcl = (k - k2hpo4) / 2;
       kac = 0;
       naac = 0;
-      formulas["3% NaCl"] = `${na} ÷ 0.5 = ${nacl.toFixed(2)}`;
+      formulas["3% NaCl"] =
+        `(${na} - ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
       formulas["15% KCl"] =
         `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] = "ไม่ใช้ Acetate → 0";

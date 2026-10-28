@@ -462,7 +462,7 @@ function calculate(opts = {}) {
       document.getElementById("dilutionCard").classList.remove("hidden");
       document.getElementById("extraWaterCard").classList.remove("hidden");
       document.getElementById("dilutionV2").textContent =
-        effectiveVolume.toFixed(1);
+        `${effectiveVolume.toFixed(1)} / ${effectiveVolume2.toFixed(1)}`;
       document.getElementById("extraWater").textContent =
         `${extraWater1.toFixed(1)} / ${extraWater2.toFixed(1)}`;
       const v2Line = (label, n1, v1, v2, dil) =>

@@ -101,10 +101,12 @@ Prioritises NaCl using the smaller of Na or Cl, then allocates remainders:
 #### Method 2 — NaCl First (no acetate)
 
 ```
-3% NaCl (mL) = Na ÷ 0.5
+3% NaCl (mL) = (Na − Glycophos×2) ÷ 0.5
 15% KCl (mL) = (K − K₂HPO₄) ÷ 2
 KAc = 0, NaAc = 0
 ```
+
+With acetate enabled and Cl entered equal to the auto-derived Cl, both methods give the same volumes as the no-acetate mode.
 
 ---
 
