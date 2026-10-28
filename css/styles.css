@@ -445,6 +445,11 @@ input:read-only {
   max-width: 820px;
   position: relative;
 }
+.manual-download-btn {
+  min-width: auto;
+  padding: 6px 12px;
+  font-size: 0.9em;
+}
 .manual-top-btn {
   position: absolute;
   right: 24px;
@@ -1284,6 +1289,14 @@ select:focus-visible {
   .btn-icon {
     width: 24px;
     height: 24px;
+  }
+  /* ให้เท่าปุ่มกากบาทข้างๆ */
+  .manual-download-btn {
+    min-width: 36px !important;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    flex: 0 0 36px;
   }
   .rate-hero .rate-value {
     font-size: 2.5em;

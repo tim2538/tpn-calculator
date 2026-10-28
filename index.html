@@ -816,9 +816,21 @@
       <div class="print-modal manual-modal">
         <div class="qr-scanner-header">
           <h3>คู่มือสูตรคำนวณ</h3>
-          <button class="qr-close-btn" onclick="closeManual()">
-            <i data-lucide="x"></i>
-          </button>
+          <div class="header-actions">
+            <button
+              class="btn btn-reset manual-download-btn"
+              onclick="downloadManual()"
+            >
+              <i data-lucide="download" class="btn-icon btn-icon-only"></i>
+              <span class="btn-text">
+                <i data-lucide="download" class="btn-icon"></i>
+                ดาวน์โหลดคู่มือ
+              </span>
+            </button>
+            <button class="qr-close-btn" onclick="closeManual()">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
         </div>
         <div class="manual-body" id="manualBody"></div>
         <button

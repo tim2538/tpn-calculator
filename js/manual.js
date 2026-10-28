@@ -377,6 +377,54 @@ function scrollManualTo(id) {
     .scrollTo({ top: target.offsetTop - 8, behavior: "smooth" });
 }
 
+// CSS ของไฟล์คู่มือที่ดาวน์โหลด (theme สว่างเสมอ เปิดนอกแอปได้)
+const MANUAL_EXPORT_CSS = `
+body { font-family: "Sarabun", "Tahoma", sans-serif; color: #37352f; background: #fff; line-height: 1.7; max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+h1 { font-size: 1.5em; margin: 0 0 16px; }
+h2 { font-size: 1.25em; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #e9e9e7; }
+h3 { font-size: 1.1em; margin: 24px 0 8px; }
+h4 { font-size: 1em; color: #787774; margin: 16px 0 6px; }
+p, ul { margin: 6px 0; }
+ul { padding-left: 22px; }
+pre { background: #fafaf9; border: 1px solid #f1f1ef; border-radius: 6px; padding: 10px 12px; margin: 8px 0; overflow-x: auto; font-family: "Courier New", monospace; font-size: 0.88em; line-height: 1.5; white-space: pre-wrap; }
+code { font-family: "Courier New", monospace; background: #fafaf9; border-radius: 4px; padding: 1px 4px; font-size: 0.92em; }
+.manual-table-wrap { overflow-x: auto; margin: 8px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+th, td { border: 1px solid #e9e9e7; padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: #f7f6f3; white-space: nowrap; }
+.manual-toc { background: #fafaf9; border: 1px solid #e9e9e7; border-radius: 6px; padding: 12px 16px; }
+.manual-toc-title { font-weight: 600; margin-bottom: 4px; }
+.manual-toc ol { list-style: none; padding-left: 0; columns: 2; column-gap: 24px; }
+.manual-toc a { color: #2383e2; text-decoration: none; }
+@media (max-width: 600px) { .manual-toc ol { columns: 1; } }
+@media print { pre, table { page-break-inside: avoid; } }
+`;
+
+function downloadManual() {
+  // ลิงก์สารบัญในไฟล์ที่โหลดออกไปใช้ href="#id" ปกติ (ไม่มี scrollManualTo)
+  const content = MANUAL_HTML.replace(/ onclick="[^"]*"/g, "");
+  const html = `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือสูตรคำนวณ TPN</title>
+<style>${MANUAL_EXPORT_CSS}</style>
+</head>
+<body>
+<h1>คู่มือสูตรคำนวณ TPN</h1>
+${content}
+</body>
+</html>
+`;
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+  a.download = "TPN_Manual_" + dateStr + ".html";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 function scrollManualTop() {
   document
     .getElementById("manualBody")
