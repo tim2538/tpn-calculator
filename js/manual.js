@@ -228,7 +228,7 @@ SWI add (mL)  = V_target − V_eff                       (on top of the dilution
 <h4>การแบ่ง input</h4>
 <pre>Each bag receives half of: Na, K, Cl, PO₄, Protein Solution, Dextrose Solution</pre>
 <p>การกระจาย Ca และ Mg เลือกได้ด้วยปุ่มในส่วนแบ่งถุง (หลังกดคำนวณ)</p>
-<p>ค่าเริ่มต้นคือ <strong>separate</strong> เมื่อสลับโหมดจะคำนวณใหม่โดยไม่เลื่อนหน้าจอ</p>
+<p>ค่าเริ่มต้นคือ <strong>equal</strong> เมื่อสลับโหมดจะคำนวณใหม่โดยไม่เลื่อนหน้าจอ</p>
 <div class="manual-table-wrap">
 <table>
   <thead><tr><th>โหมด</th><th>Bag A (ถุงที่ 1)</th><th>Bag B (ถุงที่ 2)</th></tr></thead>
@@ -279,7 +279,7 @@ Ca (mmol/L)  = Ca_A (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)</pre>
 <p>ใช้เกณฑ์ 4 ข้อและคำแนะนำเติม sterile water เดียวกับหัวข้อ 9 (ใช้ Ca_A, PO₄ ÷ 2 และ effVol_BagA) คำเตือนขึ้นเมื่อ V_target &gt; 1,200 mL ต่อถุง</p>
-<p>เมื่อแบ่งถุงแล้ว ส่วนถุงเดียวจะชี้ให้ไปดูคำแนะนำรายถุงแทน</p>
+<p>เมื่อแบ่งถุงแล้ว ซ่อนกล่อง Ca–PO₄ ของถุงเดียว แสดงเฉพาะผลตรวจรายถุงที่ท้ายส่วนแบ่งถุง โดยหัวข้อระบุ V₂ เมื่อถุงนั้นเจือจาง</p>
 <ul>
   <li><code>separate</code>: Bag B มี Ca = 0 → ไม่มีความเสี่ยงตกตะกอน</li>
   <li><code>equal</code>: Bag A และ Bag B มีส่วนประกอบเหมือนกัน ตรวจครั้งเดียวครอบคลุมทั้งสองถุง</li>

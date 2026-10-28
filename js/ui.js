@@ -1,6 +1,6 @@
 let allFormulasVisible = false;
 // PPN split: "separate" = Ca + Mg เต็มในถุงที่ 1, "equal" = Ca + Mg แบ่งครึ่งทั้ง 2 ถุง
-let splitMode = "separate";
+let splitMode = "equal";
 
 function syncSplitModeButtons() {
   document
@@ -263,7 +263,7 @@ function resetForm() {
   window.scrollTo({ top: 0, behavior: "smooth" });
   document.getElementById("printBtn").disabled = true;
   document.getElementById("ppnSplitSection").classList.add("hidden");
-  splitMode = "separate";
+  splitMode = "equal";
   syncSplitModeButtons();
   window.lastResult = null;
   document.getElementById("rateHero1").textContent = "-";
@@ -723,13 +723,12 @@ function calculate(opts = {}) {
         dilutionWater,
         scope: "",
         overLimitText: "ปริมาตรรวมเกิน 1,200 mL — ควรพิจารณาแบ่ง 2 ถุง",
-        adviceNote: needsSplit
-          ? "ปริมาตรเกิน 1,200 mL จึงแบ่ง 2 ถุง — ดูผลตรวจและคำแนะนำ SWI รายถุงในส่วนแบ่งถุงด้านล่าง"
-          : "",
       });
     document.getElementById("caPO4Checks").innerHTML =
       singleCaPO4Block("Vol I (K₂HPO₄ First)", caPO4Res1, effectiveVolume, extraWater1) +
       singleCaPO4Block("Vol II (NaCl First)", caPO4Res2, effectiveVolume2, extraWater2);
+    // แบ่งถุงแล้วแสดง Ca–PO₄ รายถุงในส่วนแบ่งถุงที่เดียว เพื่อไม่ให้สับสน
+    document.getElementById("caPO4Section").classList.toggle("hidden", needsSplit);
     document.getElementById("resultsSection").classList.remove("hidden");
     if (opts.scroll !== false) {
       document

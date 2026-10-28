@@ -292,7 +292,7 @@ Each bag receives half of: Na, K, Cl, PO₄, Protein Solution, Dextrose Solution
 ```
 
 Ca and Mg distribution is chosen with a toggle in the split section (after calculating).
-Default is **separate**; switching re-runs the calculation without scrolling.
+Default is **equal**; switching re-runs the calculation without scrolling.
 
 | Mode       | Bag A (ถุงที่ 1)        | Bag B (ถุงที่ 2)        |
 | ---------- | ----------------------- | ----------------------- |
@@ -362,7 +362,7 @@ PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)
 ```
 
 The same four criteria and sterile water recommendation from Section 9 apply (with Ca_A, PO₄ ÷ 2 and effVol_BagA); the warning is shown when V_target > 1,200 mL per bag.
-When the bags are split, the single-bag section refers to the per-bag recommendation instead.
+When the bags are split, the single-bag Ca–PO₄ section is hidden; the check is shown only per bag at the bottom of the split section, titled with V₂ when the bag is diluted.
 
 - `separate`: Bag B has Ca = 0 → no precipitation risk.
 - `equal`: Bag A and Bag B have identical composition, so one check covers both bags.

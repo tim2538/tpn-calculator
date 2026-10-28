@@ -188,10 +188,9 @@ function checkCaPO4(ca, po4, volMl) {
   };
 }
 
-// opts: { title, res, vol, dilutionWater, scope, overLimitText, adviceNote }
-// adviceNote แทนคำแนะนำ SWI (ใช้เมื่อแบ่งถุงแล้ว ให้ดูคำแนะนำรายถุง)
+// opts: { title, res, vol, dilutionWater, scope, overLimitText }
 function renderCaPO4Block(opts) {
-  const { title, res, vol, dilutionWater, scope, overLimitText, adviceNote } = opts;
+  const { title, res, vol, dilutionWater, scope, overLimitText } = opts;
   const checksHTML = res.checks
     .map(
       (c) => `
@@ -204,10 +203,8 @@ function renderCaPO4Block(opts) {
   const statusHTML = res.allPass
     ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ${scope} ผ่านเกณฑ์ทุกข้อ</div></div>`
     : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ${scope} ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`;
-  let adviceLines = [];
-  if (!res.allPass && adviceNote) {
-    adviceLines = [adviceNote];
-  } else if (!res.allPass) {
+  const adviceLines = [];
+  if (!res.allPass) {
     if (res.targetVolume) {
       const addWater = res.targetVolume - vol;
       const passText = res.ratioPass ? "ผ่านครบ 4 ข้อ" : "ผ่านข้อ 1, 2, 4";
@@ -232,7 +229,7 @@ function renderCaPO4Block(opts) {
     : "";
   return `
     <div style="margin-top:12px;">
-      <h4 style="margin:0 0 6px;">${title} — ${vol.toFixed(1)} mL${dilutionWater > 0 ? ` (รวมน้ำเจือจาง Osm ${dilutionWater.toFixed(1)} mL)` : ""}</h4>
+      <h4 style="margin:0 0 6px;">${title} — ${dilutionWater > 0 ? `V₂ = ${vol.toFixed(1)} mL (รวมน้ำเจือจาง Osm ${dilutionWater.toFixed(1)} mL)` : `${vol.toFixed(1)} mL`}</h4>
       ${checksHTML}
       ${statusHTML}
       ${adviceHTML}

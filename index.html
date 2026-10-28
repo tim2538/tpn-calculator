@@ -638,7 +638,7 @@
             </div>
           </div>
           <!-- Ca-PO4 Compatibility -->
-          <div class="electrolyte-results">
+          <div class="electrolyte-results" id="caPO4Section">
             <h3>
               <i data-lucide="shield-check"></i>
               Ca&ndash;PO&#x2084; Compatibility Checks
@@ -655,14 +655,14 @@
           <div id="ppnSplitInfo" style="margin-bottom: 12px"></div>
           <div class="print-method-toggle split-mode-toggle">
             <button
-              id="splitModeBtnSeparate"
+              id="splitModeBtnEqual"
               class="active"
-              onclick="setSplitMode('separate')"
+              onclick="setSplitMode('equal')"
             >
-              แยก Ca/Mg ไว้ถุงที่ 1
-            </button>
-            <button id="splitModeBtnEqual" onclick="setSplitMode('equal')">
               แบ่งเท่ากันทั้ง 2 ถุง
+            </button>
+            <button id="splitModeBtnSeparate" onclick="setSplitMode('separate')">
+              แยก Ca/Mg ไว้ถุงที่ 1
             </button>
           </div>
           <div class="split-method-label">
