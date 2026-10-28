@@ -21,7 +21,7 @@ function phosphateFormulas(formulas, k, po4, k2hpo4, glycophos, isSplit) {
     ? `min(${po4} ÷ 0.5, K ${k}) = ${k2hpo4.toFixed(2)}`
     : `${po4} ÷ 0.5 = ${k2hpo4.toFixed(2)}`;
   formulas["Glycophos"] = isSplit
-    ? `(${po4} - ${k2hpo4.toFixed(2)} × 0.5) ÷ 1 = ${glycophos.toFixed(2)}`
+    ? `(${po4} − ${k2hpo4.toFixed(2)} × 0.5) ÷ 1 = ${glycophos.toFixed(2)}`
     : glycophos > 0
       ? `${po4} ÷ 1 = ${glycophos.toFixed(2)}`
       : "0";
@@ -46,23 +46,23 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
       nacl = (cl - kcl * 2) / 0.5;
       naac = (na - nacl * 0.5 - glycophos * 2) / 3;
       formulas["15% KCl"] =
-        `min(${k} - ${k2hpo4.toFixed(2)}, ${cl}) ÷ 2 = ${kcl.toFixed(2)}`;
+        `min(${k} − ${k2hpo4.toFixed(2)}, ${cl}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] =
-        `(${k} - ${k2hpo4.toFixed(2)} - ${(kcl * 2).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
+        `(${k} − ${k2hpo4.toFixed(2)} − ${(kcl * 2).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
       formulas["3% NaCl"] =
-        `(${cl} - ${(kcl * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+        `(${cl} − ${(kcl * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
       formulas["24.6% NaAc"] =
-        `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
+        `(${na} − ${(nacl * 0.5).toFixed(2)} − ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
     } else {
       kcl = (k - k2hpo4) / 2;
       kac = 0;
       nacl = (na - glycophos * 2) / 0.5;
       naac = 0;
       formulas["15% KCl"] =
-        `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+        `(${k} − ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] = "ไม่ใช้ Acetate → 0";
       formulas["3% NaCl"] =
-        `(${na} - ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+        `(${na} − ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
       formulas["24.6% NaAc"] = "ไม่ใช้ Acetate → 0";
     }
     electrolytes = {
@@ -84,20 +84,20 @@ function calculateElectrolytes(method, na, k, cl, ca, mg, po4, useAcetate) {
       naac = (na - nacl * 0.5 - glycophos * 2) / 3;
       formulas["3% NaCl"] = `min(${na}, ${cl}) ÷ 0.5 = ${nacl.toFixed(2)}`;
       formulas["15% KCl"] =
-        `(${cl} - ${(nacl * 0.5).toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+        `(${cl} − ${(nacl * 0.5).toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] =
-        `(${k} - ${k2hpo4.toFixed(2)} - ${(cl - nacl * 0.5).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
+        `(${k} − ${k2hpo4.toFixed(2)} − ${(cl - nacl * 0.5).toFixed(2)}) ÷ 3 = ${kac.toFixed(2)}`;
       formulas["24.6% NaAc"] =
-        `(${na} - ${(nacl * 0.5).toFixed(2)} - ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
+        `(${na} − ${(nacl * 0.5).toFixed(2)} − ${(glycophos * 2).toFixed(2)}) ÷ 3 = ${naac.toFixed(2)}`;
     } else {
       nacl = (na - glycophos * 2) / 0.5;
       kcl = (k - k2hpo4) / 2;
       kac = 0;
       naac = 0;
       formulas["3% NaCl"] =
-        `(${na} - ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
+        `(${na} − ${(glycophos * 2).toFixed(2)}) ÷ 0.5 = ${nacl.toFixed(2)}`;
       formulas["15% KCl"] =
-        `(${k} - ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
+        `(${k} − ${k2hpo4.toFixed(2)}) ÷ 2 = ${kcl.toFixed(2)}`;
       formulas["29.4% KAc"] = "ไม่ใช้ Acetate → 0";
       formulas["24.6% NaAc"] = "ไม่ใช้ Acetate → 0";
     }
@@ -167,7 +167,7 @@ function checkCaPO4(ca, po4, volMl) {
       pass: po4MmolL > 0 ? caMmolL / po4MmolL < 0.5 : true,
     },
     {
-      label: "Ca (mmol/L) × P (mmol/L) ≤ 75",
+      label: "Ca (mmol/L) × PO₄ (mmol/L) ≤ 75",
       detail: `${caMmolL.toFixed(2)} × ${po4MmolL.toFixed(2)} = ${(caMmolL * po4MmolL).toFixed(2)}`,
       pass: caMmolL * po4MmolL <= 75,
     },

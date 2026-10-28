@@ -451,7 +451,11 @@ function calculate(opts = {}) {
     document.getElementById("formula-ivleRateHr").innerHTML = `
       <div class="formula-label">สูตร:</div>
       <div class="formula-calculation">Lipid ÷ Weight ÷ IVLE Hours</div>
-      <div class="formula-calculation">${lipid} ÷ ${weight} ÷ ${ivleHours} = ${ivleRateHr.toFixed(3)} g/kg/hr</div>
+      <div class="formula-calculation">${
+        ivleHours > 0
+          ? `${lipid} ÷ ${weight} ÷ ${ivleHours} = ${ivleRateHr.toFixed(3)} g/kg/hr`
+          : "ไม่ได้ระบุ IVLE Hours → 0"
+      }</div>
     `;
     document.getElementById("formula-ivleRateDay").innerHTML = `
       <div class="formula-label">สูตร:</div>
@@ -467,7 +471,7 @@ function calculate(opts = {}) {
         `${extraWater1.toFixed(1)} / ${extraWater2.toFixed(1)}`;
       const v2Line = (label, n1, v1, v2, dil) =>
         dil
-          ? `<div class="formula-calculation">${label}: (${n1.toFixed(0)} × ${v1.toFixed(1)}) ÷ 900 = ${v2.toFixed(1)} mL</div>`
+          ? `<div class="formula-calculation">${label}: (${n1.toFixed(2)} × ${v1.toFixed(2)}) ÷ 900 = ${v2.toFixed(1)} mL</div>`
           : `<div class="formula-calculation">${label}: ${n1.toFixed(0)} mOsm/L ≤ 900 ไม่ต้องเจือจาง</div>`;
       const waterLine = (label, v1, v2) =>
         `<div class="formula-calculation">${label}: ${v2.toFixed(1)} − ${v1.toFixed(1)} = ${(v2 - v1).toFixed(1)} mL</div>`;
@@ -545,7 +549,7 @@ function calculate(opts = {}) {
     document.getElementById("formula-gir").innerHTML = `
       <div class="formula-label">สูตร:</div>
       <div class="formula-calculation">(Dextrose × 1000) ÷ (Weight × Duration × 60)</div>
-      <div class="formula-calculation">(${dextrose} × 1000) ÷ (${weight} × ${infusionDuration} × 60) = ${gir.toFixed(2)}</div>
+      <div class="formula-calculation">(${dextrose} × 1000) ÷ (${weight} × ${infusionDuration} × 60) = ${gir.toFixed(2)} mg/kg/min</div>
     `;
     document.getElementById("formula-calories").innerHTML = `
       <div class="formula-label">สูตร:</div>
@@ -910,10 +914,18 @@ function calculate(opts = {}) {
         osm,
         effVol,
         extraWater,
+        glyNa,
+        mgX,
+        caX,
       ) => {
         const needsDil = extraWater > 0;
         const initialOsm = osm / vol * 1000;
         const finalOsm = needsDil ? 900 : initialOsm;
+        const showClass = allFormulasVisible ? "show" : "";
+        const bagNaCalc =
+          glyNa > 0
+            ? `(${(na2 - glyNa).toFixed(2)} × 2) + (${glyNa.toFixed(2)} × 3)`
+            : `(${na2} × 2)`;
         const osmBadge = isPeripheral
           ? `<span class="compat-pass" style="margin-left:auto;">✓ Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`
           : `<span style="margin-left:auto;color:var(--text-secondary);">Osmolarity ${finalOsm.toFixed(0)} mOsm/L</span>`;
@@ -937,11 +949,19 @@ function calculate(opts = {}) {
               <span class="electrolyte-name">${proteinConcentration}% ${proteinProduct === "amiparen" ? "Amiparen" : "Aminoplasmal"}</span>
               <span class="electrolyte-value">${pSol.toFixed(2)} mL</span>
             </div>
+            <div class="electrolyte-formula ${showClass}">
+              <div class="formula-label">สูตร:</div>
+              <div class="formula-calculation">${protein / 2} × 100 ÷ ${proteinConcentration} = ${pSol.toFixed(2)}</div>
+            </div>
           </div>
           <div class="electrolyte-item">
             <div class="electrolyte-header">
               <span class="electrolyte-name">50% Dextrose</span>
               <span class="electrolyte-value">${dSol.toFixed(2)} mL</span>
+            </div>
+            <div class="electrolyte-formula ${showClass}">
+              <div class="formula-label">สูตร:</div>
+              <div class="formula-calculation">${dextrose / 2} × 100 ÷ 50 = ${dSol.toFixed(2)}</div>
             </div>
           </div>
           ${renderElectrolyteHTML(elec, forms, allFormulasVisible)}
@@ -953,6 +973,12 @@ function calculate(opts = {}) {
             <div class="summary-item">
               ${osmBadge}
             </div>
+          </div>
+          <div class="electrolyte-formula ${showClass}">
+            <div class="formula-label">สูตร Osmolarity ต่อถุง:</div>
+            <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
+            <div class="formula-calculation">(${pSol.toFixed(1)} × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (${dextrose / 2} × 5) + ${bagNaCalc} + (${k2} × 2) + (${mgX} × 1) + (${caX} × 1.4) = ${osm.toFixed(0)} mOsm</div>
+            <div class="formula-calculation">${osm.toFixed(0)} × 1000 ÷ ${vol.toFixed(1)} = ${initialOsm.toFixed(0)} mOsm/L</div>
           </div>
         `;
       };
@@ -966,6 +992,9 @@ function calculate(opts = {}) {
         osmA1,
         effVolA1,
         xwA1,
+        glyA1,
+        mgA,
+        caA,
       );
       document.getElementById("splitBagB1").innerHTML = renderBag(
         pSol2,
@@ -976,6 +1005,9 @@ function calculate(opts = {}) {
         osmB1,
         effVolB1,
         xwB1,
+        glyB1,
+        mgB,
+        caB,
       );
       document.getElementById("splitBagA2").innerHTML = renderBag(
         pSol2,
@@ -986,6 +1018,9 @@ function calculate(opts = {}) {
         osmA2,
         effVolA2,
         xwA2,
+        glyA2,
+        mgA,
+        caA,
       );
       document.getElementById("splitBagB2").innerHTML = renderBag(
         pSol2,
@@ -996,6 +1031,9 @@ function calculate(opts = {}) {
         osmB2,
         effVolB2,
         xwB2,
+        glyB2,
+        mgB,
+        caB,
       );
 
       const checkScope = isEqualSplit
