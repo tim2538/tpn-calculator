@@ -704,57 +704,32 @@ function calculate(opts = {}) {
       </div>
     `;
     document.getElementById("alerts").innerHTML = alertsHTML;
-    const volL = totalVolume1 / 1000;
-    const ca_meqPerL = ca / volL;
-    const ca_mmolPerL = (ca * 0.5) / volL;
-    const po4_meqPerL = (po4 * 2) / volL;
-    const po4_mmolPerL = po4 / volL;
-    const check1 = ca_meqPerL + po4_meqPerL <= 45;
-    const check2 = ca_meqPerL <= 15 && po4_meqPerL <= 30;
-    const check3 = po4_mmolPerL > 0 ? ca_mmolPerL / po4_mmolPerL < 0.5 : true;
-    const check4 = ca_mmolPerL * po4_mmolPerL <= 75;
-    const caPoChecks = [
-      {
-        label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45",
-        detail: `${ca_meqPerL.toFixed(2)} + ${po4_meqPerL.toFixed(2)} = ${(ca_meqPerL + po4_meqPerL).toFixed(2)}`,
-        pass: check1,
-      },
-      {
-        label: "Ca (mEq/L) ≤ 15 และ PO₄ (mEq/L) ≤ 30",
-        detail: `Ca = ${ca_meqPerL.toFixed(2)}, PO₄ = ${po4_meqPerL.toFixed(2)}`,
-        pass: check2,
-      },
-      {
-        label: "Ca (mmol/L) / PO₄ (mmol/L) < 1/2",
-        detail: `${ca_mmolPerL.toFixed(2)} / ${po4_mmolPerL.toFixed(2)} = ${po4_mmolPerL > 0 ? (ca_mmolPerL / po4_mmolPerL).toFixed(3) : "N/A"}`,
-        pass: check3,
-      },
-      {
-        label: "Ca (mmol/L) × P (mmol/L) ≤ 75",
-        detail: `${ca_mmolPerL.toFixed(2)} × ${po4_mmolPerL.toFixed(2)} = ${(ca_mmolPerL * po4_mmolPerL).toFixed(2)}`,
-        pass: check4,
-      },
-    ];
-    const allCaPoPass = caPoChecks.every((c) => c.pass);
-    document.getElementById("caPO4Checks").innerHTML = caPoChecks
-      .map(
-        (c) => `
-        <div class="compat-check">
-          <span>${c.label}<br><small style="color:var(--text-secondary)">${c.detail}</small></span>
-          <span class="${c.pass ? "compat-pass" : "compat-fail"}">${c.pass ? "✓ ผ่าน" : "✗ ไม่ผ่าน"}</span>
-        </div>`,
-      )
-      .join("");
-    document.getElementById("caPO4Alert").innerHTML = allCaPoPass
-      ? `<div class="alert alert-success" style="margin-top:12px;">
-          <i data-lucide="check-circle" style="width:20px;height:20px;"></i>
-          <div><strong>ปลอดภัย:</strong> Ca–PO₄ ผ่านเกณฑ์ความเข้ากันได้ทุกข้อ</div>
-        </div>`
-      : `<div class="alert alert-danger" style="margin-top:12px;">
-          <i data-lucide="circle-alert" style="width:20px;height:20px;"></i>
-          <div><strong>อันตราย!</strong> Ca–PO₄ ไม่ผ่านเกณฑ์ความเข้ากันได้
-            — อาจเกิด Calcium Phosphate Precipitation</div>
-        </div>`;
+
+    // แบ่งถุงเมื่อวิธีใดวิธีหนึ่งเกิน 1,200 mL (Vol I / Vol II อาจไม่เท่ากันเมื่อใช้ Acetate หรือ Glycophos)
+    // Central line ไม่มีการเจือจาง จึงเท่ากับ max(totalVolume1, totalVolume2)
+    const splitTriggerVolume = Math.max(effectiveVolume, effectiveVolume2);
+    const isPeripheral = venousAccess === "peripheral";
+    const needsSplit =
+      (isPeripheral || venousAccess === "central") && splitTriggerVolume > 1200;
+
+    // Ca–PO₄ ตรวจที่ effective volume (V₂ ถ้าเจือจาง) แยกตามวิธี
+    const caPO4Res1 = checkCaPO4(ca, po4, effectiveVolume);
+    const caPO4Res2 = checkCaPO4(ca, po4, effectiveVolume2);
+    const singleCaPO4Block = (title, res, vol, dilutionWater) =>
+      renderCaPO4Block({
+        title,
+        res,
+        vol,
+        dilutionWater,
+        scope: "",
+        overLimitText: "ปริมาตรรวมเกิน 1,200 mL — ควรพิจารณาแบ่ง 2 ถุง",
+        adviceNote: needsSplit
+          ? "ปริมาตรเกิน 1,200 mL จึงแบ่ง 2 ถุง — ดูผลตรวจและคำแนะนำ SWI รายถุงในส่วนแบ่งถุงด้านล่าง"
+          : "",
+      });
+    document.getElementById("caPO4Checks").innerHTML =
+      singleCaPO4Block("Vol I (K₂HPO₄ First)", caPO4Res1, effectiveVolume, extraWater1) +
+      singleCaPO4Block("Vol II (NaCl First)", caPO4Res2, effectiveVolume2, extraWater2);
     document.getElementById("resultsSection").classList.remove("hidden");
     if (opts.scroll !== false) {
       document
@@ -764,12 +739,6 @@ function calculate(opts = {}) {
 
     // --- PPN Split Bags ---
     const ppnSplitSection = document.getElementById("ppnSplitSection");
-    // แบ่งถุงเมื่อวิธีใดวิธีหนึ่งเกิน 1,200 mL (Vol I / Vol II อาจไม่เท่ากันเมื่อใช้ Acetate หรือ Glycophos)
-    // Central line ไม่มีการเจือจาง จึงเท่ากับ max(totalVolume1, totalVolume2)
-    const splitTriggerVolume = Math.max(effectiveVolume, effectiveVolume2);
-    const isPeripheral = venousAccess === "peripheral";
-    const needsSplit =
-      (isPeripheral || venousAccess === "central") && splitTriggerVolume > 1200;
     let splitData = null;
     if (needsSplit) {
       ppnSplitSection.classList.remove("hidden");
@@ -882,11 +851,17 @@ function calculate(opts = {}) {
       const xwA2 = effVolA2 - volA2;
       const xwB2 = effVolB2 - volB2;
 
+      // ตรวจ Ca–PO₄ ที่ถุงที่ 1 ของแต่ละวิธี; equal ถุงที่ 2 องค์ประกอบเท่ากัน, separate ถุงที่ 2 ไม่มี Ca
+      const caPO4ResA1 = checkCaPO4(caA, po4_2, effVolA1);
+      const caPO4ResA2 = checkCaPO4(caA, po4_2, effVolA2);
+      const caPO4VolB1 = isEqualSplit ? caPO4ResA1.targetVolume : null;
+      const caPO4VolB2 = isEqualSplit ? caPO4ResA2.targetVolume : null;
+
       splitData = {
-        bagA1: { electrolytes: bagA1.electrolytes, sterileWater: xwA1, baseVolume: volA1, osm: osmA1, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolA1, flowRate: effVolA1 / infusionDuration },
-        bagB1: { electrolytes: bagB1.electrolytes, sterileWater: xwB1, baseVolume: volB1, osm: osmB1, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolB1, flowRate: effVolB1 / infusionDuration },
-        bagA2: { electrolytes: bagA2.electrolytes, sterileWater: xwA2, baseVolume: volA2, osm: osmA2, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolA2, flowRate: effVolA2 / infusionDuration },
-        bagB2: { electrolytes: bagB2.electrolytes, sterileWater: xwB2, baseVolume: volB2, osm: osmB2, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolB2, flowRate: effVolB2 / infusionDuration },
+        bagA1: { electrolytes: bagA1.electrolytes, sterileWater: xwA1, baseVolume: volA1, osm: osmA1, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolA1, flowRate: effVolA1 / infusionDuration, caPO4Volume: caPO4ResA1.targetVolume },
+        bagB1: { electrolytes: bagB1.electrolytes, sterileWater: xwB1, baseVolume: volB1, osm: osmB1, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolB1, flowRate: effVolB1 / infusionDuration, caPO4Volume: caPO4VolB1 },
+        bagA2: { electrolytes: bagA2.electrolytes, sterileWater: xwA2, baseVolume: volA2, osm: osmA2, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolA2, flowRate: effVolA2 / infusionDuration, caPO4Volume: caPO4ResA2.targetVolume },
+        bagB2: { electrolytes: bagB2.electrolytes, sterileWater: xwB2, baseVolume: volB2, osm: osmB2, proteinSolution: pSol2, dextroseSolution: dSol2, volume: effVolB2, flowRate: effVolB2 / infusionDuration, caPO4Volume: caPO4VolB2 },
         naA: na2, naB: na2,
         kA: k2, kB: k2,
         clA: cl2, clB: cl2,
@@ -1024,56 +999,25 @@ function calculate(opts = {}) {
         xwB2,
       );
 
-      const vL = effVolA1 / 1000;
-      const ca_mL = caA / vL,
-        ca_mol = (caA * 0.5) / vL;
-      const po4_mL = (po4_2 * 2) / vL,
-        po4_mol = po4_2 / vL;
-      const splitChecks = [
-        {
-          label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45",
-          detail: `${ca_mL.toFixed(2)} + ${po4_mL.toFixed(2)} = ${(ca_mL + po4_mL).toFixed(2)}`,
-          pass: ca_mL + po4_mL <= 45,
-        },
-        {
-          label: "Ca (mEq/L) ≤ 15 และ PO₄ (mEq/L) ≤ 30",
-          detail: `Ca = ${ca_mL.toFixed(2)}, PO₄ = ${po4_mL.toFixed(2)}`,
-          pass: ca_mL <= 15 && po4_mL <= 30,
-        },
-        {
-          label: "Ca (mmol/L) / PO₄ (mmol/L) < 1/2",
-          detail: `${ca_mol.toFixed(2)} / ${po4_mol.toFixed(2)} = ${po4_mol > 0 ? (ca_mol / po4_mol).toFixed(3) : "N/A"}`,
-          pass: po4_mol > 0 ? ca_mol / po4_mol < 0.5 : true,
-        },
-        {
-          label: "Ca (mmol/L) × P (mmol/L) ≤ 75",
-          detail: `${ca_mol.toFixed(2)} × ${po4_mol.toFixed(2)} = ${(ca_mol * po4_mol).toFixed(2)}`,
-          pass: ca_mol * po4_mol <= 75,
-        },
-      ];
-      const allSplitPass = splitChecks.every((c) => c.pass);
       const checkScope = isEqualSplit
         ? "ถุงที่ 1 และ 2 (องค์ประกอบเท่ากัน): Ca/2, PO&#x2084;/2"
         : "ถุงที่ 1: Ca เต็ม, PO&#x2084;/2";
       const alertScope = isEqualSplit ? "ทั้ง 2 ถุง" : "ถุงที่ 1";
+      const splitCaPO4Block = (title, res, vol, dilutionWater) =>
+        renderCaPO4Block({
+          title,
+          res,
+          vol,
+          dilutionWater,
+          scope: alertScope,
+          overLimitText: "ปริมาตรต่อถุงเกิน 1,200 mL",
+        });
       document.getElementById("splitCaPO4").innerHTML = `
         <div>
           <h3 style="margin-bottom:4px;"><i data-lucide="shield-check"></i> Ca&ndash;PO&#x2084; Compatibility Checks</h3>
-          <p style="margin:0 0 10px;font-size:0.85em;color:var(--text-secondary);">${checkScope}${xwA1 > 0 ? ` — หลังเติม Sterile Water ${xwA1.toFixed(1)} mL` : ""}</p>
-          ${splitChecks
-            .map(
-              (c) => `
-            <div class="compat-check">
-              <span>${c.label}<br><small style="color:var(--text-secondary)">${c.detail}</small></span>
-              <span class="${c.pass ? "compat-pass" : "compat-fail"}">${c.pass ? "✓ ผ่าน" : "✗ ไม่ผ่าน"}</span>
-            </div>`,
-            )
-            .join("")}
-          ${
-            allSplitPass
-              ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ${alertScope} ผ่านเกณฑ์ทุกข้อ</div></div>`
-              : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ${alertScope} ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`
-          }
+          <p style="margin:0 0 10px;font-size:0.85em;color:var(--text-secondary);">${checkScope}</p>
+          ${splitCaPO4Block("Vol I (K₂HPO₄ First)", caPO4ResA1, effVolA1, xwA1)}
+          ${splitCaPO4Block("Vol II (NaCl First)", caPO4ResA2, effVolA2, xwA2)}
           ${
             isEqualSplit
               ? ""
@@ -1098,6 +1042,8 @@ function calculate(opts = {}) {
       baseVolume2: totalVolume2,
       minVolume1: effectiveVolume,
       minVolume2: effectiveVolume2,
+      caPO4Volume1: caPO4Res1.targetVolume,
+      caPO4Volume2: caPO4Res2.targetVolume,
       dextroseSolution,
       proteinSolution,
       protein,

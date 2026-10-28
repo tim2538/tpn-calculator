@@ -184,11 +184,12 @@ IVLE Daily  (g/kg/day) = Lipid (g) ÷ Weight (kg)</pre>
 </div>
 
 <h3 id="manual-s9">9. Calcium–Phosphate Compatibility</h3>
-<p>ตรวจทั้ง 4 ข้อโดยใช้ความเข้มข้นต่อลิตรของ Total Volume I</p>
-<pre>Ca (mEq/L)   = Ca (mEq) ÷ (Total Volume I ÷ 1000)
-Ca (mmol/L)  = Ca (mEq) × 0.5 ÷ (Total Volume I ÷ 1000)
-PO₄ (mEq/L)  = PO₄ (mmol) × 2 ÷ (Total Volume I ÷ 1000)
-PO₄ (mmol/L) = PO₄ (mmol) ÷ (Total Volume I ÷ 1000)</pre>
+<p>ตรวจทั้ง 4 ข้อแยกตามวิธี โดยใช้ความเข้มข้นต่อลิตรของ Effective Volume (V₂ ถ้าเจือจางแบบ peripheral ไม่เช่นนั้นใช้ Total Volume; central line ไม่เจือจาง)</p>
+<pre>V_eff        = Effective Volume I (Method 1)  or  Effective Volume II (Method 2)
+Ca (mEq/L)   = Ca (mEq) ÷ (V_eff ÷ 1000)
+Ca (mmol/L)  = Ca (mEq) × 0.5 ÷ (V_eff ÷ 1000)
+PO₄ (mEq/L)  = PO₄ (mmol) × 2 ÷ (V_eff ÷ 1000)
+PO₄ (mmol/L) = PO₄ (mmol) ÷ (V_eff ÷ 1000)</pre>
 <div class="manual-table-wrap">
 <table>
   <thead><tr><th>ข้อ</th><th>เกณฑ์</th><th>ความเสี่ยงถ้าไม่ผ่าน</th></tr></thead>
@@ -201,6 +202,16 @@ PO₄ (mmol/L) = PO₄ (mmol) ÷ (Total Volume I ÷ 1000)</pre>
 </table>
 </div>
 <p>ไม่ผ่านข้อใดข้อหนึ่ง → แจ้งเตือนระดับ danger</p>
+<h4>คำแนะนำเติม Sterile water</h4>
+<p>เมื่อมีข้อที่ไม่ผ่าน จะแสดงปริมาตรรวมขั้นต่ำที่ทำให้ผ่านข้อ 1, 2 และ 4 เป็นคำแนะนำ</p>
+<p>ข้อ 3 เป็นอัตราส่วน เติมน้ำแล้วค่าไม่เปลี่ยน ถ้าไม่ผ่านต้องปรับ Ca หรือ PO₄ แทน</p>
+<pre>V_req (mL)    = max( (Ca + PO₄ × 2) ÷ 45,              ← check 1
+                     Ca ÷ 15,  PO₄ × 2 ÷ 30,           ← check 2
+                     √(Ca × 0.5 × PO₄ ÷ 75) ) × 1000   ← check 4
+V_target (mL) = ceil(V_req)                            (only when check 1, 2 or 4 fails)
+SWI add (mL)  = V_target − V_eff                       (on top of the dilution water, if any)</pre>
+<p>เป็นคำแนะนำเท่านั้น ผลลัพธ์หลักไม่เปลี่ยน ให้เติมน้ำผ่านช่องปริมาตร custom ใน print modal (หัวข้อ 12)</p>
+<p>ถ้า V_target &gt; 1,200 mL จะมีคำเตือนให้พิจารณาแบ่ง 2 ถุง</p>
 
 <h3 id="manual-s10">10. Chloride Maximum Hint (Acetate Mode)</h3>
 <p>เมื่อเปิด acetate จะมีคำแนะนำแบบ live เพื่อไม่ให้ค่า Cl ทำให้ปริมาตร electrolyte ติดลบ</p>
@@ -261,12 +272,14 @@ Else:
   effVol_Bag = vol_Bag, extraWater = 0</pre>
 
 <h4>ตรวจ Ca–PO₄ compatibility</h4>
-<p>ตรวจกับ effective volume ของ Bag A (Method 1) โดยใช้ Ca_A และ PO₄ ที่หารครึ่ง</p>
-<pre>Ca (mEq/L)   = Ca_A (mEq) ÷ (effVol_BagA ÷ 1000)
+<p>ตรวจกับ effective volume ของ Bag A แยกตามวิธี โดยใช้ Ca_A และ PO₄ ที่หารครึ่ง</p>
+<pre>effVol_BagA  = effVol of Bag A, Method 1  or  Method 2
+Ca (mEq/L)   = Ca_A (mEq) ÷ (effVol_BagA ÷ 1000)
 Ca (mmol/L)  = Ca_A (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)</pre>
-<p>ใช้เกณฑ์ 4 ข้อเดียวกับหัวข้อ 9</p>
+<p>ใช้เกณฑ์ 4 ข้อและคำแนะนำเติม sterile water เดียวกับหัวข้อ 9 (ใช้ Ca_A, PO₄ ÷ 2 และ effVol_BagA) คำเตือนขึ้นเมื่อ V_target &gt; 1,200 mL ต่อถุง</p>
+<p>เมื่อแบ่งถุงแล้ว ส่วนถุงเดียวจะชี้ให้ไปดูคำแนะนำรายถุงแทน</p>
 <ul>
   <li><code>separate</code>: Bag B มี Ca = 0 → ไม่มีความเสี่ยงตกตะกอน</li>
   <li><code>equal</code>: Bag A และ Bag B มีส่วนประกอบเหมือนกัน ตรวจครั้งเดียวครอบคลุมทั้งสองถุง</li>
@@ -285,6 +298,8 @@ Rate (mL/hr)            = V_final ÷ Infusion Duration
 Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final</pre>
 <p>ถุงเดียวใช้ Osmolarity จากหัวข้อ 4 ส่วนกรณีแบ่งถุงใช้ <code>osm_Bag</code> จากหัวข้อ 11</p>
 <p>ฉลากแสดง <strong>Total volume</strong> และ <strong>Osmolarity (mOsm/L)</strong> ใต้ Rate</p>
+<p>ถ้าการตรวจ Ca–PO₄ แนะนำให้เติมน้ำเพิ่ม (หัวข้อ 9) ช่องกรอกจะแสดง hint ค่า V_target แต่ค่าเริ่มต้นยังเป็น V_min</p>
+<p>กรณีแบ่งถุงแสดง hint ที่ Bag A และที่ Bag B เฉพาะโหมด <code>equal</code></p>
 <p>ค่าที่กรอกเองจะถูกล้างทุกครั้งที่กดคำนวณใหม่</p>
 
 <h2 id="manual-outputs">สรุปผลลัพธ์ (Outputs Summary)</h2>
@@ -323,6 +338,8 @@ Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final</pre>
     <tr><td>IVLE hourly &gt; 0.11 g/kg/hr</td><td>Danger</td></tr>
     <tr><td>IVLE daily &gt; 1.5 g/kg/day</td><td>Danger</td></tr>
     <tr><td>ตรวจ Ca–PO₄ ไม่ผ่าน</td><td>Danger — เสี่ยงตกตะกอน</td></tr>
+    <tr><td>ตรวจ Ca–PO₄ ไม่ผ่าน</td><td>Info — แนะนำปริมาณ SWI / ปริมาตรรวม</td></tr>
+    <tr><td>Ca–PO₄ V_target &gt; 1,200 mL</td><td>ข้อความเตือน — ควรพิจารณาแบ่งถุง</td></tr>
     <tr><td>ผ่านทุกข้อ (osmolarity, GIR, IVLE)</td><td>Success</td></tr>
   </tbody>
 </table>

@@ -37,6 +37,7 @@ function getLabelParts(r, method, bagNum) {
       osm: r.osmolarity,
       baseVolume: method === "1" ? r.baseVolume1 : r.baseVolume2,
       minVolume: method === "1" ? r.minVolume1 : r.minVolume2,
+      caPO4Volume: method === "1" ? r.caPO4Volume1 : r.caPO4Volume2,
     };
   }
   const s = r.split;
@@ -54,6 +55,7 @@ function getLabelParts(r, method, bagNum) {
     osm: bagData.osm,
     baseVolume: bagData.baseVolume,
     minVolume: bagData.volume,
+    caPO4Volume: bagData.caPO4Volume,
   };
 }
 
@@ -100,6 +102,7 @@ function renderVolumeInputs() {
             oninput="onCustomVolumeInput('${bagNum || ""}', this)"
             onchange="onCustomVolumeChange('${bagNum || ""}', this)" />
           <small id="customVolHint-${parts.key}" class="helper-text">${volumeHintText(parts, fig, false)}</small>
+          ${parts.caPO4Volume ? `<small class="helper-text warn">แนะนำ: Ca–PO₄ ผ่านเกณฑ์เมื่อปริมาตรรวม ≥ ${parts.caPO4Volume} mL</small>` : ""}
         </div>`;
     })
     .join("");

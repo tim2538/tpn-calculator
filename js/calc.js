@@ -141,6 +141,104 @@ function renderElectrolyteHTML(electrolytes, formulas, allFormulasVisible) {
     .join("");
 }
 
+// ตรวจ Ca–PO₄ 4 ข้อที่ปริมาตร volMl (Ca mEq, PO₄ mmol) และหาปริมาตรรวมขั้นต่ำที่ผ่านข้อ 1, 2, 4
+// ข้อ 3 เป็นอัตราส่วน Ca/PO₄ เติมน้ำแล้วไม่เปลี่ยน
+function checkCaPO4(ca, po4, volMl) {
+  const volL = volMl / 1000;
+  const caMeqL = ca / volL;
+  const caMmolL = (ca * 0.5) / volL;
+  const po4MeqL = (po4 * 2) / volL;
+  const po4MmolL = po4 / volL;
+  const checks = [
+    {
+      label: "Ca (mEq/L) + PO₄ (mEq/L) ≤ 45",
+      detail: `${caMeqL.toFixed(2)} + ${po4MeqL.toFixed(2)} = ${(caMeqL + po4MeqL).toFixed(2)}`,
+      pass: caMeqL + po4MeqL <= 45,
+    },
+    {
+      label: "Ca (mEq/L) ≤ 15 และ PO₄ (mEq/L) ≤ 30",
+      detail: `Ca = ${caMeqL.toFixed(2)}, PO₄ = ${po4MeqL.toFixed(2)}`,
+      pass: caMeqL <= 15 && po4MeqL <= 30,
+    },
+    {
+      label: "Ca (mmol/L) / PO₄ (mmol/L) < 1/2",
+      detail: `${caMmolL.toFixed(2)} / ${po4MmolL.toFixed(2)} = ${po4MmolL > 0 ? (caMmolL / po4MmolL).toFixed(3) : "N/A"}`,
+      pass: po4MmolL > 0 ? caMmolL / po4MmolL < 0.5 : true,
+    },
+    {
+      label: "Ca (mmol/L) × P (mmol/L) ≤ 75",
+      detail: `${caMmolL.toFixed(2)} × ${po4MmolL.toFixed(2)} = ${(caMmolL * po4MmolL).toFixed(2)}`,
+      pass: caMmolL * po4MmolL <= 75,
+    },
+  ];
+  const volumeChecksPass = checks[0].pass && checks[1].pass && checks[3].pass;
+  const reqVolume =
+    Math.max(
+      (ca + po4 * 2) / 45,
+      ca / 15,
+      (po4 * 2) / 30,
+      Math.sqrt((ca * 0.5 * po4) / 75),
+    ) * 1000;
+  return {
+    checks,
+    allPass: checks.every((c) => c.pass),
+    ratioPass: checks[2].pass,
+    // ปัดขึ้นเป็นจำนวนเต็ม mL เพื่อให้กรอกในหน้าพิมพ์ได้ตรงตัว
+    targetVolume: volumeChecksPass ? null : Math.ceil(reqVolume),
+  };
+}
+
+// opts: { title, res, vol, dilutionWater, scope, overLimitText, adviceNote }
+// adviceNote แทนคำแนะนำ SWI (ใช้เมื่อแบ่งถุงแล้ว ให้ดูคำแนะนำรายถุง)
+function renderCaPO4Block(opts) {
+  const { title, res, vol, dilutionWater, scope, overLimitText, adviceNote } = opts;
+  const checksHTML = res.checks
+    .map(
+      (c) => `
+        <div class="compat-check">
+          <span>${c.label}<br><small style="color:var(--text-secondary)">${c.detail}</small></span>
+          <span class="${c.pass ? "compat-pass" : "compat-fail"}">${c.pass ? "✓ ผ่าน" : "✗ ไม่ผ่าน"}</span>
+        </div>`,
+    )
+    .join("");
+  const statusHTML = res.allPass
+    ? `<div class="alert alert-success" style="margin-top:12px;"><i data-lucide="check-circle" style="width:20px;height:20px;"></i><div><strong>ปลอดภัย:</strong> Ca–PO₄ ${scope} ผ่านเกณฑ์ทุกข้อ</div></div>`
+    : `<div class="alert alert-danger" style="margin-top:12px;"><i data-lucide="circle-alert" style="width:20px;height:20px;"></i><div><strong>อันตราย!</strong> Ca–PO₄ ${scope} ไม่ผ่านเกณฑ์ — อาจเกิด Calcium Phosphate Precipitation</div></div>`;
+  let adviceLines = [];
+  if (!res.allPass && adviceNote) {
+    adviceLines = [adviceNote];
+  } else if (!res.allPass) {
+    if (res.targetVolume) {
+      const addWater = res.targetVolume - vol;
+      const passText = res.ratioPass ? "ผ่านครบ 4 ข้อ" : "ผ่านข้อ 1, 2, 4";
+      adviceLines.push(
+        dilutionWater > 0
+          ? `เติม SWI <strong>เพิ่มอีก ${addWater.toFixed(1)} mL</strong> จากน้ำที่เติมเจือจาง Osm แล้ว ${dilutionWater.toFixed(1)} mL (รวมน้ำ ${(dilutionWater + addWater).toFixed(1)} mL) → ปริมาตรรวม <strong>${res.targetVolume} mL</strong> จึง${passText}`
+          : `เติม SWI <strong>${addWater.toFixed(1)} mL</strong> → ปริมาตรรวม <strong>${res.targetVolume} mL</strong> จึง${passText}`,
+        `ปรับได้ที่ช่อง "ปริมาตรรวม" ตอนพิมพ์ใบสั่งยา (ไม่เปลี่ยนผลคำนวณหลัก)`,
+      );
+      if (res.targetVolume > 1200) {
+        adviceLines.push(`<strong>คำเตือน:</strong> ${overLimitText}`);
+      }
+    }
+    if (!res.ratioPass) {
+      adviceLines.push(
+        "ข้อ 3 (Ca/PO₄) ไม่ผ่าน — เติมน้ำไม่ช่วยเพราะเป็นอัตราส่วน ต้องปรับปริมาณ Ca หรือ PO₄",
+      );
+    }
+  }
+  const adviceHTML = adviceLines.length
+    ? `<div class="alert alert-info" style="margin-top:8px;"><i data-lucide="lightbulb" style="width:20px;height:20px;"></i><div><strong>คำแนะนำ:</strong> ${adviceLines.join("<br>")}</div></div>`
+    : "";
+  return `
+    <div style="margin-top:12px;">
+      <h4 style="margin:0 0 6px;">${title} — ${vol.toFixed(1)} mL${dilutionWater > 0 ? ` (รวมน้ำเจือจาง Osm ${dilutionWater.toFixed(1)} mL)` : ""}</h4>
+      ${checksHTML}
+      ${statusHTML}
+      ${adviceHTML}
+    </div>`;
+}
+
 function computeClMax() {
   const na = parseFloat(document.getElementById("na").value) || 0;
   const k = parseFloat(document.getElementById("k").value) || 0;

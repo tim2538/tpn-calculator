@@ -227,13 +227,15 @@ Safety limits:
 
 ### 9. Calcium–Phosphate Compatibility
 
-All four checks are evaluated using concentrations per litre of Total Volume I.
+All four checks are evaluated per method, using concentrations per litre of the Effective Volume
+(V₂ when peripheral dilution applies, otherwise Total Volume; central line is never diluted).
 
 ```
-Ca (mEq/L)   = Ca (mEq) ÷ (Total Volume I ÷ 1000)
-Ca (mmol/L)  = Ca (mEq) × 0.5 ÷ (Total Volume I ÷ 1000)
-PO₄ (mEq/L)  = PO₄ (mmol) × 2 ÷ (Total Volume I ÷ 1000)
-PO₄ (mmol/L) = PO₄ (mmol) ÷ (Total Volume I ÷ 1000)
+V_eff        = Effective Volume I (Method 1)  or  Effective Volume II (Method 2)
+Ca (mEq/L)   = Ca (mEq) ÷ (V_eff ÷ 1000)
+Ca (mmol/L)  = Ca (mEq) × 0.5 ÷ (V_eff ÷ 1000)
+PO₄ (mEq/L)  = PO₄ (mmol) × 2 ÷ (V_eff ÷ 1000)
+PO₄ (mmol/L) = PO₄ (mmol) ÷ (V_eff ÷ 1000)
 ```
 
 | Check | Criterion                            | Failure risk  |
@@ -244,6 +246,22 @@ PO₄ (mmol/L) = PO₄ (mmol) ÷ (Total Volume I ÷ 1000)
 | 4     | Ca (mmol/L) × PO₄ (mmol/L) ≤ 75      | Precipitation |
 
 Any failed check triggers a danger alert.
+
+#### Sterile water recommendation
+
+When a check fails, the minimum total volume that passes checks 1, 2 and 4 is shown as a recommendation.
+Check 3 is a ratio, so adding water does not change it; if it fails, Ca or PO₄ must be adjusted instead.
+
+```
+V_req (mL)    = max( (Ca + PO₄ × 2) ÷ 45,              ← check 1
+                     Ca ÷ 15,  PO₄ × 2 ÷ 30,           ← check 2
+                     √(Ca × 0.5 × PO₄ ÷ 75) ) × 1000   ← check 4
+V_target (mL) = ceil(V_req)                            (only when check 1, 2 or 4 fails)
+SWI add (mL)  = V_target − V_eff                       (on top of the dilution water, if any)
+```
+
+It is advisory only: the main results are unchanged, and the water is added via the custom bag volume in the print modal (Section 12).
+If V_target > 1,200 mL, a warning suggests splitting into 2 bags.
 
 ---
 
@@ -333,16 +351,18 @@ Else:
 
 #### Ca–PO₄ compatibility check
 
-Checked against Bag A's effective volume (Method 1), using Ca_A and halved PO₄.
+Checked against Bag A's effective volume for each method, using Ca_A and halved PO₄.
 
 ```
+effVol_BagA  = effVol of Bag A, Method 1  or  Method 2
 Ca (mEq/L)   = Ca_A (mEq) ÷ (effVol_BagA ÷ 1000)
 Ca (mmol/L)  = Ca_A (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)
 ```
 
-The same four criteria from Section 9 apply.
+The same four criteria and sterile water recommendation from Section 9 apply (with Ca_A, PO₄ ÷ 2 and effVol_BagA); the warning is shown when V_target > 1,200 mL per bag.
+When the bags are split, the single-bag section refers to the per-bag recommendation instead.
 
 - `separate`: Bag B has Ca = 0 → no precipitation risk.
 - `equal`: Bag A and Bag B have identical composition, so one check covers both bags.
@@ -367,6 +387,8 @@ Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final
 
 Single bag uses Osmolarity from Section 4; split bags use `osm_Bag` from Section 11.
 The label shows **Total volume** and **Osmolarity (mOsm/L)** under the Rate.
+When the Ca–PO₄ check recommends more water (Section 9), the input shows a hint with V_target; the default stays V_min.
+In split mode the hint is shown for Bag A, and for Bag B only in `equal` mode.
 Custom values reset whenever the calculation is re-run.
 
 ---
@@ -404,6 +426,8 @@ Custom values reset whenever the calculation is re-run.
 | IVLE hourly > 0.11 g/kg/hr         | Danger                                 |
 | IVLE daily > 1.5 g/kg/day          | Danger                                 |
 | Ca–PO₄ check fails                 | Danger — precipitation risk            |
+| Ca–PO₄ check fails                 | Info — recommended SWI / total volume  |
+| Ca–PO₄ V_target > 1,200 mL         | Warning text — consider splitting      |
 | All checks pass (osmolarity, GIR, IVLE) | Success                           |
 
 Mixing order reminder is always shown: **Dextrose + AA → Phosphate → Electrolyte → Calcium** to prevent calcium phosphate precipitation.
