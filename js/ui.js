@@ -978,7 +978,14 @@ function calculate(opts = {}) {
             <div class="formula-label">สูตร Osmolarity ต่อถุง:</div>
             <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
             <div class="formula-calculation">(${pSol.toFixed(1)} × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (${dextrose / 2} × 5) + ${bagNaCalc} + (${k2} × 2) + (${mgX} × 1) + (${caX} × 1.4) = ${osm.toFixed(0)} mOsm</div>
+            ${needsDil ? `<div class="formula-label">ก่อนเจือจาง:</div>` : ""}
             <div class="formula-calculation">${osm.toFixed(0)} × 1000 ÷ ${vol.toFixed(1)} = ${initialOsm.toFixed(0)} mOsm/L</div>
+            ${
+              needsDil
+                ? `<div class="formula-label">หลังเจือจาง:</div>
+            <div class="formula-calculation">${osm.toFixed(0)} × 1000 ÷ ${effVol.toFixed(1)} = ${((osm * 1000) / effVol).toFixed(0)} mOsm/L</div>`
+                : ""
+            }
           </div>
         `;
       };
