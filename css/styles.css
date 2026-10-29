@@ -113,23 +113,19 @@ body {
     background-color 0.3s ease,
     color 0.3s ease;
 }
+/* container ไม่เป็นการ์ด ให้ .section เป็นกรอบชั้นแรก (กรอบซ้อนไม่เกิน 2 ชั้น) */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px var(--shadow);
-  overflow: hidden;
-  transition: background-color 0.3s ease;
 }
 .header {
   background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   padding: 30px 30px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  transition: background-color 0.3s ease;
 }
 .header-content h1 {
   font-size: 2.2em;
@@ -168,12 +164,13 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  padding: 30px;
+  /* ซ้าย-ขวาชิดขอบเดียวกับ .header ใช้ระยะขอบจาก body แทน */
+  padding: 30px 0;
 }
 .section {
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   padding: 24px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   transition: background-color 0.3s ease;
 }
@@ -189,6 +186,11 @@ body {
 .section h2 svg {
   width: 24px;
   height: 24px;
+}
+.title-note {
+  font-size: 0.55em;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 .form-group {
   margin-bottom: 16px;
@@ -249,10 +251,12 @@ input:read-only {
   border-color: #ef4444 !important;
   animation: shake 0.3s ease;
 }
+/* ระยะแนวตั้งใช้ margin-bottom ของ .form-group อย่างเดียว */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 0;
 }
 .fixed-bottom-btn {
   position: fixed;
@@ -763,13 +767,15 @@ input:read-only {
 .alert strong {
   font-weight: 600;
 }
+/* หัวข้อย่อยใน section ใช้เส้นคั่นแทนกรอบ */
 .electrolyte-results {
-  background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: 6px;
-  margin-top: 16px;
-  border: 1px solid var(--border-color);
-  transition: background-color 0.3s ease;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+.split-method-label + .electrolyte-results {
+  padding-top: 0;
+  border-top: none;
 }
 .electrolyte-results h3 {
   color: var(--text-primary);
@@ -787,7 +793,7 @@ input:read-only {
 .comparison-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
   margin-top: 16px;
   align-items: start;
 }
@@ -807,6 +813,9 @@ input:read-only {
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--accent-color);
+}
+.macro-solutions {
+  margin-top: 16px;
 }
 .comparison-section > div:first-of-type {
   flex-grow: 1;
@@ -870,11 +879,10 @@ input:read-only {
   border-radius: 3px;
   display: inline-block;
 }
+/* แถวรวมใช้เส้นบนแทนกล่อง */
 .summary-box {
-  background: var(--bg-secondary);
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  padding-top: 10px;
+  border-top: 2px solid var(--border-color);
   margin-top: auto;
 }
 .summary-item {
@@ -893,12 +901,12 @@ input:read-only {
 .summary-main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
   margin-top: 16px;
 }
 .summary-card {
   background: var(--bg-tertiary);
-  padding: 20px;
+  padding: 16px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   transition: background-color 0.3s ease;
@@ -931,10 +939,8 @@ input:read-only {
   font-weight: 600;
 }
 .summary-total-box {
-  background: var(--bg-secondary);
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  padding-top: 10px;
+  border-top: 2px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -953,10 +959,8 @@ input:read-only {
   grid-column: 1 / -1;
 }
 .summary-total-box-multi {
-  background: var(--bg-secondary);
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  padding-top: 10px;
+  border-top: 2px solid var(--border-color);
 }
 .summary-total-box-multi .summary-multi-row {
   display: flex;
@@ -1037,9 +1041,6 @@ select:focus-visible {
   flex: 1;
   height: 1px;
   background: var(--border-color);
-}
-#ppnSplitSection .comparison-section {
-  background: var(--bg-secondary);
 }
 .subsection-label {
   font-size: 0.85em;
@@ -1239,7 +1240,7 @@ select:focus-visible {
   }
   .content {
     grid-template-columns: 1fr;
-    padding: 20px;
+    padding: 20px 0;
   }
   .header {
     padding: 20px 12px;
@@ -1250,10 +1251,6 @@ select:focus-visible {
   }
   .header-content h1 {
     font-size: 1.8em;
-  }
-  .grid-2 {
-    grid-template-columns: 1fr;
-    gap: 0;
   }
   .comparison-grid {
     grid-template-columns: 1fr;
@@ -1314,15 +1311,21 @@ select:focus-visible {
 @media (max-width: 600px) {
   body {
     padding: 0;
-    padding-bottom: 77px;
+    /* = ความสูงแถบปุ่มล่าง (ปุ่ม 52 + padding 8×2 + border 1) */
+    padding-bottom: 69px;
   }
-  .container {
-    border-radius: 0;
-    box-shadow: none;
+  .fixed-bottom-btn {
+    padding: 8px 12px;
   }
+  /* mobile ไม่มีระยะขอบ body ให้ header เต็มความกว้าง */
   .header {
     padding: 12px;
     gap: 12px;
+    border-width: 0 0 1px;
+    border-radius: 0;
+  }
+  .header-content h1 {
+    font-size: 1.5em;
   }
   .content {
     padding: 12px;
@@ -1330,6 +1333,34 @@ select:focus-visible {
   }
   .section {
     padding: 12px;
+  }
+  .comparison-section,
+  .summary-card {
+    padding: 12px;
+  }
+  .comparison-grid,
+  .summary-main-grid {
+    gap: 12px;
+  }
+  .result-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: dense;
+    gap: 8px;
+  }
+  /* แสดงสูตรแล้วกลับเป็นคอลัมน์เดียว ไม่ให้สูตรแคบลง */
+  .result-grid:has(.formula-details.show) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* การ์ดที่แสดง 2 ค่า (วิธีที่ 1 / วิธีที่ 2) กินเต็มแถว */
+  #dilutionCard,
+  #extraWaterCard {
+    grid-column: 1 / -1;
+  }
+  .result-card {
+    padding: 12px;
+  }
+  .result-card .value {
+    font-size: 1.8em;
   }
   .print-modal {
     padding: 16px;

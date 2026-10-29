@@ -896,8 +896,8 @@ function calculate(opts = {}) {
           }</div>
         </div>`;
       document.getElementById("ppnSplitTitle").innerHTML = isPeripheral
-        ? "แบ่งถุง PPN (ปริมาตร &gt; 1,200 mL)"
-        : "แบ่งถุง TPN (Central, ปริมาตร &gt; 1,200 mL)";
+        ? `แบ่งถุง PPN <span class="title-note">(ปริมาตร &gt; 1,200 mL)</span>`
+        : `แบ่งถุง TPN <span class="title-note">(Central, ปริมาตร &gt; 1,200 mL)</span>`;
       const titleA = isEqualSplit ? "ถุงที่ 1 (½Ca + ½Mg)" : "ถุงที่ 1 (มี Ca + Mg)";
       const titleB = isEqualSplit ? "ถุงที่ 2 (½Ca + ½Mg)" : "ถุงที่ 2 (ไม่มี Ca + Mg)";
       document.getElementById("splitBagA1Title").textContent = titleA;
