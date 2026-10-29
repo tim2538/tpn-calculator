@@ -46,8 +46,6 @@ function syncThemeIcons(theme) {
   const isDark = theme === "dark";
   document.getElementById("theme-icon-sun").style.display = isDark ? "none" : "block";
   document.getElementById("theme-icon-moon").style.display = isDark ? "block" : "none";
-  document.getElementById("sticky-theme-icon-sun").style.display = isDark ? "none" : "block";
-  document.getElementById("sticky-theme-icon-moon").style.display = isDark ? "block" : "none";
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -224,6 +222,7 @@ function toggleAllFormulas() {
   });
   text.textContent = allFormulasVisible ? "ซ่อนสูตร" : "แสดงสูตร";
   document.getElementById("stickyFormulaBtn").title = text.textContent;
+  document.getElementById("formulaToggleBtn").title = text.textContent;
   document.body.classList.toggle("formulas-visible", allFormulasVisible);
 }
 
@@ -248,7 +247,7 @@ function resetForm() {
   document.getElementById("mg").value = "";
   document.getElementById("po4").value = "";
   document.getElementById("resultsSection").classList.add("hidden");
-  document.getElementById("stickyFormulaBtn").classList.add("hidden");
+  document.getElementById("stickyFormulaBtn").disabled = true;
   document.getElementById("acetateMode").value = "yes";
   onAcetateModeChange();
   document.getElementById("clAuto").value = "";
@@ -737,7 +736,7 @@ function calculate(opts = {}) {
     // แบ่งถุงแล้วแสดง Ca–PO₄ รายถุงในส่วนแบ่งถุงที่เดียว เพื่อไม่ให้สับสน
     document.getElementById("caPO4Section").classList.toggle("hidden", needsSplit);
     document.getElementById("resultsSection").classList.remove("hidden");
-    document.getElementById("stickyFormulaBtn").classList.remove("hidden");
+    document.getElementById("stickyFormulaBtn").disabled = false;
     if (opts.scroll !== false) {
       document
         .getElementById("resultsSection")

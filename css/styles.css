@@ -31,11 +31,19 @@
   font-size: 1.15em;
   font-weight: 700;
   color: var(--text-primary);
+  min-width: 0;
 }
 .sticky-header-left svg {
   width: 22px;
   height: 22px;
   margin-left: 8px;
+  flex-shrink: 0;
+}
+/* ชื่อไม่ตัดบรรทัด ถ้าพื้นที่ไม่พอจริงๆ ให้ขึ้น ... แทน */
+.sticky-header-left span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sticky-header-right {
   display: flex;
@@ -1117,9 +1125,13 @@ select:focus-visible {
   width: 24px;
   height: 24px;
 }
-/* .scan-qr-btn ประกาศทีหลัง .hidden จึงต้องระบุซ้ำ */
-.scan-qr-btn.hidden {
-  display: none;
+/* ปุ่มสูตรใน sticky กดไม่ได้จนกว่าจะมีผลคำนวณ */
+.scan-qr-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.scan-qr-btn:disabled:hover {
+  background: var(--reset-bg);
 }
 /* ปุ่มสูตรสลับ icon f / f ขีดฆ่า ตามสถานะที่ body */
 .formula-icon-hide,
@@ -1306,6 +1318,17 @@ select:focus-visible {
     width: 24px;
     height: 24px;
   }
+  /* เหลือแต่ icon ขนาดเท่าปุ่มดาวน์โหลดคู่มือ ใช้ title บอกการกระทำ */
+  .formula-toggle-main {
+    justify-content: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+  .formula-toggle-main #toggleAllText {
+    display: none;
+  }
   /* ให้เท่าปุ่มกากบาทข้างๆ */
   .manual-download-btn {
     min-width: 36px !important;
@@ -1337,14 +1360,47 @@ select:focus-visible {
     padding: 8px 12px;
   }
   /* mobile ไม่มีระยะขอบ body ให้ header เต็มความกว้าง */
+  /* คำอธิบายใช้ความกว้างเต็มแถว ไม่ถูกปุ่มขวาบีบ */
   .header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "title actions"
+      "desc desc";
+    align-items: center;
     padding: 12px;
-    gap: 12px;
+    gap: 4px 12px;
     border-width: 0 0 1px;
     border-radius: 0;
   }
+  .header-content {
+    display: contents;
+  }
   .header-content h1 {
+    grid-area: title;
     font-size: 1.5em;
+    margin-bottom: 0;
+  }
+  .header-content p {
+    grid-area: desc;
+    font-size: 0.95em;
+  }
+  .header-actions {
+    grid-area: actions;
+  }
+  .sticky-header-left {
+    gap: 8px;
+    font-size: 1.05em;
+  }
+  /* sticky มี padding 12 อยู่แล้ว ไม่ต้องเว้นซ้ายเพิ่ม */
+  .sticky-header-left svg {
+    margin-left: 0;
+  }
+  .sticky-header-right {
+    gap: 6px;
+  }
+  .sticky-header .scan-qr-btn {
+    padding: 8px;
   }
   .content {
     padding: 12px;
