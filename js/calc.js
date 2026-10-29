@@ -229,9 +229,9 @@ function renderCaPO4Block(opts) {
     ? `<div class="alert alert-info" style="margin-top:8px;"><i data-lucide="lightbulb" style="width:20px;height:20px;"></i><div><strong>คำแนะนำ:</strong> ${adviceLines.join("<br>")}</div></div>`
     : "";
   return `
-    <div style="margin-top:12px;">
-      <h4 style="margin:0 0 6px;">${title} — ${dilutionWater > 0 ? `V₂ = ${vol.toFixed(1)} mL (รวมน้ำเจือจาง Osm ${dilutionWater.toFixed(1)} mL)` : `${vol.toFixed(1)} mL`}</h4>
-      ${checksHTML}
+    <div class="comparison-section compat-card">
+      <h4>${title} — ${dilutionWater > 0 ? `V₂ = ${vol.toFixed(1)} mL (รวมน้ำเจือจาง Osm ${dilutionWater.toFixed(1)} mL)` : `${vol.toFixed(1)} mL`}</h4>
+      <div>${checksHTML}</div>
       ${statusHTML}
       ${adviceHTML}
     </div>`;
