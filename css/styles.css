@@ -1117,6 +1117,22 @@ select:focus-visible {
   width: 24px;
   height: 24px;
 }
+/* .scan-qr-btn ประกาศทีหลัง .hidden จึงต้องระบุซ้ำ */
+.scan-qr-btn.hidden {
+  display: none;
+}
+/* ปุ่มสูตรสลับ icon f / f ขีดฆ่า ตามสถานะที่ body */
+.formula-icon-hide,
+.formulas-visible .formula-icon-show {
+  display: none;
+}
+.formulas-visible .formula-icon-hide {
+  display: block;
+}
+/* ให้ปลายขีดฆ่าเลยขอบ viewBox ได้ */
+.formula-icon-hide {
+  overflow: visible;
+}
 
 .qr-scanner-overlay {
   display: none;

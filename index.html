@@ -24,6 +24,20 @@
         </div>
         <div class="sticky-header-right">
           <button
+            class="scan-qr-btn hidden"
+            id="stickyFormulaBtn"
+            onclick="toggleAllFormulas()"
+            title="แสดงสูตร"
+          >
+            <i data-lucide="square-function" class="formula-icon-show"></i>
+            <svg class="formula-icon-hide" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+              <path d="M9 17c2 0 2.8-1 2.8-2.8V10c0-2 1-3.3 3.2-3" />
+              <path d="M9 11.2h5.7" />
+              <path d="M0 0 24 24" stroke-width="2.5" />
+            </svg>
+          </button>
+          <button
             class="scan-qr-btn"
             onclick="openManual()"
             title="คู่มือสูตรคำนวณ"
@@ -416,8 +430,15 @@
             <button class="formula-toggle-main" onclick="toggleAllFormulas()">
               <i
                 data-lucide="square-function"
+                class="formula-icon-show"
                 style="width: 18px; height: 18px"
               ></i>
+              <svg class="formula-icon-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                <path d="M9 17c2 0 2.8-1 2.8-2.8V10c0-2 1-3.3 3.2-3" />
+                <path d="M9 11.2h5.7" />
+                <path d="M0 0 24 24" stroke-width="2.5" />
+              </svg>
               <span id="toggleAllText">แสดงสูตร</span>
             </button>
           </div>

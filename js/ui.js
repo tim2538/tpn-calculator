@@ -223,6 +223,8 @@ function toggleAllFormulas() {
     }
   });
   text.textContent = allFormulasVisible ? "ซ่อนสูตร" : "แสดงสูตร";
+  document.getElementById("stickyFormulaBtn").title = text.textContent;
+  document.body.classList.toggle("formulas-visible", allFormulasVisible);
 }
 
 function resetForm() {
@@ -246,6 +248,7 @@ function resetForm() {
   document.getElementById("mg").value = "";
   document.getElementById("po4").value = "";
   document.getElementById("resultsSection").classList.add("hidden");
+  document.getElementById("stickyFormulaBtn").classList.add("hidden");
   document.getElementById("acetateMode").value = "yes";
   onAcetateModeChange();
   document.getElementById("clAuto").value = "";
@@ -451,11 +454,11 @@ function calculate(opts = {}) {
     document.getElementById("formula-ivleRateHr").innerHTML = `
       <div class="formula-label">สูตร:</div>
       <div class="formula-calculation">Lipid ÷ Weight ÷ IVLE Hours</div>
-      <div class="formula-calculation">${
+      ${
         ivleHours > 0
-          ? `${lipid} ÷ ${weight} ÷ ${ivleHours} = ${ivleRateHr.toFixed(3)} g/kg/hr`
-          : "ไม่ได้ระบุ IVLE Hours → 0"
-      }</div>
+          ? `<div class="formula-calculation">${lipid} ÷ ${weight} ÷ ${ivleHours} = ${ivleRateHr.toFixed(3)} g/kg/hr</div>`
+          : `<div>ไม่ได้ระบุ IVLE Hours → 0</div>`
+      }
     `;
     document.getElementById("formula-ivleRateDay").innerHTML = `
       <div class="formula-label">สูตร:</div>
@@ -734,6 +737,7 @@ function calculate(opts = {}) {
     // แบ่งถุงแล้วแสดง Ca–PO₄ รายถุงในส่วนแบ่งถุงที่เดียว เพื่อไม่ให้สับสน
     document.getElementById("caPO4Section").classList.toggle("hidden", needsSplit);
     document.getElementById("resultsSection").classList.remove("hidden");
+    document.getElementById("stickyFormulaBtn").classList.remove("hidden");
     if (opts.scroll !== false) {
       document
         .getElementById("resultsSection")
