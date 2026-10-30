@@ -1,5 +1,7 @@
 # TPN Calculator — Calculation Summary
 
+**Formula version:** 2026-10-28 19:46
+
 ## Inputs
 
 | Category       | Field              | Unit                 | Notes                                   |

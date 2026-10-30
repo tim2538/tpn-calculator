@@ -1,5 +1,10 @@
 // คู่มือสูตรคำนวณ: แปลจาก readme.md (สูตรใน <pre> ต้องตรงกับ readme ทุกตัวอักษร)
 // แก้ readme.md เมื่อไร ต้องแก้ไฟล์นี้ตามด้วย
+// วันเวลาที่สูตรเปลี่ยนล่าสุด (เวลาเครื่อง dev) แก้เฉพาะเมื่อผลคำนวณ เงื่อนไข ค่าคงที่ alert หรือคำแนะนำเปลี่ยน
+// ต้องตรงกับ "Formula version" ใน readme.md
+const FORMULA_VERSION = "2026-10-28 19:46";
+const FORMULA_VERSION_TEXT = `เวอร์ชันสูตร ${FORMULA_VERSION}`;
+
 const MANUAL_TOC = [
   ["manual-inputs", "ข้อมูลนำเข้า (Inputs)"],
   ["manual-s1", "1. Macronutrient Solution Volumes"],
@@ -352,6 +357,7 @@ function openManual() {
   const body = document.getElementById("manualBody");
   if (!body.innerHTML) {
     body.innerHTML = MANUAL_HTML;
+    document.getElementById("manualVersion").textContent = FORMULA_VERSION_TEXT;
     body.addEventListener("scroll", () => {
       document
         .getElementById("manualTopBtn")
@@ -381,6 +387,7 @@ function scrollManualTo(id) {
 const MANUAL_EXPORT_CSS = `
 body { font-family: "Sarabun", "Tahoma", sans-serif; color: #37352f; background: #fff; line-height: 1.7; max-width: 820px; margin: 0 auto; padding: 24px 16px; }
 h1 { font-size: 1.5em; margin: 0 0 16px; }
+.manual-version { color: #787774; font-size: 0.9em; margin: -12px 0 16px; }
 h2 { font-size: 1.25em; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #e9e9e7; }
 h3 { font-size: 1.1em; margin: 24px 0 8px; }
 h4 { font-size: 1em; color: #787774; margin: 16px 0 6px; }
@@ -413,6 +420,7 @@ function downloadManual() {
 </head>
 <body>
 <h1>คู่มือสูตรคำนวณ TPN</h1>
+<div class="manual-version">${FORMULA_VERSION_TEXT}</div>
 ${content}
 </body>
 </html>

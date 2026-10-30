@@ -9,9 +9,9 @@
     <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)" />
     <title>TPN Calculator - เครื่องคำนวณโภชนบำบัดทางหลอดเลือด</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+    <script src="js/vendor/lucide-1.65.0.min.js"></script>
+    <script src="js/vendor/qrcode-1.5.1.min.js"></script>
+    <script src="js/vendor/jsQR-1.4.0.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
@@ -847,7 +847,10 @@
     >
       <div class="print-modal manual-modal">
         <div class="qr-scanner-header">
-          <h3>คู่มือสูตรคำนวณ</h3>
+          <div>
+            <h3>คู่มือสูตรคำนวณ</h3>
+            <div class="manual-version" id="manualVersion"></div>
+          </div>
           <div class="header-actions">
             <button
               class="btn btn-reset manual-download-btn"
@@ -882,6 +885,13 @@
     <script src="js/ui.js"></script>
     <script src="js/export.js"></script>
     <script src="js/manual.js"></script>
+    <script>
+      if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js").catch(console.error);
+        });
+      }
+    </script>
     <script>
       lucide.createIcons();
     </script>
