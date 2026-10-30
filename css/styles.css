@@ -261,6 +261,10 @@ select {
   appearance: none;
   font-family: "Sarabun", sans-serif;
 }
+input:not([type="checkbox"]),
+select {
+  min-height: 44px;
+}
 select {
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2337352f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -380,7 +384,7 @@ input:read-only {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: flex-end;
 }
 .btn {
@@ -542,7 +546,7 @@ input:read-only {
 }
 .print-modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: flex-end;
 }
 .header-actions {
@@ -717,6 +721,10 @@ input:read-only {
 }
 .formula-toggle-main:hover {
   background: var(--reset-hover);
+}
+.formula-toggle-main svg {
+  width: 18px;
+  height: 18px;
 }
 .result-grid {
   display: grid;
@@ -1289,7 +1297,7 @@ select:focus-visible {
   border-radius: 6px;
   cursor: pointer;
   color: var(--text-primary);
-  padding: 6px;
+  padding: 10px;
   display: flex;
   align-items: center;
   transition: background 0.15s ease;
@@ -1398,12 +1406,13 @@ select:focus-visible {
   .btn {
     flex: 1;
     min-width: auto;
+    padding: 14px 16px;
   }
   .btn-reset {
-    min-width: 48px !important;
-    width: 48px;
+    min-width: 52px !important;
+    width: 52px;
     padding: 10px;
-    flex: 0 0 48px;
+    flex: 0 0 52px;
   }
   .btn-reset .btn-text {
     display: none;
@@ -1420,21 +1429,25 @@ select:focus-visible {
   /* เหลือแต่ icon ขนาดเท่าปุ่มดาวน์โหลดคู่มือ ใช้ title บอกการกระทำ */
   .formula-toggle-main {
     justify-content: center;
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
     padding: 0;
+  }
+  .formula-toggle-main svg {
+    width: 24px;
+    height: 24px;
   }
   .formula-toggle-main #toggleAllText {
     display: none;
   }
   /* ให้เท่าปุ่มกากบาทข้างๆ */
   .manual-download-btn {
-    min-width: 36px !important;
-    width: 36px;
-    height: 36px;
-    padding: 6px;
-    flex: 0 0 36px;
+    min-width: 44px !important;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    flex: 0 0 44px;
   }
   .rate-hero .rate-value {
     font-size: 2.5em;

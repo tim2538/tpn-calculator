@@ -259,8 +259,11 @@ function toggleAllFormulas() {
     }
   });
   text.textContent = allFormulasVisible ? "ซ่อนสูตร" : "แสดงสูตร";
-  document.getElementById("stickyFormulaBtn").title = text.textContent;
-  document.getElementById("formulaToggleBtn").title = text.textContent;
+  ["stickyFormulaBtn", "formulaToggleBtn"].forEach((id) => {
+    const btn = document.getElementById(id);
+    btn.title = text.textContent;
+    btn.setAttribute("aria-label", text.textContent);
+  });
   document.body.classList.toggle("formulas-visible", allFormulasVisible);
 }
 
