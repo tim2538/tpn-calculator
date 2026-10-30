@@ -228,6 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     input.addEventListener("focus", function () {
       setTimeout(() => {
+        // กด Go ไปแล้ว (blur): ไม่ดึงจอกลับมาที่ช่องนี้
+        if (document.activeElement !== this) return;
         // เมนูเปิดอยู่: หน้าถูกล็อก scroll ไม่เลื่อนให้เมนูขยับ
         if (isSelectPickerOpen(this)) return;
         this.scrollIntoView({
@@ -354,6 +356,28 @@ function onAcetateModeChange() {
     clInput.classList.add("required-field");
   }
   updateClHint();
+}
+
+// ให้หัวข้อผลคำนวณอยู่ใต้ sticky header (ความสูงต่างกันตามขนาดจอ จึงวัดจริง)
+function scrollResultsToTop() {
+  const section = document.getElementById("resultsSection");
+  const headerHeight = document.getElementById("stickyHeader").offsetHeight;
+  const top = section.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+  window.scrollTo({ top, behavior: "smooth" });
+}
+
+function scrollToResults() {
+  scrollResultsToTop();
+  // keyboard มือถือกำลังปิด: viewport เปลี่ยนแล้วการเลื่อนอาจหยุดกลางทาง จึงเลื่อนซ้ำเมื่อนิ่ง
+  const viewport = window.visualViewport;
+  if (!viewport) return;
+  let timer;
+  const onResize = () => {
+    clearTimeout(timer);
+    timer = setTimeout(scrollResultsToTop, 150);
+  };
+  viewport.addEventListener("resize", onResize);
+  setTimeout(() => viewport.removeEventListener("resize", onResize), 1000);
 }
 
 function calculate(opts = {}) {
@@ -774,9 +798,7 @@ function calculate(opts = {}) {
     document.getElementById("resultsSection").classList.remove("hidden");
     document.getElementById("stickyFormulaBtn").disabled = false;
     if (opts.scroll !== false) {
-      document
-        .getElementById("resultsSection")
-        .scrollIntoView({ behavior: "smooth", block: "nearest" });
+      scrollToResults();
     }
 
     // --- PPN Split Bags ---
