@@ -11,6 +11,18 @@ function syncSplitModeButtons() {
     .classList.toggle("active", splitMode === "equal");
 }
 
+// scrollbar ที่กินพื้นที่ (Windows) ใช้สไตล์บางแบบ macOS ส่วน scrollbar แบบ overlay (macOS, มือถือ) คงของระบบไว้
+function detectClassicScrollbar() {
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position: absolute; top: -9999px; width: 100px; height: 100px; overflow: scroll;";
+  document.body.appendChild(probe);
+  const classic = probe.offsetWidth - probe.clientWidth > 0;
+  probe.remove();
+  document.documentElement.classList.toggle("classic-scrollbar", classic);
+}
+detectClassicScrollbar();
+
 function setSplitMode(mode) {
   splitMode = mode;
   syncSplitModeButtons();
@@ -161,12 +173,34 @@ function handleCalculate() {
   calculate();
 }
 
+// เปิดเมนู dropdown สำเร็จหรือไม่ (เบราว์เซอร์ที่ไม่มี showPicker คืน false)
+function openSelectPicker(select) {
+  if (typeof select.showPicker !== "function") return false;
+  try {
+    select.showPicker();
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function isSelectPickerOpen(select) {
+  try {
+    return select.matches(":open");
+  } catch (err) {
+    return false;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const inputs = document.querySelectorAll("input:not([readonly]), select");
   inputs.forEach((input) => {
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
+        // เมนู base-select เปิดอยู่ (keydown จาก option bubble มาที่ select): ให้เบราว์เซอร์เลือกค่าและปิดเมนูเอง
+        if (e.target !== this || isSelectPickerOpen(this)) return;
         e.preventDefault();
+        if (this.tagName === "SELECT" && openSelectPicker(this)) return;
         const enterkeyhint = this.getAttribute("enterkeyhint");
         if (enterkeyhint === "done") {
           this.blur();
@@ -194,6 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     input.addEventListener("focus", function () {
       setTimeout(() => {
+        // เมนูเปิดอยู่: หน้าถูกล็อก scroll ไม่เลื่อนให้เมนูขยับ
+        if (isSelectPickerOpen(this)) return;
         this.scrollIntoView({
           behavior: "smooth",
           block: "center",

@@ -53,6 +53,8 @@
 :root {
   /* ให้ scrollbar และ native control ของเบราว์เซอร์ตาม theme */
   color-scheme: light;
+  /* เว้นที่ scrollbar ไว้ตลอด ล็อก scroll ตอนเปิด dropdown แล้วหน้าไม่ขยับ (Windows) */
+  scrollbar-gutter: stable;
   --bg-primary: #f7f6f3;
   --bg-secondary: white;
   --bg-tertiary: #fafaf9;
@@ -74,6 +76,8 @@
   --summary-bg: #f7f6f3;
   --shadow: rgba(0, 0, 0, 0.06);
   --shadow-lg: rgba(0, 0, 0, 0.1);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.25);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.45);
 }
 [data-theme="dark"] {
   color-scheme: dark;
@@ -98,6 +102,40 @@
   --summary-bg: #1a1a1a;
   --shadow: rgba(0, 0, 0, 0.4);
   --shadow-lg: rgba(0, 0, 0, 0.6);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.25);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.45);
+}
+/* scrollbar บาง มุมมน แบบ macOS เฉพาะเครื่องที่ scrollbar กินพื้นที่ (class จาก detectClassicScrollbar) */
+.classic-scrollbar::-webkit-scrollbar,
+.classic-scrollbar ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.classic-scrollbar::-webkit-scrollbar-track,
+.classic-scrollbar ::-webkit-scrollbar-track,
+.classic-scrollbar::-webkit-scrollbar-corner,
+.classic-scrollbar ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+/* กรอบใสดัน thumb ให้ห่างขอบ เหมือน scrollbar ของ macOS */
+.classic-scrollbar::-webkit-scrollbar-thumb,
+.classic-scrollbar ::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: 6px;
+}
+.classic-scrollbar::-webkit-scrollbar-thumb:hover,
+.classic-scrollbar ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+/* Firefox ไม่มี ::-webkit-scrollbar (Chrome ถ้าตั้ง scrollbar-color จะไม่ใช้ ::-webkit-scrollbar จึงแยกไว้) */
+@supports not selector(::-webkit-scrollbar) {
+  .classic-scrollbar,
+  .classic-scrollbar * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
 }
 * {
   margin: 0;
@@ -243,26 +281,46 @@ select {
     display: none; /* ใช้ลูกศรจาก background-image เดิม */
   }
   ::picker(select) {
-    margin-top: 4px;
+    /* margin ล่างเผื่อแถบปุ่มล่าง (สูงสุด 85px บน desktop) ถ้าใต้กล่องไม่พอจะเปิดขึ้นแทน ไม่ไปทับแถบ */
+    margin: 4px 0 90px;
+    /* ไม่ให้เมนูหดจนพอดีที่ว่าง ถ้าหดได้จะถือว่าพอเสมอและไม่เปิดขึ้น */
+    max-block-size: none;
     padding: 4px;
     border: 1px solid var(--input-border);
     border-radius: 4px;
     background: var(--bg-secondary);
     color: var(--text-primary);
     box-shadow: 0 4px 12px var(--shadow-lg);
+    /* ค่าเริ่มต้น most-block-size เลือกฝั่งที่ที่ว่างมากกว่า กล่องครึ่งล่างจอจึงเปิดขึ้นเสมอ ให้เปิดลงก่อน ไม่พอค่อยเปิดขึ้น */
+    position-try-order: normal;
+    position-try-fallbacks: --picker-above;
+  }
+  /* เปิดขึ้นด้านบน: ใช้แทน flip-block ที่จะสลับ margin 90px ไปไว้ระหว่างเมนูกับกล่อง */
+  @position-try --picker-above {
+    position-area: block-start span-inline-end;
+    margin: 0 0 4px;
   }
   select option {
     padding: 8px 12px;
     border-radius: 4px;
     cursor: pointer;
   }
-  select option:hover,
-  select option:focus-visible {
+  select option:hover {
+    background: var(--reset-hover);
+  }
+  /* สีเข้มตามตัวที่ keyboard อยู่ ถ้าเปิดด้วยเมาส์ (ไม่มี focus-visible) ให้เข้มที่ค่าที่เลือกไว้ */
+  select option:focus-visible,
+  select:not(:has(option:focus-visible)) option:checked {
     background: var(--button-bg);
     color: var(--button-text);
+    outline: none;
   }
   select option::checkmark {
     display: none;
+  }
+  /* ล็อก scroll ตอนเมนูเปิด ไม่ให้เลื่อนจนกล่องไปอยู่หลังแถบปุ่มล่างแต่เมนูยังค้างอยู่ */
+  html:has(select:open) {
+    overflow: hidden;
   }
 }
 input:focus,
