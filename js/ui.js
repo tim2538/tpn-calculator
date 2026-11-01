@@ -217,6 +217,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
     if (input.tagName === "SELECT") {
+      // มือถือ: แตะกล่องตอนเมนูเปิด เมนูปิดตั้งแต่ pointerup แล้ว mousedown ที่ตามมาจะเปิดใหม่
+      let closeOnTap = false;
+      input.addEventListener("pointerdown", function (e) {
+        closeOnTap = e.pointerType !== "mouse" && e.target === this && isSelectPickerOpen(this);
+      });
+      input.addEventListener("mousedown", function (e) {
+        if (closeOnTap && e.target === this) e.preventDefault();
+        closeOnTap = false;
+      });
       input.addEventListener("change", function () {
         setTimeout(() => {
           const nextInput = getNextInput(this);
