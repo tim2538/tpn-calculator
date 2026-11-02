@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById("weight").addEventListener("input", calculateBMI);
 document.getElementById("height").addEventListener("input", calculateBMI);
 
-function handleCalculate() {
+function handleCalculate(opts = {}) {
   const requiredFields = document.querySelectorAll(".required-field");
   let firstEmptyField = null;
   let hasError = false;
@@ -195,7 +195,7 @@ function handleCalculate() {
     });
     return;
   }
-  calculate();
+  calculate(opts);
 }
 
 // เปิดเมนู dropdown สำเร็จหรือไม่ (เบราว์เซอร์ที่ไม่มี showPicker คืน false)
@@ -1250,6 +1250,33 @@ if (history.state && history.state.backDepth) history.go(-history.state.backDept
 // ── QR Code Scanner ──
 let qrScanStream = null;
 let qrScanActive = false;
+// ต้องตรงกับ payload ใน downloadQRCode (js/export.js)
+const QR_FIELDS = [
+  "id", "name", "weight", "height", "clinicalStatus", "venousAccess",
+  "protein", "proteinProduct", "dextrose", "infusionDuration", "lipid", "ivleHours",
+  "acetateMode", "na", "k", "cl", "ca", "mg", "po4",
+  "cernevit", "soluvit", "bComplex", "addamel",
+];
+
+function saveQRAutoCalculate(input) {
+  localStorage.setItem("qrAutoCalculate", input.checked);
+}
+
+function applyScannedQR(code) {
+  const data = JSON.parse(code.data);
+  fillPatientFromQR(data);
+  closeQRScanner();
+  if (!document.getElementById("qrAutoCalculate").checked) return;
+  // ช่องที่ QR ไม่มีจะคงค่าเดิมในฟอร์ม ซึ่งอาจเป็นของผู้ป่วยคนก่อน
+  const missing = QR_FIELDS.filter((key) => data[key] === undefined || data[key] === null);
+  if (missing.length > 0) {
+    alert(
+      `QR Code มีข้อมูลไม่ครบ (${missing.join(", ")}) จึงยังไม่คำนวณ\nกรุณาตรวจสอบค่าในฟอร์ม แล้วกด "คำนวณ TPN"`,
+    );
+    return;
+  }
+  handleCalculate({ scroll: false });
+}
 
 function openQRScanner() {
   const modal = document.getElementById("qrScannerModal");
@@ -1257,6 +1284,8 @@ function openQRScanner() {
   document.body.style.overflow = "hidden";
   pushBackLayer("qr", hideQRScanner);
   qrScanActive = true;
+  document.getElementById("qrAutoCalculate").checked =
+    localStorage.getItem("qrAutoCalculate") === "true";
   document.getElementById("qrStatus").textContent = "กำลังเปิดกล้อง...";
   lucide.createIcons();
 
@@ -1294,8 +1323,7 @@ function scanQRFrame() {
     const code = jsQR(img.data, img.width, img.height);
     if (code) {
       try {
-        fillPatientFromQR(JSON.parse(code.data));
-        closeQRScanner();
+        applyScannedQR(code);
         return;
       } catch (_) {
         document.getElementById("qrStatus").textContent =
@@ -1322,8 +1350,7 @@ function scanQRFromImage(input) {
     URL.revokeObjectURL(img.src);
     if (code) {
       try {
-        fillPatientFromQR(JSON.parse(code.data));
-        closeQRScanner();
+        applyScannedQR(code);
       } catch (_) {
         status.textContent = "QR Code ไม่ถูกรูปแบบ";
       }

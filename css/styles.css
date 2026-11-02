@@ -1424,6 +1424,10 @@ select:focus-visible {
   font-weight: 600;
   color: var(--text-primary);
 }
+/* ระยะห่างมาจาก gap ของ modal */
+.qr-auto-calculate {
+  margin-bottom: 0;
+}
 
 .qr-close-btn {
   background: var(--reset-bg);
