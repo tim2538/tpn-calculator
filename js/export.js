@@ -525,7 +525,7 @@ function drawExportCanvas(canvas, method) {
 
 function downloadQRCode() {
   const get = (id) => document.getElementById(id);
-  const payload = JSON.stringify({
+  const payload = encodeQRPayload({
     id: get("patientId").value.trim(),
     name: get("patientName").value.trim(),
     weight: parseFloat(get("weight").value) || 0,

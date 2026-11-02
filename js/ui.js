@@ -1265,13 +1265,87 @@ const QR_FIELDS = [
   "acetateMode", "na", "k", "cl", "ca", "mg", "po4",
   "cernevit", "soluvit", "bComplex", "addamel",
 ];
+// QR แบบ V1: "V1:ID6512345:NM...:WT62.5:..." key 2 ตัวอักษร เรียงลำดับใดก็ได้
+// เพิ่ม key ได้ แต่ห้ามเปลี่ยนความหมายของ key/รหัสเดิม เพราะ QR ที่พิมพ์ไปแล้วจะอ่านผิด
+const QR_KEYS = {
+  ID: "id", NM: "name", WT: "weight", HT: "height", CS: "clinicalStatus",
+  VA: "venousAccess", PR: "protein", PP: "proteinProduct", DX: "dextrose",
+  DU: "infusionDuration", LP: "lipid", LH: "ivleHours", AC: "acetateMode",
+  NA: "na", KK: "k", CL: "cl", CA: "ca", MG: "mg", PO: "po4", AD: "additives",
+};
+// รหัสตัวอักษรของ dropdown ("" = ยังไม่เลือก)
+const QR_CODES = {
+  clinicalStatus: { stable: "S", critical: "C", "": "" },
+  venousAccess: { central: "C", peripheral: "P", "": "" },
+  proteinProduct: { amiparen: "A", aminoplasmal: "M", "": "" },
+  acetateMode: { yes: "Y", no: "N" },
+};
+// รหัส 1 ตัวอักษร (A-Z, 0-9) ต่อ additive "AD" ตามด้วยรหัสของตัวที่ติ๊ก เรียงลำดับใดก็ได้ เช่น ADCA
+// สลับ/เพิ่ม/ลบรายการได้ แต่ห้ามเปลี่ยนรหัสเดิมหรือใช้รหัสซ้ำ
+const QR_ADDITIVES = { cernevit: "C", soluvit: "S", bComplex: "B", addamel: "A" };
+const QR_TEXT_FIELDS = ["id", "name"];
+
+// รับ object รูปเดียวกับ QR JSON เดิม คืนข้อความ "V1:..."
+function encodeQRPayload(d) {
+  // escape เฉพาะ % และตัวคั่น ชื่อไทยจึงไม่ยาวขึ้น
+  const esc = (s) => String(s).replace(/%/g, "%25").replace(/:/g, "%3A");
+  const parts = ["V1"];
+  Object.entries(QR_KEYS).forEach(([key, field]) => {
+    let val;
+    if (field === "additives") {
+      val = Object.keys(QR_ADDITIVES).filter((f) => d[f]).map((f) => QR_ADDITIVES[f]).join("");
+    } else if (QR_TEXT_FIELDS.includes(field)) {
+      val = esc(d[field]);
+    } else if (QR_CODES[field]) {
+      val = QR_CODES[field][d[field]];
+    } else {
+      val = String(d[field]);
+    }
+    // ค่าที่ไม่มีรหัสไม่ใส่ key ตอนอ่านจะเป็นช่องที่ขาด และ auto calculate ถูกบล็อก
+    if (val !== undefined) parts.push(key + val);
+  });
+  return parts.join(":");
+}
+
+// อ่านได้ทั้ง QR JSON เดิมและ v1 คืน object key เดียวกัน ค่าที่อ่านไม่ได้เป็น undefined
+function decodeQRPayload(text) {
+  if (text.startsWith("{")) return JSON.parse(text);
+  if (!text.startsWith("V1:")) throw new Error("unknown QR format");
+  const d = {};
+  const seen = new Set();
+  text.slice(3).split(":").forEach((part) => {
+    if (!part) return;
+    const key = part.slice(0, 2);
+    const val = part.slice(2);
+    // key ซ้ำไม่เดาว่าค่าไหนถูก
+    if (seen.has(key)) throw new Error("duplicate QR key " + key);
+    seen.add(key);
+    const field = QR_KEYS[key];
+    if (!field) return;
+    if (field === "additives") {
+      const known = Object.values(QR_ADDITIVES);
+      // มีรหัสที่เวอร์ชันนี้ไม่รู้จัก: ไม่เติมเลย ดีกว่าเติมไม่ครบ
+      if ([...val].some((code) => !known.includes(code))) return;
+      Object.keys(QR_ADDITIVES).forEach((f) => (d[f] = val.includes(QR_ADDITIVES[f])));
+    } else if (QR_TEXT_FIELDS.includes(field)) {
+      d[field] = val.replace(/%(25|3A)/gi, (_, hex) => (hex === "25" ? "%" : ":"));
+    } else if (QR_CODES[field]) {
+      const value = Object.keys(QR_CODES[field]).find((k) => QR_CODES[field][k] === val);
+      if (value !== undefined) d[field] = value;
+    } else {
+      const n = Number(val);
+      if (val !== "" && Number.isFinite(n)) d[field] = n;
+    }
+  });
+  return d;
+}
 
 function saveQRAutoCalculate(input) {
   localStorage.setItem("qrAutoCalculate", input.checked);
 }
 
 function applyScannedQR(code) {
-  const data = JSON.parse(code.data);
+  const data = decodeQRPayload(code.data);
   fillPatientFromQR(data);
   closeQRScanner();
   if (!document.getElementById("qrAutoCalculate").checked) return;
