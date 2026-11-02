@@ -126,10 +126,10 @@ Lipid is infused separately (IVLE bag); volumes are shown combined for reference
 
 ---
 
-### 4. Osmolarity
+### 4. Total Osmoles
 
 ```
-Osmolarity (mOsm) =
+Total Osmoles (mOsm) =
   (Protein Sol mL × AA_factor)   ← product-specific
   + Dextrose (g) × 5
   + Na_other (mEq) × 2           ← Na not from Glycophos
@@ -150,21 +150,28 @@ AA_factor:
 
 ---
 
-### 5. Peripheral Dilution (when needed)
+### 5. Osmolarity (mOsm/L)
 
-Osmolarity from Section 4 is a total (mOsm). It is first converted to a concentration
-using the volume **without lipid** (V₁), separately for each method:
+Total Osmoles from Section 4 (mOsm) is converted to a concentration using the volume
+**without lipid** (V₁), separately for each method:
 
 ```
-N₁ (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V₁
+N₁ (mOsm/L) = Total Osmoles (mOsm) × 1000 ÷ V₁
   V₁ = Total Volume I  (Method 1)  or  Total Volume II (Method 2)
 ```
 
-Dilution is triggered per method when `N₁ > 900 mOsm/L` AND venous access is `peripheral`.
+The result card shows N₁ as `Vol I / Vol II` (before dilution).
+This is the value compared with 900 mOsm/L in Section 6 and in the alerts.
+
+---
+
+### 6. Peripheral Dilution (when needed)
+
+Dilution is triggered per method when `N₁ (Section 5) > 900 mOsm/L` AND venous access is `peripheral`.
 It uses N₁V₁ = N₂V₂ with N₂ = 900 mOsm/L:
 
 ```
-V₂ (mL)          = N₁ × V₁ ÷ 900        (= Osmolarity × 1000 ÷ 900)
+V₂ (mL)          = N₁ × V₁ ÷ 900        (= Total Osmoles × 1000 ÷ 900)
 Extra Water (mL) = V₂ − V₁
 ```
 
@@ -172,7 +179,7 @@ If central line or N₁ ≤ 900, effective volume equals the total volume direct
 
 ---
 
-### 5a. Rate I and Rate II
+### 7. Rate I and Rate II
 
 Both methods produce a rate. Each uses its own effective volume:
 
@@ -188,7 +195,7 @@ Both rates are displayed as large text in the right panel and the PNG export sho
 
 ---
 
-### 6. Glucose Infusion Rate (GIR)
+### 8. Glucose Infusion Rate (GIR)
 
 ```
 GIR (mg/kg/min) = (Dextrose (g) × 1000) ÷ (Weight (kg) × Duration (hr) × 60)
@@ -205,7 +212,7 @@ Exceeding threshold → warning: risk of hyperglycemia and hepatic steatosis.
 
 ---
 
-### 7. Total Calories
+### 9. Total Calories
 
 ```
 Calories (kcal) = (Protein (g) × 4) + (Dextrose (g) × 3.4) + (Lipid (g) × 10)
@@ -213,7 +220,7 @@ Calories (kcal) = (Protein (g) × 4) + (Dextrose (g) × 3.4) + (Lipid (g) × 10)
 
 ---
 
-### 8. IVLE (Lipid) Infusion Rates
+### 10. IVLE (Lipid) Infusion Rates
 
 ```
 IVLE Hourly (g/kg/hr) = Lipid (g) ÷ Weight (kg) ÷ IVLE Duration (hr)
@@ -229,7 +236,7 @@ Safety limits:
 
 ---
 
-### 9. Calcium–Phosphate Compatibility
+### 11. Calcium–Phosphate Compatibility
 
 All four checks are evaluated per method, using concentrations per litre of the Effective Volume
 (V₂ when peripheral dilution applies, otherwise Total Volume; central line is never diluted).
@@ -264,12 +271,12 @@ V_target (mL) = ceil(V_req)                            (only when check 1, 2 or 
 SWI add (mL)  = V_target − V_eff                       (on top of the dilution water, if any)
 ```
 
-It is advisory only: the main results are unchanged, and the water is added via the custom bag volume in the print modal (Section 12).
+It is advisory only: the main results are unchanged, and the water is added via the custom bag volume in the print modal (Section 14).
 If V_target > 1,200 mL, a warning suggests splitting into 2 bags.
 
 ---
 
-### 10. Chloride Maximum Hint (Acetate Mode)
+### 12. Chloride Maximum Hint (Acetate Mode)
 
 When acetate is enabled, a live hint prevents Cl from creating negative electrolyte volumes:
 
@@ -282,7 +289,7 @@ K₂HPO₄ and Glycophos follow the phosphate source selection in Section 2.
 
 ---
 
-### 11. Split Bags (Peripheral or Central, volume > 1,200 mL)
+### 13. Split Bags (Peripheral or Central, volume > 1,200 mL)
 
 Triggered when `venous access = peripheral or central` AND `max(effectiveVolume, effectiveVolume2) > 1,200 mL`.
 For central line there is no dilution, so this equals `max(totalVolume1, totalVolume2)`.
@@ -323,7 +330,7 @@ The phosphate source selection (Section 2) is applied per bag with K/2 and PO₄
 vol_Bag (mL) = (Protein Solution ÷ 2) + (Dextrose Solution ÷ 2) + Σ Electrolyte Vol (bag)
 ```
 
-#### Per-bag osmolarity
+#### Per-bag total osmoles
 
 Same formula as Section 4, applied to each bag's own inputs.
 `aminoAcidOsmolarity` is halved; Ca/Mg follow the selected mode.
@@ -365,7 +372,7 @@ PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)
 ```
 
-The same four criteria and sterile water recommendation from Section 9 apply (with Ca_A, PO₄ ÷ 2 and effVol_BagA); the warning is shown when V_target > 1,200 mL per bag.
+The same four criteria and sterile water recommendation from Section 11 apply (with Ca_A, PO₄ ÷ 2 and effVol_BagA); the warning is shown when V_target > 1,200 mL per bag.
 When the bags are split, the single-bag Ca–PO₄ section is hidden; the check is shown only per bag at the bottom of the split section, titled with V₂ when the bag is diluted.
 
 - `separate`: Bag B has Ca = 0 → no precipitation risk.
@@ -373,7 +380,7 @@ When the bags are split, the single-bag Ca–PO₄ section is hidden; the check 
 
 ---
 
-### 12. Custom Bag Volume & Final Osmolarity (Print)
+### 14. Custom Bag Volume & Final Osmolarity (Print)
 
 In the print preview, each label (one per bag when split, per method) has a total-volume input.
 The calculated volume is the **minimum**; a larger value is filled up with sterile water.
@@ -386,12 +393,12 @@ V_final = max(V_custom, V_min)                              (default V_min)
 
 Sterile Water (mL)      = V_final − V_base
 Rate (mL/hr)            = V_final ÷ Infusion Duration
-Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final
+Final Osmolarity (mOsm/L) = Total Osmoles (mOsm) × 1000 ÷ V_final
 ```
 
-Single bag uses Osmolarity from Section 4; split bags use `osm_Bag` from Section 11.
+Single bag uses Total Osmoles from Section 4; split bags use `osm_Bag` from Section 13.
 The label shows **Total volume** and **Osmolarity (mOsm/L)** under the Rate.
-When the Ca–PO₄ check recommends more water (Section 9), the input shows a hint with V_target; the default stays V_min.
+When the Ca–PO₄ check recommends more water (Section 11), the input shows a hint with V_target; the default stays V_min.
 In split mode the hint is shown for Bag A, and for Bag B only in `equal` mode.
 Custom values reset whenever the calculation is re-run.
 
@@ -405,11 +412,11 @@ Custom values reset whenever the calculation is re-run.
 | Total Volume II      | Protein + Dextrose + Electrolyte (NaCl method)   | mL        |
 | Volume I with Lipid  | Total Volume I + Lipid Sol                       | mL        |
 | Volume II with Lipid | Total Volume II + Lipid Sol                      | mL        |
-| Osmolarity           | AA + Dextrose×5 + Na_other×2 + Na_glycophos×3 + K×2 + Mg×1 + Ca×1.4 | mOsm |
-| N₁                   | Osmolarity × 1000 ÷ Vol (per method, no lipid)   | mOsm/L    |
+| Total Osmoles        | AA + Dextrose×5 + Na_other×2 + Na_glycophos×3 + K×2 + Mg×1 + Ca×1.4 | mOsm |
+| Osmolarity (N₁)      | Total Osmoles × 1000 ÷ Vol (per method, no lipid) | mOsm/L   |
 | V₂ (diluted)         | N₁ × Vol ÷ 900 (per method)                      | mL        |
 | Extra Water          | V₂ − Vol (per method; printed on label)          | mL        |
-| Final Osmolarity     | Osmolarity × 1000 ÷ V_final (label)              | mOsm/L    |
+| Final Osmolarity     | Total Osmoles × 1000 ÷ V_final (label)           | mOsm/L    |
 | Rate I               | Effective Volume I ÷ Duration  (K₂HPO₄ method)   | mL/hr     |
 | Rate II              | Effective Volume II ÷ Duration (NaCl method)      | mL/hr     |
 | GIR                  | Dextrose×1000 ÷ (Weight×Duration×60)             | mg/kg/min |

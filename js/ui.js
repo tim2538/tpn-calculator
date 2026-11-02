@@ -538,6 +538,8 @@ function calculate(opts = {}) {
     document.getElementById("totalVolume2").textContent =
       totalVolume2.toFixed(1);
     document.getElementById("osmolarity").textContent = osmolarity.toFixed(0);
+    document.getElementById("osmPerL").textContent =
+      `${osmPerL1.toFixed(0)} / ${osmPerL2.toFixed(0)}`;
     document.getElementById("gir").textContent = gir.toFixed(2);
     document.getElementById("totalCalories").textContent =
       totalCalories.toFixed(0);
@@ -641,9 +643,15 @@ function calculate(opts = {}) {
       <div class="formula-label">สูตร:</div>
       <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
       <div class="formula-calculation">${aaOsmLabel} + (${dextrose} × 5) + ${naFormulaCalc} + (${k} × 2) + (${mg} × 1) + (${ca} × 1.4) = ${osmolarity.toFixed(0)} mOsm</div>
-      <div class="formula-label">mOsm/L (N₁) = mOsm × 1000 ÷ V₁ (ไม่รวม IVLE):</div>
-      <div class="formula-calculation">Vol I: ${osmolarity.toFixed(0)} × 1000 ÷ ${totalVolume1.toFixed(1)} = ${osmPerL1.toFixed(0)} mOsm/L</div>
-      <div class="formula-calculation">Vol II: ${osmolarity.toFixed(0)} × 1000 ÷ ${totalVolume2.toFixed(1)} = ${osmPerL2.toFixed(0)} mOsm/L</div>
+    `;
+    const osmLine = (label, v1, n1, v2, dil) => `
+      <div class="formula-calculation">${label}: ${osmolarity.toFixed(0)} × 1000 ÷ ${v1.toFixed(1)} = ${n1.toFixed(0)} mOsm/L</div>
+      ${dil ? `<div class="formula-calculation">${label} หลังเจือจาง: ${osmolarity.toFixed(0)} × 1000 ÷ ${v2.toFixed(1)} = ${((osmolarity * 1000) / v2).toFixed(0)} mOsm/L</div>` : ""}`;
+    document.getElementById("formula-osmPerL").innerHTML = `
+      <div class="formula-label">สูตร (N₁):</div>
+      <div class="formula-calculation">Total Osmoles × 1000 ÷ V₁ (ไม่รวม IVLE)</div>
+      ${osmLine("Vol I", totalVolume1, osmPerL1, effectiveVolume, needsDilution1)}
+      ${osmLine("Vol II", totalVolume2, osmPerL2, effectiveVolume2, needsDilution2)}
     `;
     document.getElementById("formula-gir").innerHTML = `
       <div class="formula-label">สูตร:</div>
@@ -1073,7 +1081,7 @@ function calculate(opts = {}) {
             </div>
           </div>
           <div class="electrolyte-formula ${showClass}">
-            <div class="formula-label">สูตร Osmolarity ต่อถุง:</div>
+            <div class="formula-label">สูตร Total Osmoles ต่อถุง:</div>
             <div class="formula-calculation">(AA Vol × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (Dextrose × 5) + ${naFormulaLabel} + (K × 2) + (Mg × 1) + (Ca × 1.4)</div>
             <div class="formula-calculation">(${pSol.toFixed(1)} × ${proteinProduct === "amiparen" ? "0.960" : "1.290"}) + (${dextrose / 2} × 5) + ${bagNaCalc} + (${k2} × 2) + (${mgX} × 1) + (${caX} × 1.4) = ${osm.toFixed(0)} mOsm</div>
             ${needsDil ? `<div class="formula-label">ก่อนเจือจาง:</div>` : ""}

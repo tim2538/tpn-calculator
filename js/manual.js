@@ -10,16 +10,17 @@ const MANUAL_TOC = [
   ["manual-s1", "1. Macronutrient Solution Volumes"],
   ["manual-s2", "2. Electrolyte Solution Volumes"],
   ["manual-s3", "3. Total Volumes"],
-  ["manual-s4", "4. Osmolarity"],
-  ["manual-s5", "5. Peripheral Dilution"],
-  ["manual-s5a", "5a. Rate I และ Rate II"],
-  ["manual-s6", "6. Glucose Infusion Rate (GIR)"],
-  ["manual-s7", "7. Total Calories"],
-  ["manual-s8", "8. IVLE (Lipid) Infusion Rates"],
-  ["manual-s9", "9. Calcium–Phosphate Compatibility"],
-  ["manual-s10", "10. Chloride Maximum Hint (Acetate Mode)"],
-  ["manual-s11", "11. Split Bags (> 1,200 mL)"],
-  ["manual-s12", "12. Custom Bag Volume & Final Osmolarity (Print)"],
+  ["manual-s4", "4. Total Osmoles"],
+  ["manual-s5", "5. Osmolarity (mOsm/L)"],
+  ["manual-s6", "6. Peripheral Dilution"],
+  ["manual-s7", "7. Rate I และ Rate II"],
+  ["manual-s8", "8. Glucose Infusion Rate (GIR)"],
+  ["manual-s9", "9. Total Calories"],
+  ["manual-s10", "10. IVLE (Lipid) Infusion Rates"],
+  ["manual-s11", "11. Calcium–Phosphate Compatibility"],
+  ["manual-s12", "12. Chloride Maximum Hint (Acetate Mode)"],
+  ["manual-s13", "13. Split Bags (> 1,200 mL)"],
+  ["manual-s14", "14. Custom Bag Volume & Final Osmolarity (Print)"],
   ["manual-outputs", "สรุปผลลัพธ์ (Outputs Summary)"],
   ["manual-alerts", "เงื่อนไขการแจ้งเตือน (Safety Alert Logic)"],
 ];
@@ -121,8 +122,8 @@ Volume I  with Lipid (mL) = Total Volume I  + Lipid Sol
 Volume II with Lipid (mL) = Total Volume II + Lipid Sol</pre>
 <p>Lipid ให้แยกถุง (ถุง IVLE) ปริมาตรรวม lipid แสดงไว้เพื่ออ้างอิงเท่านั้น</p>
 
-<h3 id="manual-s4">4. Osmolarity</h3>
-<pre>Osmolarity (mOsm) =
+<h3 id="manual-s4">4. Total Osmoles</h3>
+<pre>Total Osmoles (mOsm) =
   (Protein Sol mL × AA_factor)   ← product-specific
   + Dextrose (g) × 5
   + Na_other (mEq) × 2           ← Na not from Glycophos
@@ -140,16 +141,20 @@ AA_factor:
   Amiparen 10%:    0.960 mOsm/mL  (960 mOsm/L)
   Aminoplasmal 15%: 1.290 mOsm/mL (1290 mOsm/L)</pre>
 
-<h3 id="manual-s5">5. Peripheral Dilution (เมื่อจำเป็น)</h3>
-<p>Osmolarity จากหัวข้อ 4 เป็นค่ารวม (mOsm) ต้องแปลงเป็นความเข้มข้นก่อน โดยใช้ปริมาตร<strong>ไม่รวม lipid</strong> (V₁) แยกคำนวณแต่ละวิธี</p>
-<pre>N₁ (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V₁
+<h3 id="manual-s5">5. Osmolarity (mOsm/L)</h3>
+<p>Total Osmoles จากหัวข้อ 4 (mOsm) แปลงเป็นความเข้มข้นโดยใช้ปริมาตร<strong>ไม่รวม lipid</strong> (V₁) แยกคำนวณแต่ละวิธี</p>
+<pre>N₁ (mOsm/L) = Total Osmoles (mOsm) × 1000 ÷ V₁
   V₁ = Total Volume I  (Method 1)  or  Total Volume II (Method 2)</pre>
-<p>เจือจางแยกตามวิธี เมื่อ <code>N₁ &gt; 900 mOsm/L</code> และ venous access เป็น <code>peripheral</code> ใช้ N₁V₁ = N₂V₂ โดย N₂ = 900 mOsm/L</p>
-<pre>V₂ (mL)          = N₁ × V₁ ÷ 900        (= Osmolarity × 1000 ÷ 900)
+<p>การ์ดผลลัพธ์แสดง N₁ เป็น <code>Vol I / Vol II</code> (ก่อนเจือจาง)</p>
+<p>ค่านี้คือค่าที่ใช้เทียบกับ 900 mOsm/L ในหัวข้อ 6 และใน alert</p>
+
+<h3 id="manual-s6">6. Peripheral Dilution (เมื่อจำเป็น)</h3>
+<p>เจือจางแยกตามวิธี เมื่อ <code>N₁ (หัวข้อ 5) &gt; 900 mOsm/L</code> และ venous access เป็น <code>peripheral</code> ใช้ N₁V₁ = N₂V₂ โดย N₂ = 900 mOsm/L</p>
+<pre>V₂ (mL)          = N₁ × V₁ ÷ 900        (= Total Osmoles × 1000 ÷ 900)
 Extra Water (mL) = V₂ − V₁</pre>
 <p>ถ้าเป็น central line หรือ N₁ ≤ 900 ปริมาตรที่ใช้จริง (effective volume) เท่ากับ total volume</p>
 
-<h3 id="manual-s5a">5a. Rate I และ Rate II</h3>
+<h3 id="manual-s7">7. Rate I และ Rate II</h3>
 <p>ทั้งสองวิธีให้ rate ของตัวเอง โดยใช้ effective volume ของวิธีนั้น</p>
 <pre>Effective Volume I  = N₁(I)  &gt; 900 &amp;&amp; peripheral ? N₁(I)  × Total Volume I  ÷ 900 : Total Volume I
 Effective Volume II = N₁(II) &gt; 900 &amp;&amp; peripheral ? N₁(II) × Total Volume II ÷ 900 : Total Volume II
@@ -158,7 +163,7 @@ Rate I  (mL/hr) = Effective Volume I  ÷ Infusion Duration
 Rate II (mL/hr) = Effective Volume II ÷ Infusion Duration</pre>
 <p>rate ทั้งสองค่าแสดงเป็นตัวอักษรขนาดใหญ่ในส่วนผลลัพธ์ ส่วน PNG export แสดง rate ของวิธีที่เลือก</p>
 
-<h3 id="manual-s6">6. Glucose Infusion Rate (GIR)</h3>
+<h3 id="manual-s8">8. Glucose Infusion Rate (GIR)</h3>
 <pre>GIR (mg/kg/min) = (Dextrose (g) × 1000) ÷ (Weight (kg) × Duration (hr) × 60)</pre>
 <p>เกณฑ์ความปลอดภัย</p>
 <div class="manual-table-wrap">
@@ -172,10 +177,10 @@ Rate II (mL/hr) = Effective Volume II ÷ Infusion Duration</pre>
 </div>
 <p>เกินเกณฑ์ → เตือนความเสี่ยง hyperglycemia และ hepatic steatosis</p>
 
-<h3 id="manual-s7">7. Total Calories</h3>
+<h3 id="manual-s9">9. Total Calories</h3>
 <pre>Calories (kcal) = (Protein (g) × 4) + (Dextrose (g) × 3.4) + (Lipid (g) × 10)</pre>
 
-<h3 id="manual-s8">8. IVLE (Lipid) Infusion Rates</h3>
+<h3 id="manual-s10">10. IVLE (Lipid) Infusion Rates</h3>
 <pre>IVLE Hourly (g/kg/hr) = Lipid (g) ÷ Weight (kg) ÷ IVLE Duration (hr)
 IVLE Daily  (g/kg/day) = Lipid (g) ÷ Weight (kg)</pre>
 <p>ขีดจำกัดความปลอดภัย</p>
@@ -189,7 +194,7 @@ IVLE Daily  (g/kg/day) = Lipid (g) ÷ Weight (kg)</pre>
 </table>
 </div>
 
-<h3 id="manual-s9">9. Calcium–Phosphate Compatibility</h3>
+<h3 id="manual-s11">11. Calcium–Phosphate Compatibility</h3>
 <p>ตรวจทั้ง 4 ข้อแยกตามวิธี โดยใช้ความเข้มข้นต่อลิตรของ Effective Volume (V₂ ถ้าเจือจางแบบ peripheral ไม่เช่นนั้นใช้ Total Volume; central line ไม่เจือจาง)</p>
 <pre>V_eff        = Effective Volume I (Method 1)  or  Effective Volume II (Method 2)
 Ca (mEq/L)   = Ca (mEq) ÷ (V_eff ÷ 1000)
@@ -216,16 +221,16 @@ PO₄ (mmol/L) = PO₄ (mmol) ÷ (V_eff ÷ 1000)</pre>
                      √(Ca × 0.5 × PO₄ ÷ 75) ) × 1000   ← check 4
 V_target (mL) = ceil(V_req)                            (only when check 1, 2 or 4 fails)
 SWI add (mL)  = V_target − V_eff                       (on top of the dilution water, if any)</pre>
-<p>เป็นคำแนะนำเท่านั้น ผลลัพธ์หลักไม่เปลี่ยน ให้เติมน้ำผ่านช่องปริมาตร custom ใน print modal (หัวข้อ 12)</p>
+<p>เป็นคำแนะนำเท่านั้น ผลลัพธ์หลักไม่เปลี่ยน ให้เติมน้ำผ่านช่องปริมาตร custom ใน print modal (หัวข้อ 14)</p>
 <p>ถ้า V_target &gt; 1,200 mL จะมีคำเตือนให้พิจารณาแบ่ง 2 ถุง</p>
 
-<h3 id="manual-s10">10. Chloride Maximum Hint (Acetate Mode)</h3>
+<h3 id="manual-s12">12. Chloride Maximum Hint (Acetate Mode)</h3>
 <p>เมื่อเปิด acetate จะมีคำแนะนำแบบ live เพื่อไม่ให้ค่า Cl ทำให้ปริมาตร electrolyte ติดลบ</p>
 <pre>Cl_max = Na + K − K₂HPO₄ − Glycophos×2
        = Na + K − PO₄×2           [since K₂HPO₄ + Glycophos×2 = PO₄×2 in every case]</pre>
 <p>K₂HPO₄ และ Glycophos ใช้การเลือกแหล่ง phosphate ตามหัวข้อ 2</p>
 
-<h3 id="manual-s11">11. Split Bags (Peripheral หรือ Central, volume &gt; 1,200 mL)</h3>
+<h3 id="manual-s13">13. Split Bags (Peripheral หรือ Central, volume &gt; 1,200 mL)</h3>
 <p>แบ่งถุงเมื่อ <code>venous access = peripheral or central</code> และ <code>max(effectiveVolume, effectiveVolume2) &gt; 1,200 mL</code></p>
 <p>central line ไม่มีการเจือจาง ค่านี้จึงเท่ากับ <code>max(totalVolume1, totalVolume2)</code></p>
 <p>Vol I (K₂HPO₄) และ Vol II (NaCl) อาจต่างกันเมื่อใช้ Acetate หรือ Glycophos ถ้าวิธีใดเกิน 1,200 mL จะแบ่งถุงทั้งสองวิธี</p>
@@ -256,7 +261,7 @@ Bag B: calculateElectrolytes(method, Na/2, K/2, Cl/2, Ca_B, Mg_B, PO₄/2, useAc
 <h4>ปริมาตรต่อถุง</h4>
 <pre>vol_Bag (mL) = (Protein Solution ÷ 2) + (Dextrose Solution ÷ 2) + Σ Electrolyte Vol (bag)</pre>
 
-<h4>Osmolarity ต่อถุง</h4>
+<h4>Total Osmoles ต่อถุง</h4>
 <p>ใช้สูตรเดียวกับหัวข้อ 4 กับ input ของแต่ละถุง</p>
 <p><code>aminoAcidOsmolarity</code> ถูกหารครึ่ง ส่วน Ca/Mg เป็นไปตามโหมดที่เลือก</p>
 <pre>osm_Bag (mOsm) = (aminoAcidOsmolarity ÷ 2)
@@ -284,14 +289,14 @@ Ca (mEq/L)   = Ca_A (mEq) ÷ (effVol_BagA ÷ 1000)
 Ca (mmol/L)  = Ca_A (mEq) × 0.5 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mEq/L)  = (PO₄ ÷ 2) × 2 ÷ (effVol_BagA ÷ 1000)
 PO₄ (mmol/L) = (PO₄ ÷ 2) ÷ (effVol_BagA ÷ 1000)</pre>
-<p>ใช้เกณฑ์ 4 ข้อและคำแนะนำเติม sterile water เดียวกับหัวข้อ 9 (ใช้ Ca_A, PO₄ ÷ 2 และ effVol_BagA) คำเตือนขึ้นเมื่อ V_target &gt; 1,200 mL ต่อถุง</p>
+<p>ใช้เกณฑ์ 4 ข้อและคำแนะนำเติม sterile water เดียวกับหัวข้อ 11(ใช้ Ca_A, PO₄ ÷ 2 และ effVol_BagA) คำเตือนขึ้นเมื่อ V_target &gt; 1,200 mL ต่อถุง</p>
 <p>เมื่อแบ่งถุงแล้ว ซ่อนกล่อง Ca–PO₄ ของถุงเดียว แสดงเฉพาะผลตรวจรายถุงที่ท้ายส่วนแบ่งถุง โดยหัวข้อระบุ V₂ เมื่อถุงนั้นเจือจาง</p>
 <ul>
   <li><code>separate</code>: Bag B มี Ca = 0 → ไม่มีความเสี่ยงตกตะกอน</li>
   <li><code>equal</code>: Bag A และ Bag B มีส่วนประกอบเหมือนกัน ตรวจครั้งเดียวครอบคลุมทั้งสองถุง</li>
 </ul>
 
-<h3 id="manual-s12">12. Custom Bag Volume &amp; Final Osmolarity (Print)</h3>
+<h3 id="manual-s14">14. Custom Bag Volume &amp; Final Osmolarity (Print)</h3>
 <p>ใน print preview ฉลากแต่ละใบ (กรณีแบ่งถุงคือถุงละใบ แยกตามวิธี) มีช่องกรอกปริมาตรรวม</p>
 <p>ปริมาตรที่คำนวณได้คือค่า<strong>ขั้นต่ำ</strong> ถ้ากรอกมากกว่านั้น ส่วนที่เกินเติมด้วย sterile water</p>
 <p>มีผลเฉพาะฉลาก (preview, PNG, print) ไม่กระทบผลลัพธ์หลัก</p>
@@ -301,10 +306,10 @@ V_final = max(V_custom, V_min)                              (default V_min)
 
 Sterile Water (mL)      = V_final − V_base
 Rate (mL/hr)            = V_final ÷ Infusion Duration
-Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final</pre>
-<p>ถุงเดียวใช้ Osmolarity จากหัวข้อ 4 ส่วนกรณีแบ่งถุงใช้ <code>osm_Bag</code> จากหัวข้อ 11</p>
+Final Osmolarity (mOsm/L) = Total Osmoles (mOsm) × 1000 ÷ V_final</pre>
+<p>ถุงเดียวใช้ Total Osmoles จากหัวข้อ 4 ส่วนกรณีแบ่งถุงใช้ <code>osm_Bag</code> จากหัวข้อ 13</p>
 <p>ฉลากแสดง <strong>Total volume</strong> และ <strong>Osmolarity (mOsm/L)</strong> ใต้ Rate</p>
-<p>ถ้าการตรวจ Ca–PO₄ แนะนำให้เติมน้ำเพิ่ม (หัวข้อ 9) ช่องกรอกจะแสดง hint ค่า V_target แต่ค่าเริ่มต้นยังเป็น V_min</p>
+<p>ถ้าการตรวจ Ca–PO₄ แนะนำให้เติมน้ำเพิ่ม (หัวข้อ 11) ช่องกรอกจะแสดง hint ค่า V_target แต่ค่าเริ่มต้นยังเป็น V_min</p>
 <p>กรณีแบ่งถุงแสดง hint ที่ Bag A และที่ Bag B เฉพาะโหมด <code>equal</code></p>
 <p>ค่าที่กรอกเองจะถูกล้างทุกครั้งที่กดคำนวณใหม่</p>
 
@@ -317,11 +322,11 @@ Final Osmolarity (mOsm/L) = Osmolarity (mOsm) × 1000 ÷ V_final</pre>
     <tr><td>Total Volume II</td><td>Protein + Dextrose + Electrolyte (NaCl method)</td><td>mL</td></tr>
     <tr><td>Volume I with Lipid</td><td>Total Volume I + Lipid Sol</td><td>mL</td></tr>
     <tr><td>Volume II with Lipid</td><td>Total Volume II + Lipid Sol</td><td>mL</td></tr>
-    <tr><td>Osmolarity</td><td>AA + Dextrose×5 + Na_other×2 + Na_glycophos×3 + K×2 + Mg×1 + Ca×1.4</td><td>mOsm</td></tr>
-    <tr><td>N₁</td><td>Osmolarity × 1000 ÷ Vol (แยกตามวิธี, ไม่รวม lipid)</td><td>mOsm/L</td></tr>
+    <tr><td>Total Osmoles</td><td>AA + Dextrose×5 + Na_other×2 + Na_glycophos×3 + K×2 + Mg×1 + Ca×1.4</td><td>mOsm</td></tr>
+    <tr><td>Osmolarity (N₁)</td><td>Total Osmoles × 1000 ÷ Vol (แยกตามวิธี, ไม่รวม lipid)</td><td>mOsm/L</td></tr>
     <tr><td>V₂ (diluted)</td><td>N₁ × Vol ÷ 900 (แยกตามวิธี)</td><td>mL</td></tr>
     <tr><td>Extra Water</td><td>V₂ − Vol (แยกตามวิธี, พิมพ์บนฉลาก)</td><td>mL</td></tr>
-    <tr><td>Final Osmolarity</td><td>Osmolarity × 1000 ÷ V_final (ฉลาก)</td><td>mOsm/L</td></tr>
+    <tr><td>Final Osmolarity</td><td>Total Osmoles × 1000 ÷ V_final (ฉลาก)</td><td>mOsm/L</td></tr>
     <tr><td>Rate I</td><td>Effective Volume I ÷ Duration (K₂HPO₄ method)</td><td>mL/hr</td></tr>
     <tr><td>Rate II</td><td>Effective Volume II ÷ Duration (NaCl method)</td><td>mL/hr</td></tr>
     <tr><td>GIR</td><td>Dextrose×1000 ÷ (Weight×Duration×60)</td><td>mg/kg/min</td></tr>

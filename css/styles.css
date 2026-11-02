@@ -1827,6 +1827,7 @@ select:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
   /* การ์ดที่แสดง 2 ค่า (วิธีที่ 1 / วิธีที่ 2) กินเต็มแถว */
+  #osmPerLCard,
   #dilutionCard,
   #extraWaterCard {
     grid-column: 1 / -1;
