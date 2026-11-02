@@ -1190,6 +1190,37 @@ function calculate(opts = {}) {
   }
 }
 
+// ── ปุ่ม back ปิด layer ──
+// ไม่ใส่ URL ใน pushState: reload แล้วได้หน้าปกติ ไม่มี hash ค้าง
+const backLayers = [];
+
+function pushBackLayer(name, hide) {
+  if (backLayers.some((layer) => layer.name === name)) return;
+  backLayers.push({ name, hide });
+  history.pushState({ backDepth: backLayers.length }, "");
+}
+
+// ปิดจากปุ่มบนหน้าจอ: ปิดทันที แล้วถอย history ให้ตรงกัน
+function closeBackLayer(name) {
+  const index = backLayers.findIndex((layer) => layer.name === name);
+  if (index < 0) return;
+  const closing = backLayers.splice(index);
+  closing.reverse().forEach((layer) => layer.hide());
+  history.go(-closing.length);
+}
+
+window.addEventListener("popstate", (e) => {
+  const depth = (e.state && e.state.backDepth) || 0;
+  while (backLayers.length > depth) backLayers.pop().hide();
+  // กด forward กลับไป entry ของ layer ที่ปิดแล้ว: ถอยกลับ ไม่เปิดซ้ำ
+  if (depth > backLayers.length) history.go(backLayers.length - depth);
+});
+
+// กันหน้าเลื่อนเองตอนถอย history เช่น หลัง QR เติมค่าแล้วความสูงหน้าเปลี่ยน
+history.scrollRestoration = "manual";
+// reload ตอน modal เปิดอยู่: state ยังค้าง ต้องถอยออก ไม่งั้น back ครั้งถัดไปไม่มีผล
+if (history.state && history.state.backDepth) history.go(-history.state.backDepth);
+
 // ── QR Code Scanner ──
 let qrScanStream = null;
 let qrScanActive = false;
@@ -1198,6 +1229,7 @@ function openQRScanner() {
   const modal = document.getElementById("qrScannerModal");
   modal.classList.add("active");
   document.body.style.overflow = "hidden";
+  pushBackLayer("qr", hideQRScanner);
   qrScanActive = true;
   document.getElementById("qrStatus").textContent = "กำลังเปิดกล้อง...";
   lucide.createIcons();
@@ -1205,6 +1237,11 @@ function openQRScanner() {
   navigator.mediaDevices
     .getUserMedia({ video: { facingMode: "environment" } })
     .then((stream) => {
+      // ปิด dialog ไปก่อนได้กล้อง ไม่งั้นไฟกล้องจะค้าง
+      if (!qrScanActive) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
       qrScanStream = stream;
       const video = document.getElementById("qrVideo");
       video.srcObject = stream;
@@ -1273,6 +1310,10 @@ function scanQRFromImage(input) {
 }
 
 function closeQRScanner() {
+  closeBackLayer("qr");
+}
+
+function hideQRScanner() {
   qrScanActive = false;
   document.getElementById("qrScannerModal").classList.remove("active");
   document.body.style.overflow = "";

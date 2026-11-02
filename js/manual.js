@@ -368,9 +368,14 @@ function openManual() {
   document.getElementById("manualTopBtn").classList.remove("visible");
   document.getElementById("manualModal").classList.add("active");
   document.body.style.overflow = "hidden";
+  pushBackLayer("manual", hideManual);
 }
 
 function closeManual() {
+  closeBackLayer("manual");
+}
+
+function hideManual() {
   document.getElementById("manualModal").classList.remove("active");
   document.body.style.overflow = "";
 }

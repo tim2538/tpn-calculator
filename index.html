@@ -823,6 +823,15 @@
           <button class="qr-close-btn preview-zoom-close" onclick="closePreviewZoom(event)" aria-label="ปิดมุมมองขยาย">
             <i data-lucide="x"></i>
           </button>
+          <div class="preview-zoom-controls">
+            <button class="qr-close-btn" id="previewZoomOut" onclick="changePreviewZoom(event, -PREVIEW_ZOOM_STEP)" aria-label="ย่อฉลาก">
+              <i data-lucide="zoom-out"></i>
+            </button>
+            <span id="previewZoomLevel" aria-live="polite"></span>
+            <button class="qr-close-btn" id="previewZoomIn" onclick="changePreviewZoom(event, PREVIEW_ZOOM_STEP)" aria-label="ขยายฉลาก">
+              <i data-lucide="zoom-in"></i>
+            </button>
+          </div>
         </div>
         <div class="print-modal-actions">
           <button class="btn btn-reset" onclick="downloadQRCode()" title="ดาวน์โหลด QR Code" aria-label="ดาวน์โหลด QR Code">

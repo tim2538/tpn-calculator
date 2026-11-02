@@ -13,6 +13,7 @@ function printReport() {
   // mobile: overlay เป็นตัวเลื่อน และจะจำตำแหน่งเดิมไว้
   modal.scrollTop = 0;
   document.body.style.overflow = "hidden";
+  pushBackLayer("print", hidePrintModal);
   lucide.createIcons();
 }
 
@@ -139,21 +140,62 @@ function onCustomVolumeChange(bagNum, el) {
   }
 }
 
+const PREVIEW_ZOOM_DEFAULT = 200;
+const PREVIEW_ZOOM_MIN = 100;
+const PREVIEW_ZOOM_MAX = 300;
+const PREVIEW_ZOOM_STEP = 50;
+
+function getSavedPreviewZoom() {
+  const saved = Number(localStorage.getItem("previewZoom"));
+  return saved >= PREVIEW_ZOOM_MIN && saved <= PREVIEW_ZOOM_MAX ? saved : PREVIEW_ZOOM_DEFAULT;
+}
+
+function applyPreviewZoom(level) {
+  document.getElementById("printCanvasWrapper").style.setProperty("--preview-zoom", level + "%");
+  document.getElementById("previewZoomLevel").textContent = level + "%";
+  document.getElementById("previewZoomOut").disabled = level <= PREVIEW_ZOOM_MIN;
+  document.getElementById("previewZoomIn").disabled = level >= PREVIEW_ZOOM_MAX;
+}
+
 function openPreviewZoom() {
   if (!window.matchMedia("(max-width: 768px)").matches) return;
+  applyPreviewZoom(getSavedPreviewZoom());
   document.getElementById("printCanvasWrapper").classList.add("zoomed");
+  pushBackLayer("zoom", hidePreviewZoom);
+}
+
+function changePreviewZoom(event, delta) {
+  event.stopPropagation();
+  const level = Math.min(Math.max(getSavedPreviewZoom() + delta, PREVIEW_ZOOM_MIN), PREVIEW_ZOOM_MAX);
+  localStorage.setItem("previewZoom", level);
+  // คงจุดกึ่งกลางจอไว้ที่ตำแหน่งเดิมบนฉลาก
+  const wrapper = document.getElementById("printCanvasWrapper");
+  const centerX = (wrapper.scrollLeft + wrapper.clientWidth / 2) / wrapper.scrollWidth;
+  const centerY = (wrapper.scrollTop + wrapper.clientHeight / 2) / wrapper.scrollHeight;
+  applyPreviewZoom(level);
+  wrapper.scrollTo(
+    centerX * wrapper.scrollWidth - wrapper.clientWidth / 2,
+    centerY * wrapper.scrollHeight - wrapper.clientHeight / 2
+  );
 }
 
 function closePreviewZoom(event) {
   // กันไม่ให้ click bubble ไปเปิดมุมมองขยายซ้ำที่ wrapper
   if (event) event.stopPropagation();
+  closeBackLayer("zoom");
+}
+
+function hidePreviewZoom() {
   const wrapper = document.getElementById("printCanvasWrapper");
   wrapper.classList.remove("zoomed");
   wrapper.scrollTo(0, 0);
 }
 
 function closePrintModal() {
-  closePreviewZoom();
+  closeBackLayer("print");
+}
+
+function hidePrintModal() {
   document.getElementById("printPreviewModal").classList.remove("active");
   document.body.style.overflow = "";
 }
@@ -465,9 +507,8 @@ function drawExportCanvas(canvas, method) {
 
     drawLabel(ctx, W, 0, getLabelParts(r, method, "1"), method, r);
 
-    // Page-break spacer using --background CSS variable
-    const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--background").trim() || "#f3f4f6";
-    ctx.fillStyle = bgColor;
+    // ช่องคั่นถุงใช้สีตาม theme (มีเฉพาะ preview งานพิมพ์และ PNG วาดแยกถุง)
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--bg-primary").trim();
     ctx.fillRect(0, GAP_TOP, W, GAP_H);
 
     drawLabel(ctx, W, BAG2_Y, getLabelParts(r, method, "2"), method, r);

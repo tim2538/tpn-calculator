@@ -625,7 +625,8 @@ input:read-only {
 }
 /* ใช้เฉพาะจอ ≤ 768 (selector 2 ชั้นเพราะ .qr-close-btn ด้านล่างตั้ง display: flex) */
 .print-canvas-wrapper .preview-zoom-hint,
-.print-canvas-wrapper .preview-zoom-close {
+.print-canvas-wrapper .preview-zoom-close,
+.print-canvas-wrapper .preview-zoom-controls {
   display: none;
 }
 .print-modal-actions {
@@ -1623,7 +1624,7 @@ select:focus-visible {
     width: 14px;
     height: 14px;
   }
-  /* มุมมองขยาย: 200% ของจอ ทำให้คอลัมน์ซ้ายหรือขวาของฉลากพอดี 1 จอ */
+  /* มุมมองขยาย: ค่าเริ่มต้น 200% ของจอ ทำให้คอลัมน์ซ้ายหรือขวาของฉลากพอดี 1 จอ */
   .print-preview-modal .print-canvas-wrapper.zoomed {
     position: fixed;
     inset: 0;
@@ -1631,11 +1632,15 @@ select:focus-visible {
     z-index: 2;
     margin: 0;
     border: none;
+    /* สีเดียวกับช่องคั่นถุงใน drawExportCanvas แยกพื้นที่นอกฉลากออกจากฉลากสีขาว */
+    background: var(--bg-primary);
+    /* เลื่อนเลยขอบล่างได้ ปุ่ม zoom จึงไม่บังค่าท้ายฉลาก */
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
     overflow: auto;
     cursor: auto;
   }
   .print-canvas-wrapper.zoomed canvas {
-    width: 200%;
+    width: var(--preview-zoom, 200%);
     max-width: none;
   }
   .print-canvas-wrapper.zoomed .preview-zoom-hint {
@@ -1646,6 +1651,27 @@ select:focus-visible {
     position: fixed;
     top: 12px;
     right: 12px;
+  }
+  .print-canvas-wrapper.zoomed .preview-zoom-controls {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    border-radius: 6px;
+    background: var(--reset-bg);
+    color: var(--text-primary);
+    font-size: 0.9em;
+    /* กันแตะปุ่มรัวแล้วเบราว์เซอร์ double-tap zoom */
+    touch-action: manipulation;
+  }
+  #previewZoomLevel {
+    min-width: 44px;
+    text-align: center;
+  }
+  .preview-zoom-controls .qr-close-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 }
 @media (max-width: 600px) {
