@@ -1491,33 +1491,6 @@ select:focus-visible {
   .fixed-bottom-btn {
     padding: 12px 12px;
   }
-  .fixed-bottom-btn .container-inner {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  .btn {
-    flex: 1;
-    min-width: auto;
-    padding: 14px 16px;
-  }
-  .btn-reset {
-    min-width: 52px !important;
-    width: 52px;
-    padding: 10px;
-    flex: 0 0 52px;
-  }
-  .btn-reset .btn-text {
-    display: none;
-  }
-  .btn-reset .btn-icon-only {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .btn-icon {
-    width: 24px;
-    height: 24px;
-  }
   /* เหลือแต่ icon ขนาดเท่าปุ่มดาวน์โหลดคู่มือ ใช้ title บอกการกระทำ */
   .formula-toggle-main {
     justify-content: center;
@@ -1532,14 +1505,6 @@ select:focus-visible {
   }
   .formula-toggle-main #toggleAllText {
     display: none;
-  }
-  /* ให้เท่าปุ่มกากบาทข้างๆ */
-  .manual-download-btn {
-    min-width: 44px !important;
-    width: 44px;
-    height: 44px;
-    padding: 10px;
-    flex: 0 0 44px;
   }
   .rate-hero .rate-value {
     font-size: 2.5em;
@@ -1673,6 +1638,15 @@ select:focus-visible {
     opacity: 0.4;
     cursor: default;
   }
+  .qr-upload-label {
+    min-height: 44px;
+  }
+}
+/* ปุ่มมีข้อความ 3 ปุ่มต้องพอดี modal เต็มจอที่ 601 px */
+@media (min-width: 601px) and (max-width: 768px) {
+  .print-preview-modal .print-modal-actions .btn {
+    padding-inline: 16px;
+  }
 }
 @media (max-width: 600px) {
   body {
@@ -1682,6 +1656,41 @@ select:focus-visible {
   }
   .fixed-bottom-btn {
     padding: 8px 12px;
+  }
+  .fixed-bottom-btn .container-inner {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .btn {
+    flex: 1;
+    min-width: auto;
+    padding: 14px 16px;
+  }
+  .btn-reset {
+    min-width: 52px !important;
+    width: 52px;
+    padding: 10px;
+    flex: 0 0 52px;
+  }
+  .btn-reset .btn-text {
+    display: none;
+  }
+  .btn-reset .btn-icon-only {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-icon {
+    width: 24px;
+    height: 24px;
+  }
+  /* ให้เท่าปุ่มกากบาทข้างๆ */
+  .manual-download-btn {
+    min-width: 44px !important;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    flex: 0 0 44px;
   }
   /* จอแคบ: ปุ่มแบ่งถุงแบ่งความกว้างเท่ากัน ข้อความยาวตัดบรรทัดในปุ่ม */
   .split-mode-toggle {
