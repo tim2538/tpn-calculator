@@ -422,9 +422,18 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
   scroll-margin-bottom: 120px;
 }
-input:read-only {
+/* ค่าที่ระบบคำนวณให้ ขนาดเท่าช่องกรอก แต่พื้นต่างออกไปและโฟกัสไม่ได้ */
+.readonly-field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  font-size: 1em;
   background: var(--formula-bg);
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 @keyframes shake {
   0%,

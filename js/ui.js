@@ -193,7 +193,7 @@ function isSelectPickerOpen(select) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  const inputs = document.querySelectorAll("input:not([readonly]), select");
+  const inputs = document.querySelectorAll("input, select");
   inputs.forEach((input) => {
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
@@ -323,8 +323,8 @@ function resetForm() {
 }
 
 function getNextInput(currentInput) {
-  const inputs = Array.from(
-    document.querySelectorAll("input:not([readonly]), select"),
+  const inputs = Array.from(document.querySelectorAll("input, select")).filter(
+    (el) => el.getClientRects().length > 0,
   );
   const currentIndex = inputs.indexOf(currentInput);
   return inputs[currentIndex + 1] || null;

@@ -167,7 +167,7 @@
           </div>
           <div class="form-group">
             <label>BMI (kg/m²)</label>
-            <input type="text" id="bmi" disabled />
+            <output id="bmi" class="readonly-field"></output>
           </div>
           <div class="form-group">
             <label>Clinical Status</label>
@@ -345,8 +345,9 @@
               <small id="clMaxHint" class="helper-text"></small>
             </div>
             <div class="form-group hidden" id="clAutoGroup">
-              <label>Cl (mEq) — คำนวณอัตโนมัติ</label>
-              <input type="text" id="clAuto" readonly />
+              <label>Cl (mEq)</label>
+              <output id="clAuto" class="readonly-field"></output>
+              <small class="helper-text">คำนวณอัตโนมัติ</small>
             </div>
             <div class="form-group">
               <label>Ca (mEq)</label>
