@@ -8,7 +8,10 @@ function printReport() {
   renderVolumeInputs();
   const canvas = document.getElementById("previewCanvas");
   drawExportCanvas(canvas, currentPrintMethod);
-  document.getElementById("printPreviewModal").classList.add("active");
+  const modal = document.getElementById("printPreviewModal");
+  modal.classList.add("active");
+  // mobile: overlay เป็นตัวเลื่อน และจะจำตำแหน่งเดิมไว้
+  modal.scrollTop = 0;
   document.body.style.overflow = "hidden";
   lucide.createIcons();
 }
@@ -136,7 +139,21 @@ function onCustomVolumeChange(bagNum, el) {
   }
 }
 
+function openPreviewZoom() {
+  if (!window.matchMedia("(max-width: 768px)").matches) return;
+  document.getElementById("printCanvasWrapper").classList.add("zoomed");
+}
+
+function closePreviewZoom(event) {
+  // กันไม่ให้ click bubble ไปเปิดมุมมองขยายซ้ำที่ wrapper
+  if (event) event.stopPropagation();
+  const wrapper = document.getElementById("printCanvasWrapper");
+  wrapper.classList.remove("zoomed");
+  wrapper.scrollTo(0, 0);
+}
+
 function closePrintModal() {
+  closePreviewZoom();
   document.getElementById("printPreviewModal").classList.remove("active");
   document.body.style.overflow = "";
 }

@@ -794,7 +794,7 @@
       id="printPreviewModal"
       onclick="if (event.target === this) closePrintModal();"
     >
-      <div class="print-modal">
+      <div class="print-modal print-preview-modal">
         <div class="print-modal-header">
           <h3>ตัวอย่างก่อนพิมพ์</h3>
           <div class="print-method-toggle">
@@ -814,8 +814,15 @@
           </button>
         </div>
         <div id="printVolumeInputs" class="print-volume-inputs"></div>
-        <div class="print-canvas-wrapper">
+        <div class="print-canvas-wrapper" id="printCanvasWrapper" onclick="openPreviewZoom()">
           <canvas id="previewCanvas" width="900" height="1200"></canvas>
+          <span class="preview-zoom-hint">
+            <i data-lucide="zoom-in"></i>
+            แตะเพื่อขยาย
+          </span>
+          <button class="qr-close-btn preview-zoom-close" onclick="closePreviewZoom(event)" aria-label="ปิดมุมมองขยาย">
+            <i data-lucide="x"></i>
+          </button>
         </div>
         <div class="print-modal-actions">
           <button class="btn btn-reset" onclick="downloadQRCode()" title="ดาวน์โหลด QR Code" aria-label="ดาวน์โหลด QR Code">

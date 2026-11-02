@@ -623,6 +623,11 @@ input:read-only {
   max-width: 100%;
   height: auto;
 }
+/* ใช้เฉพาะจอ ≤ 768 (selector 2 ชั้นเพราะ .qr-close-btn ด้านล่างตั้ง display: flex) */
+.print-canvas-wrapper .preview-zoom-hint,
+.print-canvas-wrapper .preview-zoom-close {
+  display: none;
+}
 .print-modal-actions {
   display: flex;
   gap: 8px;
@@ -682,6 +687,9 @@ input:read-only {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* margin ลบ padding ของ modal ให้ scrollbar ชิดขอบขวา ข้อความยังเว้นระยะเดิม */
+  margin-right: -24px;
+  padding-right: 24px;
   /* เว้นที่ให้ปุ่มกลับขึ้นบน ไม่ให้ทับข้อความบรรทัดสุดท้าย */
   padding-bottom: 64px;
   color: var(--text-primary);
@@ -1544,6 +1552,101 @@ select:focus-visible {
       "title close"
       "toggle toggle";
   }
+  /* modal เต็มจอ ให้ overlay เลื่อนอย่างเดียว ไม่มี scroll ซ้อนใน canvas */
+  .print-preview-modal,
+  .manual-modal {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    padding: 0 12px;
+  }
+  /* คู่มือเลื่อนใน .manual-body (ปุ่มกลับขึ้นบนและสารบัญอิงตัวนี้) จึงล็อกความสูงเท่าจอ */
+  .manual-modal {
+    height: 100vh;
+    height: 100dvh;
+    gap: 0;
+  }
+  /* ให้ scrollbar ชิดขอบขวาตาม padding ของ modal ที่เหลือ 12 */
+  .manual-body {
+    margin-right: -12px;
+    padding-top: 12px;
+    padding-right: 12px;
+  }
+  .print-preview-modal .print-modal-header,
+  .manual-modal .qr-scanner-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-inline: -12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+  }
+  .print-preview-modal .print-canvas-wrapper {
+    position: relative;
+    flex: none;
+    overflow: visible;
+    margin-inline: -12px;
+    border-width: 1px 0;
+    border-radius: 0;
+    cursor: zoom-in;
+  }
+  /* ปุ่มพิมพ์อยู่ติดขอบล่างเสมอ เพราะฉลาก 2 ถุงยาวเกิน 1 จอ */
+  .print-preview-modal .print-modal-actions {
+    position: sticky;
+    bottom: 0;
+    margin: auto -12px 0;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+  }
+  /* สีเข้มตายตัว เพราะพื้นหลังเป็นฉลากขาวทั้ง light และ dark mode */
+  .print-canvas-wrapper .preview-zoom-hint {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 0.8em;
+    pointer-events: none;
+  }
+  .preview-zoom-hint svg {
+    width: 14px;
+    height: 14px;
+  }
+  /* มุมมองขยาย: 200% ของจอ ทำให้คอลัมน์ซ้ายหรือขวาของฉลากพอดี 1 จอ */
+  .print-preview-modal .print-canvas-wrapper.zoomed {
+    position: fixed;
+    inset: 0;
+    /* ต้องทับ header ที่ sticky */
+    z-index: 2;
+    margin: 0;
+    border: none;
+    overflow: auto;
+    cursor: auto;
+  }
+  .print-canvas-wrapper.zoomed canvas {
+    width: 200%;
+    max-width: none;
+  }
+  .print-canvas-wrapper.zoomed .preview-zoom-hint {
+    display: none;
+  }
+  .print-canvas-wrapper.zoomed .preview-zoom-close {
+    display: flex;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+  }
 }
 @media (max-width: 600px) {
   body {
@@ -1641,6 +1744,17 @@ select:focus-visible {
   }
   .print-modal {
     padding: 16px;
+  }
+  .print-preview-modal,
+  .manual-modal {
+    padding: 0 12px;
+  }
+  /* 2 ช่องอยู่แถวเดียวกันได้ถึงจอ 320 ถุงเดียวยังเต็มแถว */
+  .print-volume-inputs {
+    gap: 8px;
+  }
+  .print-volume-inputs .form-group {
+    flex-basis: 140px;
   }
   .qr-scanner-modal {
     padding: 16px;
