@@ -1,6 +1,31 @@
 let allFormulasVisible = false;
 // PPN split: "separate" = Ca + Mg เต็มในถุงที่ 1, "equal" = Ca + Mg แบ่งครึ่งทั้ง 2 ถุง
 let splitMode = "equal";
+// ค่าฟอร์มตอนคำนวณสำเร็จล่าสุด ใช้ตรวจว่าผลบนจอและฉลากยังตรงกับฟอร์มหรือไม่
+let calculatedSnapshot = null;
+
+function getFormSnapshot() {
+  const fields = document.querySelectorAll(
+    ".section:not(.results) input, .section:not(.results) select",
+  );
+  return JSON.stringify(
+    Array.from(fields, (el) => (el.type === "checkbox" ? el.checked : el.value)),
+  );
+}
+
+function syncStaleState() {
+  const hasResult = Boolean(window.lastResult);
+  const stale = hasResult && getFormSnapshot() !== calculatedSnapshot;
+  document.body.classList.toggle("results-stale", stale);
+  document.getElementById("printBtn").disabled = !hasResult || stale;
+  // สลับโหมดจะคำนวณจากค่าในฟอร์มโดยไม่ผ่าน validation จึงปิดไว้จนกว่าจะกดคำนวณใหม่
+  document.querySelectorAll(".split-mode-toggle button").forEach((btn) => {
+    btn.disabled = stale;
+  });
+}
+
+document.addEventListener("input", syncStaleState);
+document.addEventListener("change", syncStaleState);
 
 function syncSplitModeButtons() {
   document
@@ -313,11 +338,11 @@ function resetForm() {
   document.getElementById("bComplex").checked = false;
   document.getElementById("addamel").checked = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
-  document.getElementById("printBtn").disabled = true;
   document.getElementById("ppnSplitSection").classList.add("hidden");
   splitMode = "equal";
   syncSplitModeButtons();
   window.lastResult = null;
+  syncStaleState();
   document.getElementById("rateHero1").textContent = "-";
   document.getElementById("rateHero2").textContent = "-";
 }
@@ -1182,7 +1207,8 @@ function calculate(opts = {}) {
       needsSplit,
       split: splitData,
     };
-    document.getElementById("printBtn").disabled = false;
+    calculatedSnapshot = getFormSnapshot();
+    syncStaleState();
     lucide.createIcons();
   } catch (error) {
     alert("เกิดข้อผิดพลาดในการคำนวณ: " + error.message);
@@ -1366,4 +1392,5 @@ function fillPatientFromQR(d) {
 
   document.getElementById("weight").dispatchEvent(new Event("input"));
   document.getElementById("height").dispatchEvent(new Event("input"));
+  syncStaleState();
 }

@@ -608,8 +608,11 @@ select:focus {
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.print-method-toggle button:hover:not(.active) {
+.print-method-toggle button:hover:not(.active):not(:disabled) {
   background: var(--reset-hover);
+}
+.print-method-toggle button:disabled {
+  cursor: not-allowed;
 }
 .print-method-toggle button.active {
   background: var(--button-bg);
@@ -969,6 +972,27 @@ select:focus {
 [data-theme="dark"] .alert-danger {
   background: rgba(239, 68, 68, 0.15);
   color: #fca5a5;
+}
+/* input เปลี่ยนหลังคำนวณ: ผลเดิมจางลงและมีแถบเตือนในแถวเดียวกับปุ่มล่าง */
+.stale-notice {
+  display: none;
+  flex: 1;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 0.9em;
+  align-items: center;
+  gap: 6px;
+}
+.stale-notice svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 0;
+}
+body.results-stale .stale-notice {
+  display: flex;
+}
+body.results-stale .section.results {
+  opacity: 0.5;
 }
 .alert-success {
   background: #d1fae5;
@@ -1486,6 +1510,16 @@ select:focus-visible {
     padding: 12px;
     padding-bottom: 90px;
   }
+  body.results-stale {
+    padding-bottom: 130px;
+  }
+  /* แถวเดียวกับปุ่มแล้วข้อความไม่พอดีบรรทัด จึงขึ้นแถวของตัวเองเหนือปุ่ม */
+  .fixed-bottom-btn .container-inner {
+    flex-wrap: wrap;
+  }
+  .stale-notice {
+    flex: 0 0 100%;
+  }
   .content {
     grid-template-columns: 1fr;
     padding: 20px 0;
@@ -1671,6 +1705,10 @@ select:focus-visible {
     padding: 0;
     /* = ความสูงแถบปุ่มล่าง (ปุ่ม 52 + padding 8×2 + border 1) */
     padding-bottom: 69px;
+  }
+  body.results-stale {
+    /* = แถบล่าง 69 + แถบเตือน ~36 + margin 8 */
+    padding-bottom: 113px;
   }
   .fixed-bottom-btn {
     padding: 8px 12px;
