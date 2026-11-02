@@ -316,6 +316,15 @@ body {
   font-size: 0.55em;
   font-weight: 500;
   color: var(--text-secondary);
+  white-space: nowrap;
+}
+/* จอแคบให้หมายเหตุลงบรรทัดใหม่ทั้งก้อน ไม่ตัดกลางข้อความ */
+#ppnSplitTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+  line-height: 1.3;
 }
 .form-group {
   margin-bottom: 16px;
